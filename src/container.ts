@@ -46,7 +46,7 @@ const container = {
         };
     },
 
-    resolve: function <TType extends Constructor & Partial<ConstructorParams> = any>(instanceType: TType, ...args: any[]): TType {
+    resolve: function <TType extends Constructor & Partial<ConstructorParams> = any>(instanceType: TType, ...args: any[]): InstanceType<TType> {
         if (dependencies.has(instanceType)) {
             return makeInstance(instanceType, args);
         }
