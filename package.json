@@ -1,6 +1,6 @@
 {
   "name": "cheap-di",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "JavaScript dependency injection like Autofac in .Net",
   "scripts": {
     "build": "tsc",
@@ -24,5 +24,13 @@
   "bugs": {
     "url": "https://github.com/TomasLight/cheap-di/issues"
   },
-  "homepage": "https://github.com/TomasLight/cheap-di#readme"
+  "homepage": "https://github.com/TomasLight/cheap-di#readme",
+  "keywords": [
+    "dependency",
+    "injection",
+    "dependency injection",
+    "di",
+    "cheap di",
+    "instance type"
+  ]
 }
