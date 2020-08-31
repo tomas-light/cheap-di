@@ -1,4 +1,6 @@
-import { RegisteredInstanceType } from "./registered-instance-type";
+import { Constructor } from "./interfaces/constructor";
+import { ConstructorParams } from "./interfaces/constructor-params";
+import { RegisteredInstanceType } from "./interfaces/registered-instance-type";
 
 const dependencies = new Map<InstanceType<any>, RegisteredInstanceType>();
 
@@ -44,7 +46,7 @@ const container = {
         };
     },
 
-    resolve: function (instanceType: InstanceType<any>, ...args: any[]) {
+    resolve: function <TType extends Constructor & Partial<ConstructorParams> = any>(instanceType: TType, ...args: any[]): TType {
         if (dependencies.has(instanceType)) {
             return makeInstance(instanceType, args);
         }
