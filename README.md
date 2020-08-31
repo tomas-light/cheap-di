@@ -68,7 +68,7 @@ export class Logger {
 ```js
 import { Logger} from './logger';
 
-export class ConsoleLogger {
+export class ConsoleLogger extends Logger {
     constructor(prefix) {
         this.prefix = prefix;
     }
@@ -80,7 +80,7 @@ export class ConsoleLogger {
 ```
 
 You have the repository consumer.
-To allow DI container to inject dependencies in your consumer class you should specify `__constructorParams` static property.
+To allow DI container inject dependencies in your consumer class you should specify `__constructorParams` static property.
 That property should contain instance types array in the order of your constructor.
 
 `user-service.js`
