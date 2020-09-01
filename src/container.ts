@@ -4,19 +4,6 @@ import { RegisteredType } from "./interfaces/registered-type";
 
 const dependencies = new Map<InstanceType<any>, RegisteredType>();
 
-function makeInstance(instanceType: InstanceType<any>, args: any[]) {
-    const implementation = dependencies.get(instanceType);
-    if (typeof implementation !== "function") {
-        return implementation;
-    }
-
-    const injectionParams = implementation.__injectionParams || [];
-    return new implementation(...[
-        ...injectionParams,
-        ...args,
-    ]);
-}
-
 const container = {
     registerType: function (implementationType: InstanceType<RegisteredType>) {
         return {
@@ -47,22 +34,28 @@ const container = {
     },
 
     resolve: function <TType extends Constructor & Partial<ConstructorParams> = any>(type: TType, ...args: any[]): InstanceType<TType> {
+        let implementation: TType | RegisteredType = type;
         if (dependencies.has(type)) {
-            return makeInstance(type, args);
+            implementation = dependencies.get(type) as RegisteredType;
         }
 
-        if (!type.__constructorParams || !Array.isArray(type.__constructorParams)) {
-            throw new Error(`The ${type.name} cannot be resolved by Dependency Injection`);
+        if (typeof implementation !== 'function') {
+            return implementation as InstanceType<TType>;
         }
 
         const dependencyArguments: any[] = [];
-        type.__constructorParams.forEach((type: InstanceType<any>) => {
-            const instance = container.resolve(type);
-            dependencyArguments.push(instance);
-        });
+        if (implementation.__constructorParams) {
+            implementation.__constructorParams.forEach((type: InstanceType<any>) => {
+                const instance = container.resolve(type);
+                dependencyArguments.push(instance);
+            });
+        }
 
-        return new type(...[
+        const injectionParams = (implementation as RegisteredType).__injectionParams || [];
+
+        return new implementation(...[
             ...dependencyArguments,
+            ...injectionParams,
             ...args,
         ]);
     },
