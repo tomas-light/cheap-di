@@ -1,10 +1,11 @@
 import { Constructor } from "./interfaces/constructor";
 import { ConstructorParams } from "./interfaces/constructor-params";
+import { IContainer } from "./interfaces/IContainer";
 import { RegisteredType } from "./interfaces/registered-type";
 
 const dependencies = new Map<InstanceType<any>, RegisteredType>();
 
-const container = {
+const container: IContainer = {
     registerType: function (implementationType: InstanceType<RegisteredType>) {
         return {
             as: (type: any) => {
