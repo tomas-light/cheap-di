@@ -24,8 +24,18 @@ const container: IContainer = {
     },
 
     registerInstance: function (instance: any) {
+        if (instance.constructor) {
+            if (dependencies.has(instance.constructor)) {
+                throw new Error(`The instance type (${instance.constructor.name}) is already registered`);
+            }
+            dependencies.set(instance.constructor, instance);
+        }
+
         return {
             as: (type: any) => {
+                if (instance.constructor) {
+                    dependencies.delete(instance.constructor);
+                }
                 if (dependencies.has(type)) {
                     throw new Error(`The instance type (${type.name}) is already registered`);
                 }

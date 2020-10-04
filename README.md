@@ -92,7 +92,6 @@ export class UserService {
     static __constructorParams = [ UserRepository, Logger ];
 
     constructor(userRepository, logger) {
-        super();
         this.userRepository = userRepository;
         this.logger = logger;
     }
@@ -134,3 +133,5 @@ import { UserService } from './user-service';
 const service = container.resolve(UserService);
 const users = service.list();
 ```
+
+You can see more examples in `cheap-di/src/container.test.ts`
