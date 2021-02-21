@@ -1,276 +1,280 @@
 import { container } from './container';
 
 describe('register type', () => {
-    test('simple', () => {
-        class Service {
-            constructor() {
-                if (new.target === Service) {
-                    throw new Error('Cannot construct Service instance directly');
-                }
-            }
-
-            get() {
-                throw new Error('Not implemented');
-            }
+  test('simple', () => {
+    class Service {
+      constructor() {
+        if (new.target === Service) {
+          throw new Error('Cannot construct Service instance directly');
         }
+      }
 
-        class MyService extends Service {
-            get() {
-                return 'some';
-            }
+      get() {
+        throw new Error('Not implemented');
+      }
+    }
+
+    class MyService extends Service {
+      get() {
+        return 'some';
+      }
+    }
+
+    container.registerType(MyService).as(Service);
+    const service = container.resolve(Service);
+
+    expect(service instanceof Service).toBe(true);
+    expect(service instanceof MyService).toBe(true);
+    expect(service.get()).toBe('some');
+  });
+
+  test('simple with passed arguments', () => {
+    class Service {
+      constructor() {
+        if (new.target === Service) {
+          throw new Error('Cannot construct Service instance directly');
         }
+      }
 
-        container.registerType(MyService).as(Service);
-        const service = container.resolve(Service);
+      get() {
+        throw new Error('Not implemented');
+      }
+    }
 
-        expect(service instanceof Service).toBe(true);
-        expect(service instanceof MyService).toBe(true);
-        expect(service.get()).toBe('some');
-    });
+    class MyService extends Service {
+      private readonly message: string;
 
-    test('simple with passed arguments', () => {
-        class Service {
-            constructor() {
-                if (new.target === Service) {
-                    throw new Error('Cannot construct Service instance directly');
-                }
-            }
+      constructor(message: string) {
+        super();
+        this.message = message;
+      }
 
-            get() {
-                throw new Error('Not implemented');
-            }
+      get() {
+        return this.message;
+      }
+    }
+
+    container.registerType(MyService).as(Service);
+    const service = container.resolve(Service, 'some message');
+
+    expect(service instanceof Service).toBe(true);
+    expect(service instanceof MyService).toBe(true);
+    expect(service.get()).toBe('some message');
+  });
+
+  test('simple with params', () => {
+    class Service {
+      constructor() {
+        if (new.target === Service) {
+          throw new Error('Cannot construct Service instance directly');
         }
+      }
 
-        class MyService extends Service {
-            private readonly message: string;
+      get() {
+        throw new Error('Not implemented');
+      }
+    }
 
-            constructor(message: string) {
-                super();
-                this.message = message;
-            }
+    class MyService extends Service {
+      private readonly message: string;
 
-            get() {
-                return this.message;
-            }
+      constructor(message: string) {
+        super();
+        this.message = message;
+      }
+
+      get() {
+        return this.message;
+      }
+    }
+
+    container.registerType(MyService).as(Service).with('some');
+    const service = container.resolve(Service);
+
+    expect(service instanceof Service).toBe(true);
+    expect(service instanceof MyService).toBe(true);
+    expect(service.get()).toBe('some');
+  });
+
+  test('simple with params and passed arguments', () => {
+    class Service {
+      constructor() {
+        if (new.target === Service) {
+          throw new Error('Cannot construct Service instance directly');
         }
+      }
 
-        container.registerType(MyService).as(Service);
-        const service = container.resolve(Service, 'some message');
+      get() {
+        throw new Error('Not implemented');
+      }
+    }
 
-        expect(service instanceof Service).toBe(true);
-        expect(service instanceof MyService).toBe(true);
-        expect(service.get()).toBe('some message');
-    });
+    class MyService extends Service {
+      private readonly message1: string;
+      private readonly message2: string;
 
-    test('simple with params', () => {
-        class Service {
-            constructor() {
-                if (new.target === Service) {
-                    throw new Error('Cannot construct Service instance directly');
-                }
-            }
+      constructor(message1: string, message2: string) {
+        super();
+        this.message1 = message1;
+        this.message2 = message2;
+      }
 
-            get() {
-                throw new Error('Not implemented');
-            }
-        }
+      get() {
+        return `${this.message1} ${this.message2}`;
+      }
+    }
 
-        class MyService extends Service {
-            private readonly message: string;
+    container.registerType(MyService).as(Service).with('some');
+    const service = container.resolve(Service, 'property');
 
-            constructor(message: string) {
-                super();
-                this.message = message;
-            }
-
-            get() {
-                return this.message;
-            }
-        }
-
-        container.registerType(MyService).as(Service).with('some');
-        const service = container.resolve(Service);
-
-        expect(service instanceof Service).toBe(true);
-        expect(service instanceof MyService).toBe(true);
-        expect(service.get()).toBe('some');
-    });
-
-    test('simple with params and passed arguments', () => {
-        class Service {
-            constructor() {
-                if (new.target === Service) {
-                    throw new Error('Cannot construct Service instance directly');
-                }
-            }
-
-            get() {
-                throw new Error('Not implemented');
-            }
-        }
-
-        class MyService extends Service {
-            private readonly message1: string;
-            private readonly message2: string;
-
-            constructor(message1: string, message2: string) {
-                super();
-                this.message1 = message1;
-                this.message2 = message2;
-            }
-
-            get() {
-                return `${this.message1} ${this.message2}`;
-            }
-        }
-
-        container.registerType(MyService).as(Service).with('some');
-        const service = container.resolve(Service, 'property');
-
-        expect(service instanceof Service).toBe(true);
-        expect(service instanceof MyService).toBe(true);
-        expect(service.get()).toBe('some property');
-    });
+    expect(service instanceof Service).toBe(true);
+    expect(service instanceof MyService).toBe(true);
+    expect(service.get()).toBe('some property');
+  });
 });
 
 describe('register instance', () => {
-    test('simple', () => {
-        class Database {
-            readonly entities: string[];
-            constructor(entities: string[]) {
-                this.entities = entities;
-            }
+  test('simple', () => {
+    class Database {
+      readonly entities: string[];
 
-            list() {
-                return this.entities;
-            }
-        }
+      constructor(entities: string[]) {
+        this.entities = entities;
+      }
 
-        const entities = ['entity 1', 'entity 2'];
-        container.registerInstance(new Database(entities));
-        const database = container.resolve(Database);
+      list() {
+        return this.entities;
+      }
+    }
 
-        expect(database instanceof Database).toBe(true);
-        expect(database.list()).toBe(entities);
-    });
+    const entities = ['entity 1', 'entity 2'];
+    container.registerInstance(new Database(entities));
+    const database = container.resolve(Database);
 
-    test('as other', () => {
-        class Database {
-            readonly entities: string[];
-            constructor(entities: string[]) {
-                this.entities = entities;
-            }
+    expect(database instanceof Database).toBe(true);
+    expect(database.list()).toBe(entities);
+  });
 
-            list() {
-                return this.entities;
-            }
-        }
+  test('as other', () => {
+    class Database {
+      readonly entities: string[];
 
-        class Service {
-            list() {
-                throw new Error('Not implemented');
-            }
-        }
+      constructor(entities: string[]) {
+        this.entities = entities;
+      }
 
-        const entities = ['entity 1', 'entity 2'];
-        container.registerInstance(new Database(entities)).as(Service);
+      list() {
+        return this.entities;
+      }
+    }
 
-        const database = container.resolve(Database);
-        expect(database.list()).toBe(undefined);
+    class Service {
+      list() {
+        throw new Error('Not implemented');
+      }
+    }
 
-        const service = container.resolve(Service);
-        expect(service.list()).toBe(entities);
-    });
+    const entities = ['entity 1', 'entity 2'];
+    container.registerInstance(new Database(entities)).as(Service);
+
+    const database = container.resolve(Database);
+    expect(database.list()).toBe(undefined);
+
+    const service = container.resolve(Service);
+    expect(service.list()).toBe(entities);
+  });
 });
 
 describe('nested resolve', () => {
-    test('resolve service', () => {
-        class Database {
-            readonly entities: string[];
-            constructor(entities: string[]) {
-                this.entities = entities;
-            }
-        }
+  test('resolve service', () => {
+    class Database {
+      readonly entities: string[];
 
-        class Repository {
-            static __constructorParams: InstanceType<any>[] = [Database];
-            private db: Database;
+      constructor(entities: string[]) {
+        this.entities = entities;
+      }
+    }
 
-            constructor(db: Database) {
-                this.db = db;
-            }
+    class Repository {
+      static __constructorParams: InstanceType<any>[] = [Database];
+      private db: Database;
 
-            list() {
-                return this.db.entities;
-            }
-        }
+      constructor(db: Database) {
+        this.db = db;
+      }
 
-        class Service {
-            static __constructorParams: InstanceType<any>[] = [Repository];
-            private repository: Repository;
+      list() {
+        return this.db.entities;
+      }
+    }
 
-            constructor(repository: Repository) {
-                this.repository = repository;
-            }
+    class Service {
+      static __constructorParams: InstanceType<any>[] = [Repository];
+      private repository: Repository;
 
-            myList() {
-                const entities = this.repository.list();
-                return entities.concat('service entity');
-            }
-        }
+      constructor(repository: Repository) {
+        this.repository = repository;
+      }
 
-        const entities = ['entity 1', 'entity 2'];
-        container.registerInstance(new Database(entities));
+      myList() {
+        const entities = this.repository.list();
+        return entities.concat('service entity');
+      }
+    }
 
-        const service = container.resolve(Service);
-        const list = service.myList();
-        expect(list).toEqual([
-            'entity 1',
-            'entity 2',
-            'service entity',
-        ]);
-    });
+    const entities = ['entity 1', 'entity 2'];
+    container.registerInstance(new Database(entities));
 
-    test('auto resolve service', () => {
-        class Database {
-            readonly entities: string[];
-            constructor() {
-                this.entities = ['default'];
-            }
-        }
+    const service = container.resolve(Service);
+    const list = service.myList();
+    expect(list).toEqual([
+      'entity 1',
+      'entity 2',
+      'service entity',
+    ]);
+  });
 
-        class Repository {
-            static __constructorParams: InstanceType<any>[] = [Database];
-            private db: Database;
+  test('auto resolve service', () => {
+    class Database {
+      readonly entities: string[];
 
-            constructor(db: Database) {
-                this.db = db;
-            }
+      constructor() {
+        this.entities = ['default'];
+      }
+    }
 
-            defaultList() {
-                return this.db.entities;
-            }
-        }
+    class Repository {
+      static __constructorParams: InstanceType<any>[] = [Database];
+      private db: Database;
 
-        class Service {
-            static __constructorParams: InstanceType<any>[] = [Repository];
-            private repository: Repository;
+      constructor(db: Database) {
+        this.db = db;
+      }
 
-            constructor(repository: Repository) {
-                this.repository = repository;
-            }
+      defaultList() {
+        return this.db.entities;
+      }
+    }
 
-            myList() {
-                const entities = this.repository.defaultList();
-                return entities.concat('service entity');
-            }
-        }
+    class Service {
+      static __constructorParams: InstanceType<any>[] = [Repository];
+      private repository: Repository;
 
-        const service = container.resolve(Service);
-        const list = service.myList();
-        expect(list).toEqual([
-            'default',
-            'service entity',
-        ]);
-    });
+      constructor(repository: Repository) {
+        this.repository = repository;
+      }
+
+      myList() {
+        const entities = this.repository.defaultList();
+        return entities.concat('service entity');
+      }
+    }
+
+    const service = container.resolve(Service);
+    const list = service.myList();
+    expect(list).toEqual([
+      'default',
+      'service entity',
+    ]);
+  });
 });
