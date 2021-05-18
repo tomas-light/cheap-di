@@ -1,13 +1,18 @@
-import { RegisteredType } from './RegisteredType';
+import { Constructor } from './Constructor';
+import { ImplementationType } from './ImplementationType';
+import { RegistrationType } from './RegistrationType';
+
+export type InstanceRegistration<T = any> = { as: (type: Constructor<T>) => void; }
 
 export interface DependencyRegistrator {
-  registerType: (implementationType: InstanceType<RegisteredType>) => {
-    as: (type: any) => {
+  registerType: <TInstance,
+    TImplementationType extends ImplementationType<TInstance>>(implementationType: TImplementationType) => {
+    as: (type: RegistrationType<TInstance>) => {
       with: (...injectionParams: any[]) => void;
     };
   };
 
-  registerInstance: (instance: any) => {
-    as: (type: any) => void;
-  };
+  registerInstance: <TInstance extends Object>(instance: TInstance) => TInstance extends infer TBaseInstance
+    ? InstanceRegistration<TBaseInstance>
+    : never;
 }

@@ -9,7 +9,7 @@ describe('register type', () => {
         }
       }
 
-      get() {
+      get(): string {
         throw new Error('Not implemented');
       }
     }
@@ -21,7 +21,7 @@ describe('register type', () => {
     }
 
     container.registerType(MyService).as(Service);
-    const service = container.resolve(Service);
+    const service = container.resolve(Service)!;
 
     expect(service instanceof Service).toBe(true);
     expect(service instanceof MyService).toBe(true);
@@ -36,7 +36,7 @@ describe('register type', () => {
         }
       }
 
-      get() {
+      get(): string {
         throw new Error('Not implemented');
       }
     }
@@ -55,7 +55,7 @@ describe('register type', () => {
     }
 
     container.registerType(MyService).as(Service);
-    const service = container.resolve(Service, 'some message');
+    const service = container.resolve(Service, 'some message')!;
 
     expect(service instanceof Service).toBe(true);
     expect(service instanceof MyService).toBe(true);
@@ -70,7 +70,7 @@ describe('register type', () => {
         }
       }
 
-      get() {
+      get(): string {
         throw new Error('Not implemented');
       }
     }
@@ -89,7 +89,7 @@ describe('register type', () => {
     }
 
     container.registerType(MyService).as(Service).with('some');
-    const service = container.resolve(Service);
+    const service = container.resolve(Service)!;
 
     expect(service instanceof Service).toBe(true);
     expect(service instanceof MyService).toBe(true);
@@ -104,7 +104,7 @@ describe('register type', () => {
         }
       }
 
-      get() {
+      get(): string {
         throw new Error('Not implemented');
       }
     }
@@ -125,7 +125,7 @@ describe('register type', () => {
     }
 
     container.registerType(MyService).as(Service).with('some');
-    const service = container.resolve(Service, 'property');
+    const service = container.resolve(Service, 'property')!;
 
     expect(service instanceof Service).toBe(true);
     expect(service instanceof MyService).toBe(true);
@@ -149,18 +149,28 @@ describe('register instance', () => {
 
     const entities = ['entity 1', 'entity 2'];
     container.registerInstance(new Database(entities));
-    const database = container.resolve(Database);
+    const database = container.resolve(Database)!;
 
     expect(database instanceof Database).toBe(true);
     expect(database.list()).toBe(entities);
   });
 
   test('as other', () => {
-    class Database {
+    class Service {
       readonly entities: string[];
 
       constructor(entities: string[]) {
         this.entities = entities;
+      }
+
+      list(): string[] {
+        throw new Error('Not implemented');
+      }
+    }
+
+    class Database extends Service {
+      constructor(entities: string[]) {
+        super(entities);
       }
 
       list() {
@@ -168,19 +178,13 @@ describe('register instance', () => {
       }
     }
 
-    class Service {
-      list() {
-        throw new Error('Not implemented');
-      }
-    }
-
     const entities = ['entity 1', 'entity 2'];
     container.registerInstance(new Database(entities)).as(Service);
 
-    const database = container.resolve(Database);
+    const database = container.resolve(Database)!;
     expect(database.list()).toBe(undefined);
 
-    const service = container.resolve(Service);
+    const service = container.resolve(Service)!;
     expect(service.list()).toBe(entities);
   });
 });
@@ -196,7 +200,7 @@ describe('nested resolve', () => {
     }
 
     class Repository {
-      static __constructorParams: InstanceType<any>[] = [Database];
+      static __dependencies: InstanceType<any>[] = [Database];
       private db: Database;
 
       constructor(db: Database) {
@@ -209,7 +213,7 @@ describe('nested resolve', () => {
     }
 
     class Service {
-      static __constructorParams: InstanceType<any>[] = [Repository];
+      static __dependencies: InstanceType<any>[] = [Repository];
       private repository: Repository;
 
       constructor(repository: Repository) {
@@ -225,7 +229,7 @@ describe('nested resolve', () => {
     const entities = ['entity 1', 'entity 2'];
     container.registerInstance(new Database(entities));
 
-    const service = container.resolve(Service);
+    const service = container.resolve(Service)!;
     const list = service.myList();
     expect(list).toEqual([
       'entity 1',
@@ -244,7 +248,7 @@ describe('nested resolve', () => {
     }
 
     class Repository {
-      static __constructorParams: InstanceType<any>[] = [Database];
+      static __dependencies: InstanceType<any>[] = [Database];
       private db: Database;
 
       constructor(db: Database) {
@@ -257,7 +261,7 @@ describe('nested resolve', () => {
     }
 
     class Service {
-      static __constructorParams: InstanceType<any>[] = [Repository];
+      static __dependencies: InstanceType<any>[] = [Repository];
       private repository: Repository;
 
       constructor(repository: Repository) {
@@ -270,7 +274,7 @@ describe('nested resolve', () => {
       }
     }
 
-    const service = container.resolve(Service);
+    const service = container.resolve(Service)!;
     const list = service.myList();
     expect(list).toEqual([
       'default',

@@ -1,16 +1,22 @@
 import {
   Constructor,
-  ConstructorParams,
   Container,
-  RegisteredType,
+  RegistrationType,
+  InstanceRegistration,
 } from './types';
+import { AbstractConstructor } from './types/AbstractConstructor';
+import { ImplementationType } from './types/ImplementationType';
+import { ImplementationTypeWithInjection } from './types/ImplementationTypeWithInjection';
 
-const dependencies = new Map<InstanceType<any>, RegisteredType>();
+const dependencies = new Map<RegistrationType<any>, ImplementationTypeWithInjection<any> | Object>();
 
 const container: Container = {
-  registerType: function (implementationType: InstanceType<RegisteredType>) {
+  registerType: function <
+    TInstance,
+    TImplementationType extends ImplementationType<TInstance>
+  >(implementationType: TImplementationType) {
     return {
-      as: (type: any) => {
+      as: (type: RegistrationType<TInstance>) => {
         if (dependencies.has(type)) {
           throw new Error(`The instance type (${type.name}) is already registered`);
         }
@@ -18,25 +24,27 @@ const container: Container = {
 
         return {
           with: (...injectionParams: any[]) => {
-            implementationType.__injectionParams = injectionParams;
+            (implementationType as ImplementationTypeWithInjection<TInstance>).__injectionParams = injectionParams;
           },
         };
       },
     };
   },
 
-  registerInstance: function (instance: any) {
-    if (instance.constructor) {
-      if (dependencies.has(instance.constructor)) {
-        throw new Error(`The instance type (${instance.constructor.name}) is already registered`);
+  registerInstance: function <TInstance extends Object>(instance: TInstance): any {
+    const constructor = instance.constructor as Constructor<TInstance>;
+
+    if (constructor) {
+      if (dependencies.has(constructor)) {
+        throw new Error(`The instance type (${constructor.name}) is already registered`);
       }
-      dependencies.set(instance.constructor, instance);
+      dependencies.set(constructor, instance);
     }
 
-    return {
-      as: (type: any) => {
-        if (instance.constructor) {
-          dependencies.delete(instance.constructor);
+    const registration: InstanceRegistration = {
+      as: (type) => {
+        if (constructor) {
+          dependencies.delete(constructor);
         }
         if (dependencies.has(type)) {
           throw new Error(`The instance type (${type.name}) is already registered`);
@@ -44,27 +52,33 @@ const container: Container = {
         dependencies.set(type, instance);
       },
     };
+
+    return registration;
   },
 
-  resolve: function <TType extends Constructor & Partial<ConstructorParams> = any>(type: TType, ...args: any[]): InstanceType<TType> {
-    let implementation: TType | RegisteredType = type;
-    if (dependencies.has(type)) {
-      implementation = dependencies.get(type) as RegisteredType;
+  resolve: function <TInstance>(type: Constructor<TInstance> | AbstractConstructor<TInstance>, ...args: any[]): TInstance | undefined {
+    if (typeof type !== 'function') {
+      return undefined;
     }
 
-    if (typeof implementation !== 'function') {
-      return implementation as InstanceType<TType>;
+    let implementation: ImplementationTypeWithInjection<TInstance> | Object | undefined = type;
+    if (dependencies.has(type)) {
+      implementation = dependencies.get(type)!;
+    }
+
+    if (!isImplementationType(implementation)) {
+      return implementation as Object as TInstance;
     }
 
     const dependencyArguments: any[] = [];
-    if (implementation.__constructorParams) {
-      implementation.__constructorParams.forEach((type: InstanceType<any>) => {
-        const instance = container.resolve(type);
+    if (implementation.__dependencies) {
+      implementation.__dependencies.forEach((dependencyType: Constructor | AbstractConstructor) => {
+        const instance = container.resolve(dependencyType);
         dependencyArguments.push(instance);
       });
     }
 
-    const injectionParams = (implementation as RegisteredType).__injectionParams || [];
+    const injectionParams = implementation.__injectionParams || [];
 
     return new implementation(...[
       ...dependencyArguments,
@@ -73,5 +87,9 @@ const container: Container = {
     ]);
   },
 };
+
+function isImplementationType(value: any): value is ImplementationTypeWithInjection<any> {
+  return typeof value === 'function';
+}
 
 export { container };
