@@ -1,2 +1,3 @@
-export * from './container';
+export * from './ContainerImpl';
+export * from './dependencies';
 export * from './types';

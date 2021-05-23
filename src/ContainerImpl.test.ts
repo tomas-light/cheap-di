@@ -1,4 +1,6 @@
-import { container } from './container';
+import { container } from './ContainerImpl';
+import { dependencies } from './dependencies';
+import { Dependency, ImplementationType } from './types';
 
 describe('register type', () => {
   test('simple', () => {
@@ -189,6 +191,27 @@ describe('register instance', () => {
   });
 });
 
+describe('dependencies decorator', () => {
+  test('', () => {
+    class Service1 {
+      get() {
+      }
+    }
+    class Service2 {
+      get2() {
+      }
+    }
+
+    @dependencies(Service1, Service2)
+    class MyClass {
+      constructor(private service: Service1, private service2: Service2) {
+      }
+    }
+
+    expect((MyClass as ImplementationType<MyClass>).__dependencies).toEqual([Service1, Service2]);
+  });
+});
+
 describe('nested resolve', () => {
   test('resolve service', () => {
     class Database {
@@ -200,7 +223,7 @@ describe('nested resolve', () => {
     }
 
     class Repository {
-      static __dependencies: InstanceType<any>[] = [Database];
+      static __dependencies: Dependency[] = [Database];
       private db: Database;
 
       constructor(db: Database) {
@@ -213,7 +236,7 @@ describe('nested resolve', () => {
     }
 
     class Service {
-      static __dependencies: InstanceType<any>[] = [Repository];
+      static __dependencies: Dependency[] = [Repository];
       private repository: Repository;
 
       constructor(repository: Repository) {
@@ -248,7 +271,7 @@ describe('nested resolve', () => {
     }
 
     class Repository {
-      static __dependencies: InstanceType<any>[] = [Database];
+      static __dependencies: Dependency[] = [Database];
       private db: Database;
 
       constructor(db: Database) {
@@ -261,7 +284,7 @@ describe('nested resolve', () => {
     }
 
     class Service {
-      static __dependencies: InstanceType<any>[] = [Repository];
+      static __dependencies: Dependency[] = [Repository];
       private repository: Repository;
 
       constructor(repository: Repository) {
