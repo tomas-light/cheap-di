@@ -45,24 +45,24 @@ class ContainerImpl implements Container {
     };
   }
 
+  getImplementation<TInstance>(type: Constructor<TInstance> | AbstractConstructor<TInstance>): ImplementationTypeWithInjection<TInstance> | Object | undefined {
+    if (this.dependencies.has(type)) {
+      return this.dependencies.get(type)!;
+    }
+
+    if (this.parentContainer) {
+      return this.parentContainer.getImplementation(type);
+    }
+
+    return undefined;
+  }
+
   resolve<TInstance>(type: Constructor<TInstance> | AbstractConstructor<TInstance>, ...args: any[]): TInstance | undefined {
     if (typeof type !== 'function') {
       return undefined;
     }
 
-    let implementation: ImplementationTypeWithInjection<TInstance> | Object | undefined = type;
-    if (this.dependencies.has(type)) {
-      implementation = this.dependencies.get(type)!;
-    }
-    else {
-      if (this.parentContainer) {
-        const typeRegisteredInParents = this.parentContainer.resolve(type);
-        if (typeRegisteredInParents) {
-          implementation = typeRegisteredInParents;
-        }
-      }
-    }
-
+    const implementation = this.getImplementation(type) || type;
     if (!isImplementationType(implementation)) {
       return implementation as Object as TInstance;
     }
