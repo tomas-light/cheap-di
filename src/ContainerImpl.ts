@@ -13,13 +13,19 @@ class ContainerImpl implements Container {
   constructor(private parentContainer?: ContainerImpl) {
   }
 
+  sameParent(parentContainer?: ContainerImpl) {
+    return this.parentContainer === parentContainer;
+  }
+
   registerType<TInstance>(implementationType: ImplementationType<TInstance>) {
     const withInjection = (...injectionParams: any[]) => {
       (implementationType as ImplementationTypeWithInjection<TInstance>).__injectionParams = injectionParams;
     };
 
+    this.dependencies.set(implementationType, implementationType);
     return {
       as: <TBase extends Partial<TInstance>>(type: RegistrationType<TBase>) => {
+        this.dependencies.delete(implementationType);
         this.dependencies.set(type, implementationType);
         return {
           with: withInjection,
@@ -45,7 +51,7 @@ class ContainerImpl implements Container {
     };
   }
 
-  getImplementation<TInstance>(type: Constructor<TInstance> | AbstractConstructor<TInstance>): ImplementationTypeWithInjection<TInstance> | Object | undefined {
+  private getImplementation<TInstance>(type: Constructor<TInstance> | AbstractConstructor<TInstance>): ImplementationTypeWithInjection<TInstance> | Object | undefined {
     if (this.dependencies.has(type)) {
       return this.dependencies.get(type)!;
     }
