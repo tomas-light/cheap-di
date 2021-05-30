@@ -1,6 +1,6 @@
 import { container, ContainerImpl } from './ContainerImpl';
 import { dependencies } from './dependencies';
-import { Dependency, ImplementationType } from './types';
+import { Dependency, DependencyRegistrator, ImplementationType } from './types';
 
 describe('register type', () => {
   test('simple', () => {
@@ -327,4 +327,18 @@ describe('nested containers', () => {
     expect(consumer instanceof Consumer).toBe(true);
     expect(consumer!.do()).toBe('service 2');
   });
+});
+
+test('add abstract constructor for instance registration', () => {
+  abstract class Config {
+    abstract message: string;
+  }
+
+  const config: Config = {
+    message: '123',
+  };
+
+  container.registerInstance(config).as(Config);
+  const result = container.resolve(Config);
+  expect(result).toBe(config);
 });

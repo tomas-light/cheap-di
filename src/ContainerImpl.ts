@@ -42,7 +42,7 @@ class ContainerImpl implements Container {
     }
 
     return {
-      as: <TBase extends Partial<TInstance>>(type: Constructor<TBase>) => {
+      as: <TBase extends Partial<TInstance>>(type: RegistrationType<TBase>) => {
         if (constructor) {
           this.dependencies.delete(constructor);
         }

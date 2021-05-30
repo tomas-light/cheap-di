@@ -2,7 +2,7 @@ type AbstractConstructor<T = any> = abstract new(...args: any[]) => T;
 type Constructor<T = any> = new(...args: any[]) => T;
 type Dependency<T = any> = (Constructor<T> | AbstractConstructor<T>);
 
-type ImplementationType<TInstance> = Constructor<TInstance> & {
+type ImplementationType<TClass> = Constructor<TClass> & {
   __dependencies?: Dependency[]
 };
 
@@ -13,15 +13,15 @@ type ImplementationTypeWithInjection<TInstance> = ImplementationType<TInstance> 
 type RegistrationType<TInstance> = Constructor<TInstance> | AbstractConstructor<TInstance>;
 
 interface DependencyRegistrator {
-  registerType:<TInstance>(implementationType: ImplementationType<TInstance>) => {
-    as: <TBase extends Partial<TInstance>>(type: RegistrationType<TBase>) => {
+  registerType:<TClass>(implementationType: ImplementationType<TClass>) => {
+    as: <TBase extends Partial<TClass>>(type: RegistrationType<TBase>) => {
       with: (...injectionParams: any[]) => void;
     };
     with: (...injectionParams: any[]) => void;
   };
 
   registerInstance: <TInstance extends Object>(instance: TInstance) => {
-    as: <TBase extends Partial<TInstance>>(type: Constructor<TBase>) => void;
+    as: <TBase extends Partial<TInstance>>(type: RegistrationType<TBase>) => void;
   };
 }
 
