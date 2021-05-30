@@ -17,6 +17,7 @@ interface DependencyRegistrator {
     as: <TBase extends Partial<TInstance>>(type: RegistrationType<TBase>) => {
       with: (...injectionParams: any[]) => void;
     };
+    with: (...injectionParams: any[]) => void;
   };
 
   registerInstance: <TInstance extends Object>(instance: TInstance) => {
