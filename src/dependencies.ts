@@ -1,7 +1,9 @@
 import { Dependency } from './types';
 
 type D<T> = Dependency<T>;
-type Return<TClass> = (constructor: TClass) => TClass;
+type Return<TClass> = TClass extends new(...args: any[]) => infer TInstance
+  ? (constructor: TClass) => TInstance
+  : never;
 
 function dependencies<A1, TClass extends new(a1: A1, ...args: any[]) => any>(a1: D<A1>): Return<TClass>;
 function dependencies<A1, A2, TClass extends new(a1: A1, a2: A2, ...args: any[]) => any>(a1: D<A1>, a2: D<A2>,): Return<TClass>;

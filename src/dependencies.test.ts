@@ -20,6 +20,28 @@ test('case 1', () => {
   expect((MyClass as ImplementationType<MyClass>).__dependencies).toEqual([Service1, Service2]);
 });
 
+test('static members', () => {
+  class Service1 {
+    get() {
+    }
+  }
+
+  const text = 'static do';
+
+  @dependencies(Service1)
+  class MyClass {
+    static do() {
+      return text;
+    }
+
+    constructor(private service: Service1) {
+    }
+  }
+
+  expect((MyClass as ImplementationType<MyClass>).__dependencies).toEqual([Service1]);
+  expect(MyClass.do()).toBe(text);
+});
+
 test('check types: injection params allowing', () => {
   abstract class AService {
     abstract do1(m: string): void;
