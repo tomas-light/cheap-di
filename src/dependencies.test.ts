@@ -20,6 +20,21 @@ test('case 1', () => {
   expect((MyClass as ImplementationType<MyClass>).__dependencies).toEqual([Service1, Service2]);
 });
 
+test('class name preserving', () => {
+  class Service1 {
+    get() {
+    }
+  }
+
+  @dependencies(Service1)
+  class MyClass {
+    constructor(private service: Service1) {
+    }
+  }
+
+  expect((MyClass as any).className).toBe('MyClass');
+});
+
 test('static members', () => {
   class Service1 {
     get() {
