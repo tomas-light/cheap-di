@@ -3,6 +3,7 @@ type Constructor<T = any> = new(...args: any[]) => T;
 type Dependency<T = any> = (Constructor<T> | AbstractConstructor<T>);
 
 type ImplementationType<TClass> = Constructor<TClass> & {
+  __singleton?: boolean;
   __dependencies?: Dependency[]
 };
 

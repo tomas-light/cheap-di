@@ -180,5 +180,30 @@ export class UserService {
 }
 ```
 
+`@singleton` decorator allows you to inject the same instance everywhere.
+
+`user-service.ts`
+```ts
+import { singleton } from 'cheap-di';
+import { Logger } from './logger';
+import { UserRepository } from './user-repository';
+
+@singleton()
+export class UserService {
+  names: string[];
+  constructor() {
+    this.names = [];
+  }
+  
+  list() {
+      return this.names;
+  }
+  
+  add(name: string) {
+      this.names.push(name);
+  }
+}
+```
+
 
 You can see more examples in `cheap-di/src/container.test.ts`

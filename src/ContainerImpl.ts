@@ -8,6 +8,7 @@ import {
 } from './types';
 
 class ContainerImpl implements Container {
+  private singletons = new Map<ImplementationTypeWithInjection<any>, Object>();
   private dependencies = new Map<RegistrationType<any>, ImplementationTypeWithInjection<any> | Object>();
 
   constructor(private parentContainer?: ContainerImpl) {
@@ -73,6 +74,10 @@ class ContainerImpl implements Container {
       return implementation as Object as TInstance;
     }
 
+    if (implementation.__singleton && this.singletons.has(implementation)) {
+      return this.singletons.get(implementation) as TInstance;
+    }
+
     const dependencyArguments: any[] = [];
     if (implementation.__dependencies) {
       implementation.__dependencies.forEach((dependencyType: Constructor | AbstractConstructor) => {
@@ -83,11 +88,17 @@ class ContainerImpl implements Container {
 
     const injectionParams = implementation.__injectionParams || [];
 
-    return new implementation(...[
+    const target = new implementation(...[
       ...dependencyArguments,
       ...injectionParams,
       ...args,
     ]);
+
+    if (implementation.__singleton) {
+      this.singletons.set(implementation, target);
+    }
+
+    return target;
   }
 }
 

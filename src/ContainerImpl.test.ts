@@ -1,6 +1,7 @@
 import { container, ContainerImpl } from './ContainerImpl';
 import { dependencies } from './dependencies';
-import { Dependency, DependencyRegistrator, ImplementationType } from './types';
+import { singleton } from './singleton';
+import { Dependency } from './types';
 
 describe('register type', () => {
   test('simple', () => {
@@ -289,16 +290,19 @@ describe('nested containers', () => {
   abstract class Service {
     abstract some(): string;
   }
+
   class Service1 extends Service {
     some(): string {
       return 'service 1';
     }
   }
+
   class Service2 extends Service {
     some(): string {
       return 'service 2';
     }
   }
+
   @dependencies(Service)
   class Consumer {
     constructor(private service: Service) {
@@ -341,4 +345,15 @@ test('add abstract constructor for instance registration', () => {
   container.registerInstance(config).as(Config);
   const result = container.resolve(Config);
   expect(result).toBe(config);
+});
+
+test('singletones', () => {
+  @singleton()
+  class Service {
+  }
+
+  container.registerType(Service);
+  const entity1 = container.resolve(Service);
+  const entity2 = container.resolve(Service);
+  expect(entity1).toBe(entity2);
 });
