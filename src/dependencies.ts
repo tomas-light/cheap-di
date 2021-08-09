@@ -1,3 +1,4 @@
+import { dependenciesSymbol as dependencies_s } from './symbols';
 import { Dependency } from './types';
 
 type D<T> = Dependency<T>;
@@ -52,7 +53,7 @@ function dependencies<A1,
 function dependencies<TClass extends new(...args: any[]) => any>(...dependencies: any[]) {
   return function(constructor: TClass): TClass {
     const decoratedConstructor = class extends constructor {
-      static __dependencies: Dependency[] = dependencies || [];
+      static [dependencies_s]: Dependency[] = dependencies || [];
     };
     (decoratedConstructor as any).className = constructor.name;
     return decoratedConstructor;

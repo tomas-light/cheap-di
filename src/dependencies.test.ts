@@ -1,4 +1,5 @@
 import { dependencies } from './dependencies';
+import { dependenciesSymbol as dependencies_s } from './symbols';
 import { ImplementationType } from './types';
 
 test('case 1', () => {
@@ -17,7 +18,7 @@ test('case 1', () => {
     }
   }
 
-  expect((MyClass as ImplementationType<MyClass>).__dependencies).toEqual([Service1, Service2]);
+  expect((MyClass as ImplementationType<MyClass>)[dependencies_s]).toEqual([Service1, Service2]);
 });
 
 test('class name preserving', () => {
@@ -53,7 +54,7 @@ test('static members', () => {
     }
   }
 
-  expect((MyClass as ImplementationType<MyClass>).__dependencies).toEqual([Service1]);
+  expect((MyClass as ImplementationType<MyClass>)[dependencies_s]).toEqual([Service1]);
   expect(MyClass.do()).toBe(text);
 });
 
@@ -91,7 +92,7 @@ test('check types: injection params allowing', () => {
     }
   }
 
-  expect((Consumer1 as ImplementationType<Consumer1>).__dependencies).toEqual([AService]);
-  expect((Consumer2 as ImplementationType<Consumer2>).__dependencies).toEqual([AService, BService]);
-  expect((Consumer3 as ImplementationType<Consumer3>).__dependencies).toEqual([AService]);
+  expect((Consumer1 as ImplementationType<Consumer1>)[dependencies_s]).toEqual([AService]);
+  expect((Consumer2 as ImplementationType<Consumer2>)[dependencies_s]).toEqual([AService, BService]);
+  expect((Consumer3 as ImplementationType<Consumer3>)[dependencies_s]).toEqual([AService]);
 });

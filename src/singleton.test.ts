@@ -1,4 +1,5 @@
 import { singleton } from './singleton';
+import { singletonSymbol as singleton_s } from './symbols';
 import { ImplementationType } from './types';
 
 test('', () => {
@@ -6,5 +7,5 @@ test('', () => {
   class MyClass {
   }
 
-  expect((MyClass as ImplementationType<MyClass>).__singleton).toEqual(true);
+  expect((MyClass as ImplementationType<MyClass>)[singleton_s]).toEqual(true);
 });

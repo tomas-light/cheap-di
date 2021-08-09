@@ -80,11 +80,12 @@ That property should contain constructor array in the order of your constructor.
 
 `user-service.js`
 ```js
+import { dependencies } from 'cheap-di';
 import { Logger } from './logger';
 import { UserRepository } from './user-repository';
 
 export class UserService {
-  static __dependencies = [ UserRepository, Logger ];
+  static [dependencies] = [ UserRepository, Logger ];
   
   constructor(userRepository, logger) {
     this.userRepository = userRepository;
@@ -165,7 +166,7 @@ import { UserRepository } from './user-repository';
 export class UserService {
   constructor(
     private userRepository: UserRepository,
-    private logger: Logger
+    private logger: Logger,
   ) {
   }
   
@@ -178,6 +179,37 @@ export class UserService {
       return this.userRepository.getById(userId);
   }
 }
+```
+
+`@inject` decorator can be used instead of `@dependencies` like below:
+```ts
+import { inject } from 'cheap-di';
+
+export class UserService {
+  constructor(
+    @inject(UserRepository) private userRepository: UserRepository,
+    @inject(Logger) private logger: Logger,
+  ) {
+  }
+  ...
+}
+```
+
+This approach allows you to mix dependency with injection params with any order:
+```ts
+class Service {
+  constructor(
+    message1: string,
+    @inject(Repository) public repository: Repository,
+    message2: string,
+    @inject(Database) public db: Database,
+  ) {
+  }
+}
+
+const message1 = '123';
+const message2 = '456';
+container.registerType(Service).with(message1, message2);
 ```
 
 `@singleton` decorator allows you to inject the same instance everywhere.
@@ -205,5 +237,7 @@ export class UserService {
 }
 ```
 
+You can see more examples in `cheap-di/src/ContainerImpl.test.ts`
 
-You can see more examples in `cheap-di/src/container.test.ts`
+
+[Releases](./RELEASES.md)

@@ -1,7 +1,7 @@
 import { container, ContainerImpl } from './ContainerImpl';
 import { dependencies } from './dependencies';
 import { singleton } from './singleton';
-import { Dependency } from './types';
+import { inject } from './inject';
 
 describe('register type', () => {
   test('simple', () => {
@@ -202,8 +202,8 @@ describe('nested resolve', () => {
       }
     }
 
+    @dependencies(Database)
     class Repository {
-      static __dependencies: Dependency[] = [Database];
       private db: Database;
 
       constructor(db: Database) {
@@ -215,8 +215,8 @@ describe('nested resolve', () => {
       }
     }
 
+    @dependencies(Repository)
     class Service {
-      static __dependencies: Dependency[] = [Repository];
       private repository: Repository;
 
       constructor(repository: Repository) {
@@ -250,8 +250,8 @@ describe('nested resolve', () => {
       }
     }
 
+    @dependencies(Database)
     class Repository {
-      static __dependencies: Dependency[] = [Database];
       private db: Database;
 
       constructor(db: Database) {
@@ -263,8 +263,8 @@ describe('nested resolve', () => {
       }
     }
 
+    @dependencies(Repository)
     class Service {
-      static __dependencies: Dependency[] = [Repository];
       private repository: Repository;
 
       constructor(repository: Repository) {
@@ -356,4 +356,181 @@ test('singletones', () => {
   const entity1 = container.resolve(Service);
   const entity2 = container.resolve(Service);
   expect(entity1).toBe(entity2);
+});
+
+test('with inject decorator', () => {
+  class Database {
+    readonly entities: string[];
+
+    constructor(entities: string[]) {
+      this.entities = entities;
+    }
+  }
+
+  class Repository {
+    private db: Database;
+
+    constructor(@inject(Database) db: Database) {
+      this.db = db;
+    }
+
+    list() {
+      return this.db.entities;
+    }
+  }
+
+  class Service {
+    constructor(@inject(Repository) private repository: Repository) {
+    }
+
+    myList() {
+      const entities = this.repository.list();
+      return entities.concat('service entity');
+    }
+  }
+
+  const entities = ['entity 1', 'entity 2'];
+  container.registerInstance(new Database(entities));
+
+  const service = container.resolve(Service)!;
+  const list = service.myList();
+  expect(list).toEqual([
+    'entity 1',
+    'entity 2',
+    'service entity',
+  ]);
+})
+
+describe('arguments order', () => {
+  class Database {
+    constructor(private readonly entities: string[]) {}
+    list() {
+      return this.entities;
+    }
+  }
+
+  class Repository {
+    list() {
+      return ['test 1', 'test 2'];
+    }
+  }
+
+  class Service {
+    constructor(
+      public repository: Repository,
+      public db: Database,
+      public message: string,
+      public message2: string,
+    ) {}
+    list1() {
+      const entities = this.repository.list();
+      return entities.concat('service entity');
+    }
+    list2() {
+      const entities = this.db.list();
+      return entities.concat('service entity');
+    }
+  }
+
+  const message1 = '123';
+  const message2 = '456';
+
+  function check(service: Service) {
+    const list1 = service.list1();
+    expect(list1).toEqual([
+      'test 1',
+      'test 2',
+      'service entity',
+    ]);
+
+    const list2 = service.list2();
+    expect(list2).toEqual([
+      'entity 1',
+      'entity 2',
+      'service entity',
+    ]);
+
+    expect(service.message).toBe(message1);
+    expect(service.message2).toBe(message2);
+  }
+
+  test('case 1', () => {
+    class Service1 extends Service {
+      constructor(
+        @inject(Repository) public repository: Repository,
+        @inject(Database) public db: Database,
+        message: string,
+        message2: string,
+      ) {
+        super(repository, db, message, message2);
+      }
+    }
+
+    const entities = ['entity 1', 'entity 2'];
+    container.registerInstance(new Database(entities));
+    container.registerType(Service1).with(message1, message2);
+
+    const service = container.resolve(Service1)!;
+    check(service);
+  });
+
+  test('case 2', () => {
+    class Service2 extends Service {
+      constructor(
+        @inject(Repository) public repository: Repository,
+        message: string,
+        @inject(Database) public db: Database,
+        message2: string,
+      ) {
+        super(repository, db, message, message2);
+      }
+    }
+
+    const entities = ['entity 1', 'entity 2'];
+    container.registerInstance(new Database(entities));
+    container.registerType(Service2).with(message1, message2);
+
+    const service = container.resolve(Service2)!;
+    check(service);
+  });
+
+  test('case 3', () => {
+    class Service3 extends Service {
+      constructor(
+        message: string,
+        @inject(Repository) public repository: Repository,
+        @inject(Database) public db: Database,
+        message2: string,
+      ) {
+        super(repository, db, message, message2);
+      }
+    }
+
+    const entities = ['entity 1', 'entity 2'];
+    container.registerInstance(new Database(entities));
+    container.registerType(Service3).with(message1, message2);
+
+    const service = container.resolve(Service3)!;
+    check(service);
+  });
+
+  test('case 4', () => {
+    class Service4 extends Service {
+      constructor(
+        message: string,
+        @inject(Repository) public repository: Repository,
+        message2: string,
+        @inject(Database) public db: Database,
+      ) {
+        super(repository, db, message, message2);
+      }
+    }
+
+    const entities = ['entity 1', 'entity 2'];
+    container.registerInstance(new Database(entities));
+    container.registerType(Service4).with(message1, message2);
+
+    const service = container.resolve(Service4)!;
+    check(service);
+  });
 });

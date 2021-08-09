@@ -1,3 +1,4 @@
+import { singletonSymbol, dependenciesSymbol, injectionSymbol } from './symbols';
 import {
   Constructor,
   Container,
@@ -20,7 +21,7 @@ class ContainerImpl implements Container {
 
   registerType<TInstance>(implementationType: ImplementationType<TInstance>) {
     const withInjection = (...injectionParams: any[]) => {
-      (implementationType as ImplementationTypeWithInjection<TInstance>).__injectionParams = injectionParams;
+      (implementationType as ImplementationTypeWithInjection<TInstance>)[injectionSymbol] = injectionParams;
     };
 
     this.dependencies.set(implementationType, implementationType);
@@ -74,27 +75,65 @@ class ContainerImpl implements Container {
       return implementation as Object as TInstance;
     }
 
-    if (implementation.__singleton && this.singletons.has(implementation)) {
+    if (implementation[singletonSymbol] && this.singletons.has(implementation)) {
       return this.singletons.get(implementation) as TInstance;
     }
 
-    const dependencyArguments: any[] = [];
-    if (implementation.__dependencies) {
-      implementation.__dependencies.forEach((dependencyType: Constructor | AbstractConstructor) => {
-        const instance = this.resolve(dependencyType);
-        dependencyArguments.push(instance);
-      });
+    // const dependencyArguments: any[] = [];
+    // if (implementation[dependencies]) {
+    //   implementation[dependencies]!.forEach((dependencyType: Constructor | AbstractConstructor) => {
+    //     const instance = this.resolve(dependencyType);
+    //     dependencyArguments.push(instance);
+    //   });
+    // }
+    //
+    // const injectionParams = implementation[injection] || [];
+    //
+    // const target = new implementation(...[
+    //   ...dependencyArguments,
+    //   ...injectionParams,
+    //   ...args,
+    // ]);
+
+    let injectableArguments: any[] = [];
+    const injectionParams: any[] = [
+      ...(Array.isArray(implementation[injectionSymbol]) ? implementation[injectionSymbol]! : []),
+      ...args,
+    ];
+
+    let index = 0;
+    let injectionParamsIndex = 0;
+
+    if (implementation[dependenciesSymbol]) {
+      let has = true;
+      const injectableDependencies = implementation[dependenciesSymbol]!.filter(d => d);
+      const length = injectableDependencies.length + injectionParams.length;
+
+      while (has) {
+        const dependencyType = implementation[dependenciesSymbol]![index];
+        if (dependencyType) {
+          const instance = this.resolve(dependencyType);
+          injectableArguments[index] = instance;
+        }
+        else if (injectionParams[injectionParamsIndex]) {
+          injectableArguments[index] = injectionParams[injectionParamsIndex];
+          injectionParamsIndex++;
+        }
+
+        index++;
+
+        if (index >= length) {
+          has = false;
+        }
+      }
+    }
+    else {
+      injectableArguments = injectionParams;
     }
 
-    const injectionParams = implementation.__injectionParams || [];
+    const target = new implementation(...injectableArguments);
 
-    const target = new implementation(...[
-      ...dependencyArguments,
-      ...injectionParams,
-      ...args,
-    ]);
-
-    if (implementation.__singleton) {
+    if (implementation[singletonSymbol]) {
       this.singletons.set(implementation, target);
     }
 

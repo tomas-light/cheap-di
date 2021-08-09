@@ -1,14 +1,16 @@
+import { singletonSymbol, dependenciesSymbol, injectionSymbol } from './symbols';
+
 type AbstractConstructor<T = any> = abstract new(...args: any[]) => T;
 type Constructor<T = any> = new(...args: any[]) => T;
 type Dependency<T = any> = (Constructor<T> | AbstractConstructor<T>);
 
 type ImplementationType<TClass> = Constructor<TClass> & {
-  __singleton?: boolean;
-  __dependencies?: Dependency[]
+  [singletonSymbol]?: boolean;
+  [dependenciesSymbol]?: Dependency[];
 };
 
 type ImplementationTypeWithInjection<TInstance> = ImplementationType<TInstance> & {
-  __injectionParams?: any[];
+  [injectionSymbol]?: any[];
 };
 
 type RegistrationType<TInstance> = Constructor<TInstance> | AbstractConstructor<TInstance>;
