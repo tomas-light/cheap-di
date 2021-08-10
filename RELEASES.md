@@ -1,5 +1,9 @@
 # Releases
 
+### 2.2.1
+
+* add `@inject` to index import
+
 ### 2.2.0
 
 * replace static property names by Symbols:
