@@ -33,7 +33,7 @@ test('class name preserving', () => {
     }
   }
 
-  expect((MyClass as any).className).toBe('MyClass');
+  expect(MyClass.name).toBe('MyClass');
 });
 
 test('static members', () => {

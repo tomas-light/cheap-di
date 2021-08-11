@@ -1,13 +1,8 @@
 import { singletonSymbol as singleton_s } from './symbols';
 
-function singleton<TClass extends new(...args: any[]) => any>() {
-  return function(constructor: TClass): TClass {
-    const decoratedConstructor = class extends constructor {
-      static [singleton_s]: boolean = true;
-    };
-    (decoratedConstructor as any).className = constructor.name;
-    return decoratedConstructor;
-  };
-}
+function singleton<TClass extends new(...args: any[]) => any>(constructor: TClass): TClass {
+  (constructor as any)[singleton_s] = true;
+  return constructor;
+};
 
 export { singleton };

@@ -52,11 +52,8 @@ function dependencies<A1,
 
 function dependencies<TClass extends new(...args: any[]) => any>(...dependencies: any[]) {
   return function(constructor: TClass): TClass {
-    const decoratedConstructor = class extends constructor {
-      static [dependencies_s]: Dependency[] = dependencies || [];
-    };
-    (decoratedConstructor as any).className = constructor.name;
-    return decoratedConstructor;
+    (constructor as any)[dependencies_s] = dependencies || [];
+    return constructor;
   };
 }
 

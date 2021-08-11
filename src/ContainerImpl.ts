@@ -1,3 +1,4 @@
+import { CircularDependencyError } from './errors';
 import { singletonSymbol, dependenciesSymbol, injectionSymbol } from './symbols';
 import {
   Constructor,
@@ -7,12 +8,17 @@ import {
   ImplementationType,
   ImplementationTypeWithInjection,
 } from './types';
+import { Trace } from './utils';
 
 class ContainerImpl implements Container {
-  private singletons = new Map<ImplementationTypeWithInjection<any>, Object>();
-  private dependencies = new Map<RegistrationType<any>, ImplementationTypeWithInjection<any> | Object>();
+  private singletons: Map<ImplementationTypeWithInjection<any>, Object>;
+  private instances: Map<RegistrationType<any>, any>;
+  private dependencies: Map<RegistrationType<any>, ImplementationTypeWithInjection<any> | Object>;
 
   constructor(private parentContainer?: ContainerImpl) {
+    this.singletons = new Map();
+    this.instances = new Map();
+    this.dependencies = new Map();
   }
 
   sameParent(parentContainer?: ContainerImpl) {
@@ -40,34 +46,46 @@ class ContainerImpl implements Container {
   registerInstance<TInstance extends Object>(instance: TInstance) {
     const constructor = instance.constructor as Constructor<TInstance>;
     if (constructor) {
-      this.dependencies.set(constructor, instance);
+      this.instances.set(constructor, instance);
     }
 
     return {
       as: <TBase extends Partial<TInstance>>(type: RegistrationType<TBase>) => {
         if (constructor) {
-          this.dependencies.delete(constructor);
+          this.instances.delete(constructor);
         }
-        this.dependencies.set(type, instance);
+        this.instances.set(type, instance);
       },
     };
   }
 
-  private getImplementation<TInstance>(type: Constructor<TInstance> | AbstractConstructor<TInstance>): ImplementationTypeWithInjection<TInstance> | Object | undefined {
-    if (this.dependencies.has(type)) {
-      return this.dependencies.get(type)!;
+  resolve<TInstance>(type: Constructor<TInstance> | AbstractConstructor<TInstance>, ...args: any[]): TInstance | undefined {
+    const trace = new Trace(type.name);
+    try {
+      return this.internalResolve(type, trace, ...args);
     }
-
-    if (this.parentContainer) {
-      return this.parentContainer.getImplementation(type);
+    catch (error) {
+      if (error instanceof RangeError) {
+        const tree = trace.build();
+        console.warn('cheap-di, circular dependencies tree', tree);
+        throw new CircularDependencyError(`Circular dependencies during resolve ${type.name}. ${error.message}`);
+      }
+      throw error;
     }
-
-    return undefined;
   }
 
-  resolve<TInstance>(type: Constructor<TInstance> | AbstractConstructor<TInstance>, ...args: any[]): TInstance | undefined {
+  private internalResolve<TInstance>(
+    type: Constructor<TInstance> | AbstractConstructor<TInstance>,
+    trace: Trace,
+    ...args: any[]
+  ): TInstance | undefined {
     if (typeof type !== 'function') {
       return undefined;
+    }
+
+    const instance = this.getInstance(type);
+    if (instance) {
+      return instance as TInstance;
     }
 
     const implementation = this.getImplementation(type) || type;
@@ -75,25 +93,14 @@ class ContainerImpl implements Container {
       return implementation as Object as TInstance;
     }
 
-    if (implementation[singletonSymbol] && this.singletons.has(implementation)) {
-      return this.singletons.get(implementation) as TInstance;
+    if (implementation[singletonSymbol]) {
+      const rootContainer = this.findRootContainer();
+      if (rootContainer.singletons.has(implementation)) {
+        return rootContainer.singletons.get(implementation) as TInstance;
+      }
     }
 
-    // const dependencyArguments: any[] = [];
-    // if (implementation[dependencies]) {
-    //   implementation[dependencies]!.forEach((dependencyType: Constructor | AbstractConstructor) => {
-    //     const instance = this.resolve(dependencyType);
-    //     dependencyArguments.push(instance);
-    //   });
-    // }
-    //
-    // const injectionParams = implementation[injection] || [];
-    //
-    // const target = new implementation(...[
-    //   ...dependencyArguments,
-    //   ...injectionParams,
-    //   ...args,
-    // ]);
+    trace.implemented = implementation.name;
 
     let injectableArguments: any[] = [];
     const injectionParams: any[] = [
@@ -112,7 +119,9 @@ class ContainerImpl implements Container {
       while (has) {
         const dependencyType = implementation[dependenciesSymbol]![index];
         if (dependencyType) {
-          const instance = this.resolve(dependencyType);
+          trace.addTrace(dependencyType.name);
+
+          const instance = this.internalResolve(dependencyType, trace.trace!);
           injectableArguments[index] = instance;
         }
         else if (injectionParams[injectionParamsIndex]) {
@@ -134,10 +143,43 @@ class ContainerImpl implements Container {
     const target = new implementation(...injectableArguments);
 
     if (implementation[singletonSymbol]) {
-      this.singletons.set(implementation, target);
+      const rootContainer = this.findRootContainer();
+      rootContainer.singletons.set(implementation, target);
     }
 
     return target;
+  }
+
+  private getInstance<TInstance>(type: Constructor<TInstance> | AbstractConstructor<TInstance>): ImplementationTypeWithInjection<TInstance> | Object | undefined {
+    if (this.instances.has(type)) {
+      return this.instances.get(type)!;
+    }
+
+    if (this.parentContainer) {
+      return this.parentContainer.getInstance(type);
+    }
+
+    return undefined;
+  }
+
+  private getImplementation<TInstance>(type: Constructor<TInstance> | AbstractConstructor<TInstance>): ImplementationTypeWithInjection<TInstance> | Object | undefined {
+    if (this.dependencies.has(type)) {
+      return this.dependencies.get(type)!;
+    }
+
+    if (this.parentContainer) {
+      return this.parentContainer.getImplementation(type);
+    }
+
+    return undefined;
+  }
+
+  private findRootContainer(): ContainerImpl {
+    if (this.parentContainer) {
+      return this.parentContainer.findRootContainer();
+    }
+
+    return this;
   }
 }
 

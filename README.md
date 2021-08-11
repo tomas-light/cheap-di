@@ -220,7 +220,7 @@ import { singleton } from 'cheap-di';
 import { Logger } from './logger';
 import { UserRepository } from './user-repository';
 
-@singleton()
+@singleton
 export class UserService {
   names: string[];
   constructor() {
@@ -240,4 +240,4 @@ export class UserService {
 You can see more examples in `cheap-di/src/ContainerImpl.test.ts`
 
 
-[Releases](./RELEASES.md)
+[Changelog](./CHANGELOG.md)

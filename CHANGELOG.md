@@ -1,4 +1,23 @@
-# Releases
+# Changelog
+
+### 2.2.2
+
+* bugfix singletons -> move all singleton registration to root container
+* improve instance resolving
+* improve `@dependencies` and `@singleton` decorators. it doesn't wrap your class with synthetic class anymore
+* change using of `@singleton`
+```ts
+import { singleton } from 'cheap-di';
+
+@singleton()
+class Old {
+}
+
+@singleton
+class New {
+}
+```
+* add error for circular dependencies with dependency trace
 
 ### 2.2.1
 

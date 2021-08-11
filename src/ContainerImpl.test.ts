@@ -348,7 +348,7 @@ test('add abstract constructor for instance registration', () => {
 });
 
 test('singletones', () => {
-  @singleton()
+  @singleton
   class Service {
   }
 

@@ -3,7 +3,7 @@ import { singletonSymbol as singleton_s } from './symbols';
 import { ImplementationType } from './types';
 
 test('', () => {
-  @singleton()
+  @singleton
   class MyClass {
   }
 
