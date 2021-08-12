@@ -1,4 +1,4 @@
-import { singletonSymbol, dependenciesSymbol, injectionSymbol } from './symbols';
+import { singletonSymbol, dependenciesSymbol, injectionSymbol, inheritancePreserveSymbol } from './symbols';
 
 type AbstractConstructor<T = any> = abstract new(...args: any[]) => T;
 type Constructor<T = any> = new(...args: any[]) => T;
@@ -7,6 +7,7 @@ type Dependency<T = any> = (Constructor<T> | AbstractConstructor<T>);
 type ImplementationType<TClass> = Constructor<TClass> & {
   [singletonSymbol]?: boolean;
   [dependenciesSymbol]?: Dependency[];
+  [inheritancePreserveSymbol]?: TClass;
 };
 
 type ImplementationTypeWithInjection<TInstance> = ImplementationType<TInstance> & {

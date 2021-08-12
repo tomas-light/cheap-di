@@ -1,5 +1,9 @@
 # Changelog
 
+### 2.2.3
+
+* bugfix using of `@inject` in inherited classes
+
 ### 2.2.2
 
 * bugfix singletons -> move all singleton registration to root container

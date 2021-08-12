@@ -1,23 +1,23 @@
 import { inject } from './inject';
-import { dependenciesSymbol as dependencies_s } from './symbols';
-import { ImplementationType } from './types';
+import { dependenciesSymbol } from './symbols';
 
 test('', () => {
   class Service {
-    a: number;
+    a: number = 1;
+  }
+  class Service2 {
+    b: number = 2;
+  }
 
-    constructor() {
-      this.a = 1;
+  class Test {
+    constructor(@inject(Service) service?: Service) {}
+  }
+  class Test2 extends Test {
+    constructor(@inject(Service2) service?: Service2) {
+      super();
     }
   }
 
-  class MyClass {
-    constructor(
-      @inject(Service) service: Service,
-      @inject(Service) service2: Service,
-    ) {
-    }
-  }
-
-  expect((MyClass as ImplementationType<MyClass>)[dependencies_s]).toEqual([Service]);
+  expect((Test as any)[dependenciesSymbol]).toEqual([Service]);
+  expect((Test2 as any)[dependenciesSymbol]).toEqual([Service2]);
 });
