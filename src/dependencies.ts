@@ -1,5 +1,6 @@
-import { dependenciesSymbol as dependencies_s } from './symbols';
-import { Dependency } from './types';
+import { InheritancePreserver } from './InheritancePreserver';
+import { dependenciesSymbol, dependenciesSymbol as dependencies_s } from './symbols';
+import { Constructor, Dependency, ImplementationType } from './types';
 
 type D<T> = Dependency<T>;
 type Return<TClass> = TClass extends new(...args: any[]) => infer TInstance
@@ -50,11 +51,23 @@ function dependencies<A1,
   a10: D<A10>,
 ): Return<TClass>;
 
-function dependencies<TClass extends new(...args: any[]) => any>(...dependencies: any[]) {
+function dependencies<TClass extends Constructor>(...dependencies: any[]) {
   return function(constructor: TClass): TClass {
     (constructor as any)[dependencies_s] = dependencies || [];
+    InheritancePreserver.constructorModified(constructor);
     return constructor;
   };
 }
 
-export { dependencies };
+function getDependencies<TClass extends Constructor>(constructor: TClass): Dependency[] {
+  const implementation = constructor as ImplementationType<TClass>;
+  const modifiedConstructor = InheritancePreserver.getModifiedConstructor(constructor);
+  const _dependencies = implementation[dependenciesSymbol];
+  if (!modifiedConstructor || modifiedConstructor !== constructor || !Array.isArray(_dependencies)) {
+    return [];
+  }
+
+  return _dependencies!;
+}
+
+export { dependencies, getDependencies };

@@ -192,6 +192,17 @@ describe('register instance', () => {
   });
 });
 
+test('singletones', () => {
+  @singleton
+  class Service {
+  }
+
+  container.registerType(Service);
+  const entity1 = container.resolve(Service);
+  const entity2 = container.resolve(Service);
+  expect(entity1).toBe(entity2);
+});
+
 describe('nested resolve', () => {
   test('resolve service', () => {
     class Database {
@@ -331,6 +342,52 @@ describe('nested containers', () => {
     expect(consumer instanceof Consumer).toBe(true);
     expect(consumer!.do()).toBe('service 2');
   });
+
+  test('singleton resolving', () => {
+    @singleton
+    class Database {
+      readonly entities: string[];
+
+      constructor() {
+        this.entities = ['entity 1', 'entity 2'];
+      }
+    }
+
+    @dependencies(Database)
+    class Repository {
+      private db: Database;
+
+      constructor(db: Database) {
+        this.db = db;
+      }
+
+      list() {
+        return this.db.entities;
+      }
+    }
+
+    @dependencies(Repository)
+    class Service {
+      private repository: Repository;
+
+      constructor(repository: Repository) {
+        this.repository = repository;
+      }
+
+      myList() {
+        const entities = this.repository.list();
+        return entities.concat('service entity');
+      }
+    }
+
+    const service = container.resolve(Service)!;
+    const list = service.myList();
+    expect(list).toEqual([
+      'entity 1',
+      'entity 2',
+      'service entity',
+    ]);
+  });
 });
 
 test('add abstract constructor for instance registration', () => {
@@ -345,17 +402,6 @@ test('add abstract constructor for instance registration', () => {
   container.registerInstance(config).as(Config);
   const result = container.resolve(Config);
   expect(result).toBe(config);
-});
-
-test('singletones', () => {
-  @singleton
-  class Service {
-  }
-
-  container.registerType(Service);
-  const entity1 = container.resolve(Service);
-  const entity2 = container.resolve(Service);
-  expect(entity1).toBe(entity2);
 });
 
 test('with inject decorator', () => {

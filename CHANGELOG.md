@@ -1,5 +1,18 @@
 # Changelog
 
+### 2.2.4
+
+* prevent decorated setting inheritance (because it's a static field)
+* add `getDependencies` method to get settled types
+
+
+* add `getSingletons` public method to ContainerImpl
+* add `isSingleton` method to check if your type. It prevents falsy-singletons, that inherits this field from another class
+
+ 
+* add `setInjectedParams` method to set params (it's not `@inject` analog), that will be passed after all dependencies in your class
+* add `getInjectedParams` method to get injected params
+
 ### 2.2.3
 
 * bugfix using of `@inject` in inherited classes

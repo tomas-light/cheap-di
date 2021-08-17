@@ -1,11 +1,21 @@
-import { singleton } from './singleton';
-import { singletonSymbol as singleton_s } from './symbols';
-import { ImplementationType } from './types';
+import { singleton, isSingleton } from './singleton';
 
-test('', () => {
+test('set singleton', () => {
   @singleton
   class MyClass {
   }
 
-  expect((MyClass as ImplementationType<MyClass>)[singleton_s]).toEqual(true);
+  expect(isSingleton(MyClass)).toEqual(true);
+});
+
+test('singleton is not inherited', () => {
+  @singleton
+  class MyClass {
+  }
+
+  class MyClass2 extends MyClass {
+  }
+
+  expect(isSingleton(MyClass)).toEqual(true);
+  expect(isSingleton(MyClass2)).toEqual(false);
 });

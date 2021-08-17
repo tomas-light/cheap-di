@@ -1,5 +1,7 @@
+import { getDependencies } from './dependencies';
 import { CircularDependencyError } from './errors';
-import { singletonSymbol, dependenciesSymbol, injectionSymbol } from './symbols';
+import { getInjectedParams, setInjectedParams } from './inject';
+import { isSingleton } from './singleton';
 import {
   Constructor,
   Container,
@@ -27,7 +29,7 @@ class ContainerImpl implements Container {
 
   registerType<TInstance>(implementationType: ImplementationType<TInstance>) {
     const withInjection = (...injectionParams: any[]) => {
-      (implementationType as ImplementationTypeWithInjection<TInstance>)[injectionSymbol] = injectionParams;
+      setInjectedParams(implementationType, injectionParams);
     };
 
     this.dependencies.set(implementationType, implementationType);
@@ -93,10 +95,10 @@ class ContainerImpl implements Container {
       return implementation as Object as TInstance;
     }
 
-    if (implementation[singletonSymbol]) {
-      const rootContainer = this.findRootContainer();
-      if (rootContainer.singletons.has(implementation)) {
-        return rootContainer.singletons.get(implementation) as TInstance;
+    if (isSingleton(implementation)) {
+      const singletons = this.getSingletons();
+      if (singletons.has(implementation)) {
+        return singletons.get(implementation) as TInstance;
       }
     }
 
@@ -104,20 +106,21 @@ class ContainerImpl implements Container {
 
     let injectableArguments: any[] = [];
     const injectionParams: any[] = [
-      ...(Array.isArray(implementation[injectionSymbol]) ? implementation[injectionSymbol]! : []),
+      ...getInjectedParams(implementation),
       ...args,
     ];
 
     let index = 0;
     let injectionParamsIndex = 0;
 
-    if (implementation[dependenciesSymbol]) {
+    const dependencies = getDependencies(implementation);
+    if (dependencies.length) {
       let has = true;
-      const injectableDependencies = implementation[dependenciesSymbol]!.filter(d => d);
+      const injectableDependencies = dependencies.filter(d => d);
       const length = injectableDependencies.length + injectionParams.length;
 
       while (has) {
-        const dependencyType = implementation[dependenciesSymbol]![index];
+        const dependencyType = dependencies[index];
         if (dependencyType) {
           trace.addTrace(dependencyType.name);
 
@@ -142,9 +145,9 @@ class ContainerImpl implements Container {
 
     const target = new implementation(...injectableArguments);
 
-    if (implementation[singletonSymbol]) {
-      const rootContainer = this.findRootContainer();
-      rootContainer.singletons.set(implementation, target);
+    if (isSingleton(implementation)) {
+      const singletons = this.getSingletons();
+      singletons.set(implementation, target);
     }
 
     return target;
@@ -172,6 +175,11 @@ class ContainerImpl implements Container {
     }
 
     return undefined;
+  }
+
+  getSingletons() {
+    const rootContainer = this.findRootContainer();
+    return rootContainer.singletons;
   }
 
   private findRootContainer(): ContainerImpl {
