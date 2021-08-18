@@ -1,7 +1,5 @@
-import { getDependencies } from './dependencies';
+import { getDependencies, getInjectedParams, setInjectedParams, isSingleton } from './decorators';
 import { CircularDependencyError } from './errors';
-import { getInjectedParams, setInjectedParams } from './inject';
-import { isSingleton } from './singleton';
 import {
   Constructor,
   Container,

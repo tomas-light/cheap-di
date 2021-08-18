@@ -1,6 +1,6 @@
 import { dependencies } from './dependencies';
-import { dependenciesSymbol as dependencies_s } from './symbols';
-import { ImplementationType } from './types';
+import { dependenciesSymbol as dependencies_s } from '../symbols';
+import { ImplementationType } from '../types';
 
 test('case 1', () => {
   class Service1 {

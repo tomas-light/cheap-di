@@ -1,6 +1,6 @@
 import { InheritancePreserver } from './InheritancePreserver';
-import { dependenciesSymbol, dependenciesSymbol as dependencies_s } from './symbols';
-import { Constructor, Dependency, ImplementationType } from './types';
+import { dependenciesSymbol, dependenciesSymbol as dependencies_s } from '../symbols';
+import { Constructor, Dependency, ImplementationType } from '../types';
 
 type D<T> = Dependency<T>;
 type Return<TClass> = TClass extends new(...args: any[]) => infer TInstance

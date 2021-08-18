@@ -1,5 +1,5 @@
 import { inject } from './inject';
-import { dependenciesSymbol } from './symbols';
+import { dependenciesSymbol } from '../symbols';
 
 test('', () => {
   class Service {

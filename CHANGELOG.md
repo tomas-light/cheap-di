@@ -1,6 +1,6 @@
 # Changelog
 
-### 2.2.4
+### 2.3.0
 
 * prevent decorated setting inheritance (because it's a static field)
 * add `getDependencies` method to get settled types

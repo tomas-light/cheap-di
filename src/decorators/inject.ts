@@ -1,6 +1,6 @@
 import { InheritancePreserver } from './InheritancePreserver';
-import { dependenciesSymbol, injectionSymbol } from './symbols';
-import { Constructor, Dependency, ImplementationType, ImplementationTypeWithInjection } from './types';
+import { dependenciesSymbol, injectionSymbol } from '../symbols';
+import { Constructor, Dependency, ImplementationType, ImplementationTypeWithInjection } from '../types';
 
 function inject<TClass extends Constructor, TDependency extends Dependency>(dependency: TDependency) {
   return function (constructor: TClass, propertyKey: string | symbol, parameterIndex: number) {

@@ -1,5 +1,5 @@
-import { inheritancePreserveSymbol } from './symbols';
-import { Constructor, ImplementationType } from './types';
+import { inheritancePreserveSymbol } from '../symbols';
+import { Constructor, ImplementationType } from '../types';
 
 class InheritancePreserver {
   static constructorModified(constructor: Constructor) {

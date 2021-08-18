@@ -1,7 +1,5 @@
 import { container, ContainerImpl } from './ContainerImpl';
-import { dependencies } from './dependencies';
-import { singleton } from './singleton';
-import { inject } from './inject';
+import { dependencies, singleton, inject } from './decorators';
 
 describe('register type', () => {
   test('simple', () => {
