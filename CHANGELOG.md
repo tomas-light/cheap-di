@@ -1,5 +1,16 @@
 # Changelog
 
+### 3.0.0
+
+* move `parentContainer` field to `cheap-di-react`;
+* move `sameParent` method to `cheap-di-react`;
+* change access to `singletons` field by `protected`;
+* change access to `instances` field by `protected`;
+* change access to `dependencies` field by `protected`;
+* change access to `getInstance` method by `protected`;
+* change access to `getImplementation` method by `protected`;
+* change access to `getSingletons` method by `protected`;
+
 ### 2.3.0
 
 * prevent decorated setting inheritance (because it's a static field)

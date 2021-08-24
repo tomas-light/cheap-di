@@ -11,18 +11,14 @@ import {
 import { Trace } from './utils';
 
 class ContainerImpl implements Container {
-  private singletons: Map<ImplementationTypeWithInjection<any>, Object>;
-  private instances: Map<RegistrationType<any>, any>;
-  private dependencies: Map<RegistrationType<any>, ImplementationTypeWithInjection<any> | Object>;
+  protected singletons: Map<ImplementationTypeWithInjection<any>, Object>;
+  protected instances: Map<RegistrationType<any>, any>;
+  protected dependencies: Map<RegistrationType<any>, ImplementationTypeWithInjection<any> | Object>;
 
-  constructor(private parentContainer?: ContainerImpl) {
+  constructor() {
     this.singletons = new Map();
     this.instances = new Map();
     this.dependencies = new Map();
-  }
-
-  sameParent(parentContainer?: ContainerImpl) {
-    return this.parentContainer === parentContainer;
   }
 
   registerType<TInstance>(implementationType: ImplementationType<TInstance>) {
@@ -151,41 +147,24 @@ class ContainerImpl implements Container {
     return target;
   }
 
-  private getInstance<TInstance>(type: Constructor<TInstance> | AbstractConstructor<TInstance>): ImplementationTypeWithInjection<TInstance> | Object | undefined {
+  protected getInstance<TInstance>(type: Constructor<TInstance> | AbstractConstructor<TInstance>): ImplementationTypeWithInjection<TInstance> | Object | undefined {
     if (this.instances.has(type)) {
       return this.instances.get(type)!;
     }
 
-    if (this.parentContainer) {
-      return this.parentContainer.getInstance(type);
-    }
-
     return undefined;
   }
 
-  private getImplementation<TInstance>(type: Constructor<TInstance> | AbstractConstructor<TInstance>): ImplementationTypeWithInjection<TInstance> | Object | undefined {
+  protected getImplementation<TInstance>(type: Constructor<TInstance> | AbstractConstructor<TInstance>): ImplementationTypeWithInjection<TInstance> | Object | undefined {
     if (this.dependencies.has(type)) {
       return this.dependencies.get(type)!;
     }
 
-    if (this.parentContainer) {
-      return this.parentContainer.getImplementation(type);
-    }
-
     return undefined;
   }
 
-  getSingletons() {
-    const rootContainer = this.findRootContainer();
-    return rootContainer.singletons;
-  }
-
-  private findRootContainer(): ContainerImpl {
-    if (this.parentContainer) {
-      return this.parentContainer.findRootContainer();
-    }
-
-    return this;
+  protected getSingletons() {
+    return this.singletons;
   }
 }
 
