@@ -1,5 +1,11 @@
 # Changelog
 
+### 3.1.0
+
+* add `@di` class-decorator;
+* update `@singleton` to using `@di`;
+* add `clear` method to `DependencyResolver`;
+
 ### 3.0.0
 
 * move `parentContainer` field to `cheap-di-react`;
@@ -69,7 +75,7 @@ class New {
 }
 ```
 
-* add `@inject()` decorator, you can use it instead of `@dependencies()`
+* add `@inject()` parameter-decorator, you can use it instead of `@dependencies()`
 
 before:
 ```ts
@@ -97,7 +103,7 @@ class MyClass {
 
 ### 2.1.0
 
-* add singleton decorator
+* add `@singleton` class-decorator
 
 ### 2.0.5
 

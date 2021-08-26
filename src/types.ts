@@ -33,6 +33,7 @@ type Resolver = <TInstance>(type: Constructor<TInstance> | AbstractConstructor<T
 
 interface DependencyResolver {
   resolve: Resolver;
+  clear(): void;
 }
 
 interface Container extends DependencyRegistrator, DependencyResolver {}

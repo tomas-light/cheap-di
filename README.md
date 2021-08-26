@@ -1,4 +1,5 @@
 # cheap-di
+
 JavaScript dependency injection like Autofac in .Net
 
 ## How to use
@@ -10,12 +11,14 @@ You have an interface (base/abstract class) and its implementation (derived clas
 export class UserRepository {
   constructor() {
     if (new.target === UserRepository) {
-        throw new TypeError('Cannot construct UserRepository instance directly');
+      throw new TypeError('Cannot construct UserRepository instance directly');
     }
   }
+
   list() {
     throw new Error("Not implemented");
   }
+
   getById(userId) {
     throw new Error("Not implemented");
   }
@@ -40,9 +43,11 @@ export class FakeUserRepository extends UserRepository {
       },
     ];
   }
+
   list() {
     return this.users;
   }
+
   getById(userId) {
     return this.users.find(user => user.id === userId);
   }
@@ -50,6 +55,7 @@ export class FakeUserRepository extends UserRepository {
 ```
 
 There is simple logger.
+
 `logger.js`
 ```js
 export class Logger {
@@ -61,22 +67,23 @@ export class Logger {
 
 `console-logger.js`
 ```js
-import { Logger} from './logger';
+import { Logger } from './logger';
 
 export class ConsoleLogger extends Logger {
   constructor(prefix) {
     super();
     this.prefix = prefix;
   }
+
   debug(message) {
     console.log(`${this.prefix}: ${message}`);
   }
 }
 ```
 
-You have the repository consumer.
-To allow DI container inject dependencies in your consumer class you should specify `__dependencies` static property.
-That property should contain constructor array in the order of your constructor.
+You have the repository consumer. To allow DI container inject dependencies in your consumer class you should
+specify `__dependencies` static property. That property should contain constructor array in the order of your
+constructor.
 
 `user-service.js`
 ```js
@@ -85,18 +92,18 @@ import { Logger } from './logger';
 import { UserRepository } from './user-repository';
 
 export class UserService {
-  static [dependencies] = [ UserRepository, Logger ];
-  
+  static [dependencies] = [UserRepository, Logger];
+
   constructor(userRepository, logger) {
     this.userRepository = userRepository;
     this.logger = logger;
   }
-  
+
   list() {
     this.logger.debug('Access to users list');
     return this.userRepository.list();
   }
-  
+
   get(userId) {
     return this.userRepository.getById(userId);
   }
@@ -109,9 +116,9 @@ Dependency registration
 ```js
 import { container } from 'cheap-di';
 
-import { ConsoleLogger} from './console-logger';
+import { ConsoleLogger } from './console-logger';
 import { FakeUserRepository } from './fake-user-repository';
-import { Logger} from './logger';
+import { Logger } from './logger';
 import { UserRepository } from './user-repository';
 
 container.registerType(ConsoleLogger).as(Logger).with('most valuable message prefix');
@@ -130,6 +137,25 @@ const service = container.resolve(UserService);
 const users = service.list();
 ```
 
+Your injection parameter can be placed in middle of constructor params. In this case you should put `undefined`
+or `null` in `[dependencies]` with accordance order
+```js
+import { dependencies, container } from 'cheap-di';
+// ...
+
+export class UserService {
+  static [dependencies] = [UserRepository, undefined, Logger];
+
+  constructor(userRepository, someMessage, logger) {
+    // ...
+  }
+}
+
+// ...
+
+container.registerType(UserService).with('my injection string');
+```
+
 ## TypeScript
 
 `logger.ts`
@@ -141,18 +167,21 @@ export abstract class Logger {
 
 `console-logger.ts`
 ```ts
-import { Logger} from './logger';
+import { Logger } from './logger';
 
 export class ConsoleLogger extends Logger {
   constructor(prefix) {
     super();
     this.prefix = prefix;
   }
+
   debug(message: string) {
     console.log(`${this.prefix}: ${message}`);
   }
 }
 ```
+
+#### Dependencies
 
 `@dependencies` decorator can be used to simplify dependency syntax
 
@@ -169,17 +198,19 @@ export class UserService {
     private logger: Logger,
   ) {
   }
-  
+
   list() {
-      this.logger.debug('Access to users list');
-      return this.userRepository.list();
+    this.logger.debug('Access to users list');
+    return this.userRepository.list();
   }
-  
+
   get(userId) {
-      return this.userRepository.getById(userId);
+    return this.userRepository.getById(userId);
   }
 }
 ```
+
+#### Inject
 
 `@inject` decorator can be used instead of `@dependencies` like below:
 ```ts
@@ -189,13 +220,12 @@ export class UserService {
   constructor(
     @inject(UserRepository) private userRepository: UserRepository,
     @inject(Logger) private logger: Logger,
-  ) {
-  }
-  ...
+  ) {}
 }
 ```
 
 This approach allows you to mix dependency with injection params with any order:
+
 ```ts
 class Service {
   constructor(
@@ -212,9 +242,41 @@ const message2 = '456';
 container.registerType(Service).with(message1, message2);
 ```
 
+#### Di
+
+`@di` decorator can be used instead of `@dependencies` and `@inject` like below:
+```ts
+import { di } from 'cheap-di';
+
+@di
+export class UserService {
+  constructor(
+    private userRepository: UserRepository,
+    private logger: Logger,
+  ) {}
+}
+
+@di
+class Service {
+  constructor(
+    message1: string,
+    public repository: UserRepository,
+    message2: string,
+    public db: Database,
+  ) {}
+}
+
+const message1 = '123';
+const message2 = '456';
+container.registerType(Service).with(message1, message2);
+```
+
+It automatically adds `@inject` decorators to your service.
+
+#### Singleton
+
 `@singleton` decorator allows you to inject the same instance everywhere.
 
-`user-service.ts`
 ```ts
 import { singleton } from 'cheap-di';
 import { Logger } from './logger';
@@ -223,21 +285,22 @@ import { UserRepository } from './user-repository';
 @singleton
 export class UserService {
   names: string[];
+
   constructor() {
     this.names = [];
   }
-  
+
   list() {
-      return this.names;
+    return this.names;
   }
-  
+
   add(name: string) {
-      this.names.push(name);
+    this.names.push(name);
   }
 }
 ```
 
-You can see more examples in `cheap-di/src/ContainerImpl.test.ts`
 
+You can see more examples in `cheap-di/src/ContainerImpl.test.ts`
 
 [Changelog](./CHANGELOG.md)

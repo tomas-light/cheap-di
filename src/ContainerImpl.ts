@@ -70,6 +70,12 @@ class ContainerImpl implements Container {
     }
   }
 
+  clear() {
+    this.instances.clear();
+    this.singletons.clear();
+    this.dependencies.clear();
+  }
+
   private internalResolve<TInstance>(
     type: Constructor<TInstance> | AbstractConstructor<TInstance>,
     trace: Trace,
@@ -119,7 +125,17 @@ class ContainerImpl implements Container {
           trace.addTrace(dependencyType.name);
 
           const instance = this.internalResolve(dependencyType, trace.trace!);
-          injectableArguments[index] = instance;
+          if (
+            instance.constructor === dependencyType
+            && injectionParams[injectionParamsIndex] instanceof Object
+            && injectionParams[injectionParamsIndex].constructor === dependencyType
+          ) {
+            injectableArguments[index] = injectionParams[injectionParamsIndex];
+            injectionParamsIndex++;
+          }
+          else {
+            injectableArguments[index] = instance;
+          }
         }
         else if (injectionParams[injectionParamsIndex]) {
           injectableArguments[index] = injectionParams[injectionParamsIndex];

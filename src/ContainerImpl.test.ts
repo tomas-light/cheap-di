@@ -1,5 +1,5 @@
 import { container } from './ContainerImpl';
-import { dependencies, singleton, inject } from './decorators';
+import { dependencies, singleton, inject, di } from './decorators';
 
 describe('register type', () => {
   test('simple', () => {
@@ -309,7 +309,7 @@ test('add abstract constructor for instance registration', () => {
   expect(result).toBe(config);
 });
 
-test('with inject decorator', () => {
+describe('with decorators', () => {
   class Database {
     readonly entities: string[];
 
@@ -340,17 +340,57 @@ test('with inject decorator', () => {
     }
   }
 
-  const entities = ['entity 1', 'entity 2'];
-  container.registerInstance(new Database(entities));
+  function check(resolveType: typeof Service) {
+    const entities = ['entity 1', 'entity 2'];
+    container.registerInstance(new Database(entities));
 
-  const service = container.resolve(Service)!;
-  const list = service.myList();
-  expect(list).toEqual([
-    'entity 1',
-    'entity 2',
-    'service entity',
-  ]);
-})
+    const service = container.resolve(resolveType)!;
+    const list = service.myList();
+    expect(list).toEqual([
+      'entity 1',
+      'entity 2',
+      'service entity',
+    ]);
+  }
+
+  beforeEach(() => {
+    container.clear();
+  });
+
+  test('with inject decorator', () => {
+    class _Repository extends Repository {
+      constructor(@inject(Database) db: Database) {
+        super(db);
+      }
+    }
+
+    class _Service extends Service {
+      constructor(@inject(_Repository) repository: _Repository) {
+        super(repository);
+      }
+    }
+
+    check(_Service);
+  });
+
+  test('with di decorator', () => {
+    @di
+    class _Repository extends Repository {
+      constructor(db: Database) {
+        super(db);
+      }
+    }
+
+    @di
+    class _Service extends Service {
+      constructor(repository: _Repository) {
+        super(repository);
+      }
+    }
+
+    check(_Service);
+  });
+});
 
 describe('arguments order', () => {
   class Database {
@@ -386,7 +426,15 @@ describe('arguments order', () => {
   const message1 = '123';
   const message2 = '456';
 
-  function check(service: Service) {
+  function register(type: typeof Service) {
+    const entities = ['entity 1', 'entity 2'];
+    container.registerInstance(new Database(entities));
+    container.registerType(type).with(message1, message2);
+  }
+
+  function resolveAndCheck(type: typeof Service) {
+    const service = container.resolve(type)!;
+
     const list1 = service.list1();
     expect(list1).toEqual([
       'test 1',
@@ -405,6 +453,15 @@ describe('arguments order', () => {
     expect(service.message2).toBe(message2);
   }
 
+  function check(type: typeof Service) {
+    register(type);
+    resolveAndCheck(type);
+  }
+
+  beforeEach(() => {
+    container.clear();
+  });
+
   test('case 1', () => {
     class Service1 extends Service {
       constructor(
@@ -417,12 +474,7 @@ describe('arguments order', () => {
       }
     }
 
-    const entities = ['entity 1', 'entity 2'];
-    container.registerInstance(new Database(entities));
-    container.registerType(Service1).with(message1, message2);
-
-    const service = container.resolve(Service1)!;
-    check(service);
+    check(Service1);
   });
 
   test('case 2', () => {
@@ -437,12 +489,7 @@ describe('arguments order', () => {
       }
     }
 
-    const entities = ['entity 1', 'entity 2'];
-    container.registerInstance(new Database(entities));
-    container.registerType(Service2).with(message1, message2);
-
-    const service = container.resolve(Service2)!;
-    check(service);
+    check(Service2 as any);
   });
 
   test('case 3', () => {
@@ -457,12 +504,7 @@ describe('arguments order', () => {
       }
     }
 
-    const entities = ['entity 1', 'entity 2'];
-    container.registerInstance(new Database(entities));
-    container.registerType(Service3).with(message1, message2);
-
-    const service = container.resolve(Service3)!;
-    check(service);
+    check(Service3 as any);
   });
 
   test('case 4', () => {
@@ -477,11 +519,56 @@ describe('arguments order', () => {
       }
     }
 
+    check(Service4 as any);
+  });
+
+  test('case 5', () => {
+    @di
+    class Service5 extends Service {
+      constructor(
+        message: string,
+        public repository: Repository,
+        message2: string,
+        public db: Database,
+      ) {
+        super(repository, db, message, message2);
+      }
+    }
+
+    check(Service5 as any);
+  });
+
+  test('case 6', () => {
+    class AnotherService {
+      constructor(private num: number) {
+      }
+
+      some() {
+        return this.num;
+      }
+    }
+
+    @di
+    class Service6 extends Service {
+      constructor(
+        message: string,
+        public repository: Repository,
+        message2: string,
+        public db: Database,
+        public anotherService: AnotherService
+      ) {
+        super(repository, db, message, message2);
+      }
+    }
+
     const entities = ['entity 1', 'entity 2'];
     container.registerInstance(new Database(entities));
-    container.registerType(Service4).with(message1, message2);
+    container.registerType(Service6).with(message1, message2, new AnotherService(2));
 
-    const service = container.resolve(Service4)!;
-    check(service);
+    resolveAndCheck(Service6 as any);
+
+    const service = container.resolve(Service6)!;
+    // check if DI creates instance, and doesn't pass it as injectionParams
+    expect(service.anotherService.some()).toBe(2);
   });
 });
