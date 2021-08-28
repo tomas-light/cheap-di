@@ -87,12 +87,12 @@ constructor.
 
 `user-service.js`
 ```js
-import { dependencies } from 'cheap-di';
+import { dependenciesSymbol } from 'cheap-di';
 import { Logger } from './logger';
 import { UserRepository } from './user-repository';
 
 export class UserService {
-  static [dependencies] = [UserRepository, Logger];
+  static [dependenciesSymbol] = [UserRepository, Logger];
 
   constructor(userRepository, logger) {
     this.userRepository = userRepository;
@@ -115,7 +115,6 @@ Dependency registration
 `some-config.js`
 ```js
 import { container } from 'cheap-di';
-
 import { ConsoleLogger } from './console-logger';
 import { FakeUserRepository } from './fake-user-repository';
 import { Logger } from './logger';
@@ -130,7 +129,6 @@ To get instance of your service with injected parameters you should call `resolv
 `some-place.js`
 ```js
 import { container } from 'cheap-di';
-
 import { UserService } from './user-service';
 
 const service = container.resolve(UserService);
@@ -140,11 +138,11 @@ const users = service.list();
 Your injection parameter can be placed in middle of constructor params. In this case you should put `undefined`
 or `null` in `[dependencies]` with accordance order
 ```js
-import { dependencies, container } from 'cheap-di';
+import { dependenciesSymbol, container } from 'cheap-di';
 // ...
 
 export class UserService {
-  static [dependencies] = [UserRepository, undefined, Logger];
+  static [dependenciesSymbol] = [UserRepository, undefined, Logger];
 
   constructor(userRepository, someMessage, logger) {
     // ...
@@ -181,6 +179,57 @@ export class ConsoleLogger extends Logger {
 }
 ```
 
+You can use typescript reflection for auto resolve your class dependencies and inject them. 
+For that you should add lines below to your `tsconfig.json`:
+```
+"emitDecoratorMetadata": true,
+"experimentalDecorators": true,
+```
+
+and add any class-decorator to your class. For example:
+
+`metadata.ts`
+```ts
+export const metadata = <T>(constructor: T): T => constructor;
+```
+
+`service.ts`
+```ts
+import { metadata } from './metadata';
+import { Logger } from './logger';
+
+@metadata
+export class Service {
+  constructor(private logger: Logger) {}
+
+  doSome() {
+    this.logger.debug('Hello world!');
+  }
+}
+```
+
+But you should explicitly register each type like this to resolve his dependencies by container:
+```ts
+import { container } from 'cheap-di';
+import { Service } from './service';
+
+container.registerType(Service);
+
+const service = container.resolve(Service);
+service.doSome();
+```
+
+<h3>In this scenario you don't need decorators from next section!</h3>
+
+---
+
+### Decorators
+
+If you want to use any of next decorators, you should add line below to your `tsconfig.json`: 
+```
+"experimentalDecorators": true,
+```
+
 #### Dependencies
 
 `@dependencies` decorator can be used to simplify dependency syntax
@@ -196,8 +245,7 @@ export class UserService {
   constructor(
     private userRepository: UserRepository,
     private logger: Logger,
-  ) {
-  }
+  ) {}
 
   list() {
     this.logger.debug('Access to users list');

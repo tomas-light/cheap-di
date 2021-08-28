@@ -1,6 +1,10 @@
 import { container } from './ContainerImpl';
 import { dependencies, singleton, inject, di } from './decorators';
 
+beforeEach(() => {
+  container.clear();
+});
+
 describe('register type', () => {
   test('simple', () => {
     class Service {
@@ -190,15 +194,30 @@ describe('register instance', () => {
   });
 });
 
-test('singletones', () => {
-  @singleton
-  class Service {
-  }
+const metadata = <T>(constructor: T): T => constructor;
 
-  container.registerType(Service);
-  const entity1 = container.resolve(Service);
-  const entity2 = container.resolve(Service);
-  expect(entity1).toBe(entity2);
+describe('singletons', () => {
+  test('with decorator', () => {
+    @singleton
+    class Service {
+    }
+
+    container.registerType(Service);
+    const entity1 = container.resolve(Service);
+    const entity2 = container.resolve(Service);
+    expect(entity1).toBe(entity2);
+  });
+
+  test('with decorator', () => {
+    @metadata
+    class Service {
+    }
+
+    container.registerType(Service).asSingleton();
+    const entity1 = container.resolve(Service);
+    const entity2 = container.resolve(Service);
+    expect(entity1).toBe(entity2);
+  });
 });
 
 describe('nested resolve', () => {
@@ -211,12 +230,9 @@ describe('nested resolve', () => {
       }
     }
 
-    @dependencies(Database)
+    @metadata
     class Repository {
-      private db: Database;
-
-      constructor(db: Database) {
-        this.db = db;
+      constructor(private db: Database) {
       }
 
       list() {
@@ -224,12 +240,9 @@ describe('nested resolve', () => {
       }
     }
 
-    @dependencies(Repository)
+    @metadata
     class Service {
-      private repository: Repository;
-
-      constructor(repository: Repository) {
-        this.repository = repository;
+      constructor(private repository: Repository) {
       }
 
       myList() {
@@ -239,6 +252,8 @@ describe('nested resolve', () => {
     }
 
     const entities = ['entity 1', 'entity 2'];
+    container.registerType(Repository);
+    container.registerType(Service);
     container.registerInstance(new Database(entities));
 
     const service = container.resolve(Service)!;
@@ -259,12 +274,9 @@ describe('nested resolve', () => {
       }
     }
 
-    @dependencies(Database)
+    @metadata
     class Repository {
-      private db: Database;
-
-      constructor(db: Database) {
-        this.db = db;
+      constructor(private db: Database) {
       }
 
       defaultList() {
@@ -272,12 +284,9 @@ describe('nested resolve', () => {
       }
     }
 
-    @dependencies(Repository)
+    @metadata
     class Service {
-      private repository: Repository;
-
-      constructor(repository: Repository) {
-        this.repository = repository;
+      constructor(private repository: Repository) {
       }
 
       myList() {
@@ -286,6 +295,8 @@ describe('nested resolve', () => {
       }
     }
 
+    container.registerType(Repository);
+    container.registerType(Service);
     const service = container.resolve(Service)!;
     const list = service.myList();
     expect(list).toEqual([
@@ -319,10 +330,7 @@ describe('with decorators', () => {
   }
 
   class Repository {
-    private db: Database;
-
-    constructor(@inject(Database) db: Database) {
-      this.db = db;
+    constructor(@inject(Database) private db: Database) {
     }
 
     list() {
@@ -389,6 +397,48 @@ describe('with decorators', () => {
     }
 
     check(_Service);
+  });
+
+  test('resolve service', () => {
+    class Database {
+      readonly entities: string[];
+
+      constructor(entities: string[]) {
+        this.entities = entities;
+      }
+    }
+
+    @dependencies(Database)
+    class Repository {
+      constructor(private db: Database) {
+      }
+
+      list() {
+        return this.db.entities;
+      }
+    }
+
+    @dependencies(Repository)
+    class Service {
+      constructor(private repository: Repository) {
+      }
+
+      myList() {
+        const entities = this.repository.list();
+        return entities.concat('service entity');
+      }
+    }
+
+    const entities = ['entity 1', 'entity 2'];
+    container.registerInstance(new Database(entities));
+
+    const service = container.resolve(Service)!;
+    const list = service.myList();
+    expect(list).toEqual([
+      'entity 1',
+      'entity 2',
+      'service entity',
+    ]);
   });
 });
 

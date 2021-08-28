@@ -1,5 +1,9 @@
 # Changelog
 
+### 3.2.0
+
+* add `asSingleton` registration method;
+
 ### 3.1.0
 
 * add `@di` class-decorator;

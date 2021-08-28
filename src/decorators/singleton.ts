@@ -4,11 +4,15 @@ import { singletonSymbol as singleton_s } from '../symbols';
 import { Constructor, ImplementationType } from '../types';
 
 function singleton<TClass extends Constructor>(constructor: TClass): TClass {
-  (constructor as any)[singleton_s] = true;
-  InheritancePreserver.constructorModified(constructor);
+  modifySingleton(constructor);
   di(constructor);
 
   return constructor;
+}
+
+function modifySingleton<TClass extends Constructor>(constructor: TClass) {
+  (constructor as any)[singleton_s] = true;
+  InheritancePreserver.constructorModified(constructor);
 }
 
 function isSingleton<TClass extends Constructor>(constructor: TClass): boolean {
@@ -19,4 +23,4 @@ function isSingleton<TClass extends Constructor>(constructor: TClass): boolean {
   ;
 }
 
-export { singleton, isSingleton };
+export { singleton, modifySingleton, isSingleton };

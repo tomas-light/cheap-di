@@ -1,4 +1,11 @@
-import { getDependencies, getInjectedParams, setInjectedParams, isSingleton } from './decorators';
+import {
+  getDependencies,
+  getInjectedParams,
+  setInjectedParams,
+  isSingleton,
+  di,
+} from './decorators';
+import { modifySingleton } from './decorators/singleton';
 import { CircularDependencyError } from './errors';
 import {
   Constructor,
@@ -10,7 +17,9 @@ import {
 } from './types';
 import { Trace } from './utils';
 
-class ContainerImpl implements Container {
+class ContainerImpl<RegisterTypeExtension = {}, RegisterInstanceExtension = {}>
+  implements Container<RegisterTypeExtension, RegisterInstanceExtension> {
+
   protected singletons: Map<ImplementationTypeWithInjection<any>, Object>;
   protected instances: Map<RegistrationType<any>, any>;
   protected dependencies: Map<RegistrationType<any>, ImplementationTypeWithInjection<any> | Object>;
@@ -21,24 +30,50 @@ class ContainerImpl implements Container {
     this.dependencies = new Map();
   }
 
+  /** register class */
   registerType<TInstance>(implementationType: ImplementationType<TInstance>) {
     const withInjection = (...injectionParams: any[]) => {
       setInjectedParams(implementationType, injectionParams);
     };
 
     this.dependencies.set(implementationType, implementationType);
+    if (!getDependencies(implementationType).length) {
+      di(implementationType);
+    }
+
     return {
+      /** as super class */
       as: <TBase extends Partial<TInstance>>(type: RegistrationType<TBase>) => {
         this.dependencies.delete(implementationType);
         this.dependencies.set(type, implementationType);
         return {
+          /** add parameters that will be passed to the class constructor */
           with: withInjection,
         };
       },
+      /** as singleton (optionally super class). Only if you didn't use @singleton decorator */
+      asSingleton: <TBase extends Partial<TInstance>>(type?: RegistrationType<TBase>) => {
+        if (type) {
+          this.dependencies.delete(implementationType);
+          this.dependencies.set(type, implementationType);
+        }
+
+        if (!isSingleton(implementationType)) {
+          modifySingleton(implementationType);
+        }
+
+        return {
+          /** add parameters that will be passed to the class constructor */
+          with: withInjection,
+        };
+      },
+      /** add parameters that will be passed to the class constructor */
       with: withInjection,
+      ...({} as RegisterTypeExtension),
     };
   }
 
+  /** register any object as it constructor */
   registerInstance<TInstance extends Object>(instance: TInstance) {
     const constructor = instance.constructor as Constructor<TInstance>;
     if (constructor) {
@@ -46,15 +81,18 @@ class ContainerImpl implements Container {
     }
 
     return {
+      /** or register the object as any class */
       as: <TBase extends Partial<TInstance>>(type: RegistrationType<TBase>) => {
         if (constructor) {
           this.instances.delete(constructor);
         }
         this.instances.set(type, instance);
       },
+      ...({} as RegisterInstanceExtension),
     };
   }
 
+  /** instantiate (or get instance for singleton) by class */
   resolve<TInstance>(type: Constructor<TInstance> | AbstractConstructor<TInstance>, ...args: any[]): TInstance | undefined {
     const trace = new Trace(type.name);
     try {
@@ -70,6 +108,7 @@ class ContainerImpl implements Container {
     }
   }
 
+  /** clear all registered classes and instances */
   clear() {
     this.instances.clear();
     this.singletons.clear();
