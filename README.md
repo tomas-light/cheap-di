@@ -292,6 +292,11 @@ container.registerType(Service).with(message1, message2);
 
 #### Di
 
+This decorator uses typescript reflection, so you should add line below to your `tsconfig.json`: 
+```
+"emitDecoratorMetadata": true,
+```
+
 `@di` decorator can be used instead of `@dependencies` and `@inject` like below:
 ```ts
 import { di } from 'cheap-di';
