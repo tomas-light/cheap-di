@@ -598,11 +598,20 @@ describe('arguments order', () => {
       }
     }
 
+    class Config {
+      prop: string = '';
+    }
+
+    const config: Config = {
+      prop: 'qwe',
+    };
+
     @di
     class Service6 extends Service {
       constructor(
         message: string,
         public repository: Repository,
+        public config: Config,
         message2: string,
         public db: Database,
         public anotherService: AnotherService
@@ -612,6 +621,7 @@ describe('arguments order', () => {
     }
 
     const entities = ['entity 1', 'entity 2'];
+    container.registerInstance(config).as(Config);
     container.registerInstance(new Database(entities));
     container.registerType(Service6).with(message1, message2, new AnotherService(2));
 
@@ -620,5 +630,6 @@ describe('arguments order', () => {
     const service = container.resolve(Service6)!;
     // check if DI creates instance, and doesn't pass it as injectionParams
     expect(service.anotherService.some()).toBe(2);
+    expect(service.config.prop).toBe('qwe');
   });
 });

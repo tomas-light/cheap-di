@@ -4,8 +4,8 @@ import { singletonSymbol as singleton_s } from '../symbols';
 import { Constructor, ImplementationType } from '../types';
 
 function singleton<TClass extends Constructor>(constructor: TClass): TClass {
-  modifySingleton(constructor);
   di(constructor);
+  modifySingleton(constructor);
 
   return constructor;
 }

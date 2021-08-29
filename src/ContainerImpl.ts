@@ -14,6 +14,7 @@ import {
   AbstractConstructor,
   ImplementationType,
   ImplementationTypeWithInjection,
+  Dependency,
 } from './types';
 import { Trace } from './utils';
 
@@ -165,7 +166,10 @@ class ContainerImpl<RegisterTypeExtension = {}, RegisterInstanceExtension = {}>
 
           const instance = this.internalResolve(dependencyType, trace.trace!);
           if (
-            instance.constructor === dependencyType
+            !(
+              this.isRegisteredInstance(dependencyType, instance)
+              || this.isRegisteredType(dependencyType, instance)
+            )
             && injectionParams[injectionParamsIndex] instanceof Object
             && injectionParams[injectionParamsIndex].constructor === dependencyType
           ) {
@@ -220,6 +224,14 @@ class ContainerImpl<RegisterTypeExtension = {}, RegisterInstanceExtension = {}>
 
   protected getSingletons() {
     return this.singletons;
+  }
+
+  private isRegisteredInstance(dependencyType: Dependency, instance: any) {
+    return instance === this.getInstance(dependencyType);
+  }
+
+  private isRegisteredType(dependencyType: Dependency, instance: any) {
+    return instance.constructor === this.getImplementation(dependencyType);
   }
 }
 

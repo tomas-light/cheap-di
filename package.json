@@ -1,6 +1,6 @@
 {
   "name": "cheap-di",
-  "version": "3.2.0",
+  "version": "3.2.1",
   "description": "JavaScript dependency injection like Autofac in .Net",
   "scripts": {
     "build": "tsc",
