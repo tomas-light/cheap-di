@@ -1,8 +1,57 @@
 # cheap-di
 
-JavaScript dependency injection like Autofac in .Net
+JavaScript's dependency injection like Autofac in .Net
 
-## How to use
+* [Minimal Sample](#minimal-sample)
+* [How to use](#how-to-use)
+* [TypeScript](#type-script)
+* [Decorators](#decorators)
+  * [dependencies](#dependencies)
+  * [inject](#inject)
+  * [di](#di)
+  * [singleton](#singleton)
+
+## <a name="minimal-sample"></a> Minimal Sample
+
+```ts
+abstract class Logger {
+  abstract debug: (message: string) => void;
+}
+
+class ConsoleLogger implements Logger {
+  constructor(prefix) {
+    this.prefix = prefix;
+  }
+
+  debug(message: string) {
+    console.log(`${this.prefix}: ${message}`);
+  }
+}
+
+const metadata = <T>(constructor: T): T => constructor;
+
+@metadata
+class Service {
+  constructor(private logger: Logger) {}
+
+  doSome() {
+    this.logger.debug('Hello world!');
+  }
+}
+
+// somewhere
+
+import { container } from 'cheap-di';
+
+const myLogPrefix = 'INFO: ';
+container.registerType(ConsoleLogger).as(Logger).with(myLogPrefix);
+container.registerType(Service);
+
+const service = container.resolve(Service);
+service.doSome();
+```
+
+## <a name="how-to-use"></a> How to use
 
 You have an interface (base/abstract class) and its implementation (derived class)
 
@@ -154,7 +203,7 @@ export class UserService {
 container.registerType(UserService).with('my injection string');
 ```
 
-## TypeScript
+## <a name="type-script"></a> TypeScript
 
 `logger.ts`
 ```ts
@@ -223,14 +272,14 @@ service.doSome();
 
 ---
 
-### Decorators
+## <a name="decorators"></a> Decorators
 
 If you want to use any of next decorators, you should add line below to your `tsconfig.json`: 
 ```
 "experimentalDecorators": true,
 ```
 
-#### Dependencies
+### <a name="dependencies"></a> dependencies
 
 `@dependencies` decorator can be used to simplify dependency syntax
 
@@ -258,7 +307,7 @@ export class UserService {
 }
 ```
 
-#### Inject
+### <a name="inject"></a> inject
 
 `@inject` decorator can be used instead of `@dependencies` like below:
 ```ts
@@ -290,7 +339,7 @@ const message2 = '456';
 container.registerType(Service).with(message1, message2);
 ```
 
-#### Di
+### <a name="di"></a> di
 
 This decorator uses typescript reflection, so you should add line below to your `tsconfig.json`: 
 ```
@@ -326,7 +375,7 @@ container.registerType(Service).with(message1, message2);
 
 It automatically adds `@inject` decorators to your service.
 
-#### Singleton
+### <a name="singleton"></a> singleton
 
 `@singleton` decorator allows you to inject the same instance everywhere.
 
