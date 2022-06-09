@@ -196,6 +196,66 @@ describe('register instance', () => {
 
 const metadata = <T>(constructor: T): T => constructor;
 
+describe('resolving several dependencies', () => {
+  class ApiInterceptor {
+    static singleton: ApiInterceptor;
+
+    api?: {
+      fetch: () => string;
+    };
+
+    constructor(public readonly dispatch: () => any) {
+      if (ApiInterceptor.singleton) {
+        return ApiInterceptor.singleton;
+      }
+      ApiInterceptor.singleton = this;
+
+      this.api = {
+        fetch: () => {
+          this.dispatch();
+          return '123';
+        },
+      }
+    }
+  }
+
+  @metadata
+  class ApiBase {
+    constructor(public readonly interceptor: ApiInterceptor) {
+      if (!interceptor) {
+        throw new Error(`Can't instantiate Api. Have not enough arguments.`);
+      }
+    }
+
+    protected get(data: string) {
+      return this.interceptor.api!.fetch() + data;
+    }
+  }
+
+  class MyApi extends ApiBase {
+    getData() {
+      return this.get('-456');
+    }
+  }
+
+  const dispatch = jest.fn();
+  container.registerType(ApiInterceptor).with(dispatch);
+  container.registerType(MyApi);
+
+  const myApi = container.resolve(MyApi);
+  test('api resolved', () => {
+    expect(myApi).not.toBe(null);
+  });
+  test('api has passed parameter', () => {
+    expect(myApi!.interceptor).not.toBe(null);
+    expect(myApi!.interceptor!.dispatch).not.toBe(null);
+  });
+  test('api method works', () => {
+    expect(myApi!.getData()).toBe('123-456');
+    expect(dispatch).toBeCalledTimes(1);
+  });
+});
+
 describe('singletons', () => {
   test('with decorator', () => {
     @singleton

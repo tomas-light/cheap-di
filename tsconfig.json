@@ -6,7 +6,7 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "importHelpers": true,
-    "module": "CommonJS",
+    "module": "ESNext",
     "moduleResolution": "node",
     "noErrorTruncation": true,
     "outDir": "./dist",

@@ -6,7 +6,7 @@ function inject<TClass extends Constructor, TDependency extends Dependency>(depe
   return function (constructor: TClass, propertyKey: string | symbol, parameterIndex: number) {
     const implementation = constructor as ImplementationType<TClass>;
 
-    // if class inherited from another one the static property will be contain the same array ref,
+    // if class inherited from another one the static property will contain the same array ref,
     // and we shouldn't change dependencies of base class
     const modifiedConstructor = InheritancePreserver.getModifiedConstructor(constructor);
     const injectInNewClass = modifiedConstructor !== constructor;
