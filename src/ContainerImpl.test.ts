@@ -355,8 +355,6 @@ describe('nested resolve', () => {
       }
     }
 
-    container.registerType(Repository);
-    container.registerType(Service);
     const service = container.resolve(Service)!;
     const list = service.myList();
     expect(list).toEqual([

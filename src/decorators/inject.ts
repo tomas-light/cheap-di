@@ -1,3 +1,4 @@
+import { di } from "./di";
 import { InheritancePreserver } from './InheritancePreserver';
 import { dependenciesSymbol, injectionSymbol } from '../symbols';
 import { Constructor, Dependency, ImplementationType, ImplementationTypeWithInjection } from '../types';
@@ -28,8 +29,15 @@ function setInjectedParams<TInstance>(implementationType: ImplementationType<TIn
 function getInjectedParams<TClass extends Constructor>(constructor: TClass): any[] {
   const implementation = constructor as ImplementationTypeWithInjection<TClass>;
   const modifiedConstructor = InheritancePreserver.getModifiedConstructor(constructor);
-  const injected = implementation[injectionSymbol];
-  if (!modifiedConstructor || modifiedConstructor !== constructor || !Array.isArray(injected)) {
+  let injected = implementation[injectionSymbol];
+
+  if (!modifiedConstructor) {
+    di(constructor);
+    InheritancePreserver.constructorModified(constructor);
+    injected = implementation[injectionSymbol];
+  }
+
+  if (modifiedConstructor !== constructor || !Array.isArray(injected)) {
     return [];
   }
 
