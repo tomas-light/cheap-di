@@ -1,5 +1,35 @@
 # Changelog
 
+### 3.3.2
+
+Bugfixes:
+* try to get injected params in prototype chain if not found anything in current constructor during resolve;
+
+### 3.3.1
+
+Bugfixes:
+* bugfix of dependency auto resolving;
+
+### 3.2.5
+
+Bugfixes:
+* revert building for CommonJS;
+
+### 3.2.4
+
+* update dependencies;
+
+### 3.2.3
+
+* fix sources map
+
+### 3.2.1
+
+Bugfixes:
+* fix container resolving for instance registered as another class;
+* fix container resolving for type, when class was registered as super class;
+* fix auto resolving for inherited classes;
+
 ### 3.2.0
 
 * add `asSingleton` registration method;

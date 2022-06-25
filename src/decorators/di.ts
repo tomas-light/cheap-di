@@ -14,6 +14,10 @@ function di<TClass extends Constructor>(constructor: TClass): TClass {
   const paramTypes = Reflect.getMetadata('design:paramtypes', constructor) as any[]
 
   if (!Array.isArray(paramTypes)) {
+    if (constructor.prototype) {
+      return di(constructor.prototype);
+    }
+
     return constructor;
   }
 
