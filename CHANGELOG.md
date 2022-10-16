@@ -1,5 +1,12 @@
 # Changelog
 
+### 3.4.0
+
+Types: 
+* add interfaces `IHaveSingletons`, `IHaveInstances`, `IHaveDependencies`;
+* `ContainerImpl` implements new interfaces to be able to implement them in your container;
+
+
 ### 3.3.2
 
 Bugfixes:

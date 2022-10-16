@@ -15,15 +15,21 @@ import {
   ImplementationType,
   ImplementationTypeWithInjection,
   Dependency,
+  IHaveSingletons,
+  IHaveInstances,
+  IHaveDependencies,
 } from './types';
 import { Trace } from './utils';
 
 class ContainerImpl<RegisterTypeExtension = {}, RegisterInstanceExtension = {}>
-  implements Container<RegisterTypeExtension, RegisterInstanceExtension> {
+  implements Container<RegisterTypeExtension, RegisterInstanceExtension>,
+    IHaveSingletons,
+    IHaveInstances,
+    IHaveDependencies {
 
-  protected singletons: Map<ImplementationTypeWithInjection<any>, Object>;
-  protected instances: Map<RegistrationType<any>, any>;
-  protected dependencies: Map<RegistrationType<any>, ImplementationTypeWithInjection<any> | Object>;
+  singletons: Map<ImplementationTypeWithInjection<any>, Object>;
+  instances: Map<RegistrationType<any>, any>;
+  dependencies: Map<RegistrationType<any>, ImplementationTypeWithInjection<any> | Object>;
 
   constructor() {
     this.singletons = new Map();
@@ -74,7 +80,7 @@ class ContainerImpl<RegisterTypeExtension = {}, RegisterInstanceExtension = {}>
     };
   }
 
-  /** register any object as it constructor */
+  /** register any object as its constructor */
   registerInstance<TInstance extends Object>(instance: TInstance) {
     const constructor = instance.constructor as Constructor<TInstance>;
     if (constructor) {

@@ -54,6 +54,16 @@ interface Container<RegisterTypeExtension = {}, RegisterInstanceExtension = {}>
     DependencyResolver {
 }
 
+interface IHaveSingletons {
+  singletons: Map<ImplementationTypeWithInjection<any>, Object>;
+}
+interface IHaveInstances {
+  instances: Map<RegistrationType<any>, any>;
+}
+interface IHaveDependencies {
+  dependencies: Map<RegistrationType<any>, ImplementationTypeWithInjection<any> | Object>;
+}
+
 export type {
   AbstractConstructor,
   Constructor,
@@ -65,4 +75,7 @@ export type {
   ImplementationTypeWithInjection,
   RegistrationType,
   WithInjectionParams,
+  IHaveSingletons,
+  IHaveInstances,
+  IHaveDependencies,
 };
