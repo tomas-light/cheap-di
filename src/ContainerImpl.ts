@@ -212,7 +212,7 @@ class ContainerImpl<RegisterTypeExtension = {}, RegisterInstanceExtension = {}>
     return target;
   }
 
-  protected getInstance<TInstance>(type: Constructor<TInstance> | AbstractConstructor<TInstance>): ImplementationTypeWithInjection<TInstance> | Object | undefined {
+  getInstance<TInstance>(type: Constructor<TInstance> | AbstractConstructor<TInstance>): ImplementationTypeWithInjection<TInstance> | Object | undefined {
     if (this.instances.has(type)) {
       return this.instances.get(type)!;
     }
@@ -220,7 +220,7 @@ class ContainerImpl<RegisterTypeExtension = {}, RegisterInstanceExtension = {}>
     return undefined;
   }
 
-  protected getImplementation<TInstance>(type: Constructor<TInstance> | AbstractConstructor<TInstance>): ImplementationTypeWithInjection<TInstance> | Object | undefined {
+  getImplementation<TInstance>(type: Constructor<TInstance> | AbstractConstructor<TInstance>): ImplementationTypeWithInjection<TInstance> | Object | undefined {
     if (this.dependencies.has(type)) {
       return this.dependencies.get(type)!;
     }
@@ -228,7 +228,7 @@ class ContainerImpl<RegisterTypeExtension = {}, RegisterInstanceExtension = {}>
     return undefined;
   }
 
-  protected getSingletons() {
+  getSingletons() {
     return this.singletons;
   }
 

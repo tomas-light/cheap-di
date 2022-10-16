@@ -1,17 +1,20 @@
 # Changelog
 
+### 3.4.2
+
+Types: 
+* changed access level of `getInstance`, `getImplementation`, `getSingletons` methods in `ContainerImpl` to public;
+
 ### 3.4.1
 
 Types: 
 * `container` now is typed as `ContainerImpl`;
-
 
 ### 3.4.0
 
 Types: 
 * add interfaces `IHaveSingletons`, `IHaveInstances`, `IHaveDependencies`;
 * `ContainerImpl` implements new interfaces to be able to implement them in your container;
-
 
 ### 3.3.2
 
