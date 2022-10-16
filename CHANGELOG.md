@@ -1,5 +1,11 @@
 # Changelog
 
+### 3.4.1
+
+Types: 
+* `container` now is typed as `ContainerImpl`;
+
+
 ### 3.4.0
 
 Types: 

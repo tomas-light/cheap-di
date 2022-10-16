@@ -245,7 +245,7 @@ function isImplementationType(value: any): value is ImplementationTypeWithInject
   return typeof value === 'function';
 }
 
-const container: Container = new ContainerImpl();
+const container = new ContainerImpl();
 export {
   ContainerImpl,
   container,
