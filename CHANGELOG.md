@@ -1,5 +1,9 @@
 # Changelog
 
+### 3.4.3
+
+Bump dependencies versions (and typescript from v4.7.3 to v4.9.4)
+
 ### 3.4.2
 
 Types: 
