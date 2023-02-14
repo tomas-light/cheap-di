@@ -2,8 +2,8 @@
 
 JavaScript's dependency injection like Autofac in .Net
 
-* [Minimal Sample](#minimal-sample)
-* [How to use](#how-to-use)
+* [Minimal Sample (TypeScript)](#minimal-sample)
+* [How to use (JavaScript)](#how-to-use)
 * [TypeScript](#type-script)
 * [Decorators](#decorators)
   * [dependencies](#dependencies)
@@ -11,7 +11,7 @@ JavaScript's dependency injection like Autofac in .Net
   * [di](#di)
   * [singleton](#singleton)
 
-## <a name="minimal-sample"></a> Minimal Sample
+## <a name="minimal-sample"></a> Minimal Sample (TypeScript)
 
 ```ts
 abstract class Logger {
@@ -51,7 +51,7 @@ const service = container.resolve(Service);
 service.doSome();
 ```
 
-## <a name="how-to-use"></a> How to use
+## <a name="how-to-use"></a> How to use (JavaScript)
 
 You have an interface (base/abstract class) and its implementation (derived class)
 
