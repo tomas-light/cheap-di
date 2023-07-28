@@ -1,64 +1,86 @@
 # Changelog
 
+### 3.5.0
+
+🐛 fix tslib missing dependency for PNP
+
+🔨 change target ECMAScript version from `es6` to `es2016`
+
+🔨 bump dependencies;
+
+
 ### 3.4.3
 
-Bump dependencies versions (and typescript from v4.7.3 to v4.9.4)
+* Bump dependencies versions (and typescript from v4.7.3 to v4.9.4)
 
 ### 3.4.2
 
 Types: 
-* changed access level of `getInstance`, `getImplementation`, `getSingletons` methods in `ContainerImpl` to public;
+
+🔨 changed access level of `getInstance`, `getImplementation`, `getSingletons` methods in `ContainerImpl` to public;
 
 ### 3.4.1
 
-Types: 
-* `container` now is typed as `ContainerImpl`;
+Types:
+
+🔨 `container` now is typed as `ContainerImpl`;
 
 ### 3.4.0
 
-Types: 
-* add interfaces `IHaveSingletons`, `IHaveInstances`, `IHaveDependencies`;
-* `ContainerImpl` implements new interfaces to be able to implement them in your container;
+Types:
+
+🔨 add interfaces `IHaveSingletons`, `IHaveInstances`, `IHaveDependencies`;
+
+🔨 `ContainerImpl` implements new interfaces to be able to implement them in your container;
 
 ### 3.3.2
 
 Bugfixes:
-* try to get injected params in prototype chain if not found anything in current constructor during resolve;
+
+🐛 try to get injected params in prototype chain if not found anything in current constructor during resolve;
 
 ### 3.3.1
 
 Bugfixes:
-* bugfix of dependency auto resolving;
+
+🐛 bugfix of dependency auto resolving;
 
 ### 3.2.5
 
 Bugfixes:
-* revert building for CommonJS;
+
+🐛 revert building for CommonJS;
 
 ### 3.2.4
 
-* update dependencies;
+🔨 update dependencies;
 
 ### 3.2.3
 
-* fix sources map
+🔨 fix sources map
 
 ### 3.2.1
 
 Bugfixes:
-* fix container resolving for instance registered as another class;
-* fix container resolving for type, when class was registered as super class;
-* fix auto resolving for inherited classes;
+
+🐛 fix container resolving for instance registered as another class;
+
+🐛 fix container resolving for type, when class was registered as super class;
+
+🐛 fix auto resolving for inherited classes;
 
 ### 3.2.0
 
-* add `asSingleton` registration method;
+🚀 add `asSingleton` registration method;
 
 ### 3.1.0
+Features:
 
-* add `@di` class-decorator;
-* update `@singleton` to using `@di`;
-* add `clear` method to `DependencyResolver`;
+🚀 add `@di` class-decorator;
+
+🚀 update `@singleton` to using `@di`;
+
+🚀 add `clear` method to `DependencyResolver`;
 
 ### 3.0.0
 

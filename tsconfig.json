@@ -5,7 +5,6 @@
     "esModuleInterop": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "importHelpers": true,
     "module": "CommonJS",
     "moduleResolution": "node",
     "noErrorTruncation": true,
@@ -14,11 +13,6 @@
     "strict": true,
     "sourceMap": true,
     "inlineSources": true,
-    "target": "es6"
-  },
-  "include": ["src"],
-  "exclude": [
-    "node_modules",
-    "src/**/*.test.ts"
-  ]
+    "target": "es2016"
+  }
 }
