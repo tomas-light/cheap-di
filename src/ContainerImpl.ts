@@ -25,7 +25,7 @@ class ContainerImpl<RegisterTypeExtension = {}, RegisterInstanceExtension = {}>
   implements Container<RegisterTypeExtension, RegisterInstanceExtension>,
     IHaveSingletons,
     IHaveInstances,
-    IHaveDependencies {
+    IHaveDependencies, Disposable {
 
   singletons: Map<ImplementationTypeWithInjection<any>, Object>;
   instances: Map<RegistrationType<any>, any>;
@@ -120,6 +120,10 @@ class ContainerImpl<RegisterTypeExtension = {}, RegisterInstanceExtension = {}>
     this.instances.clear();
     this.singletons.clear();
     this.dependencies.clear();
+  }
+
+  [Symbol.dispose]() {
+    this.clear();
   }
 
   private internalResolve<TInstance>(

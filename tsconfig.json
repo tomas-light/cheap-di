@@ -3,16 +3,15 @@
     "allowSyntheticDefaultImports": true,
     "declaration": true,
     "esModuleInterop": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
+    "lib": ["es2022", "esnext.decorators", "esnext.disposable", "dom"],
     "module": "CommonJS",
     "moduleResolution": "node",
     "noErrorTruncation": true,
-    "outDir": "./dist",
+    "plugins": [{ "transform": "./src/dependenciesTransformer.ts", "type": "raw" }],
     "skipLibCheck": true,
     "strict": true,
     "sourceMap": true,
     "inlineSources": true,
-    "target": "es2016"
+    "target": "ES2022"
   }
 }

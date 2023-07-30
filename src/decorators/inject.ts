@@ -4,7 +4,7 @@ import { dependenciesSymbol, injectionSymbol } from '../symbols';
 import { Constructor, Dependency, ImplementationType, ImplementationTypeWithInjection } from '../types';
 
 function inject<TClass extends Constructor, TDependency extends Dependency>(dependency: TDependency) {
-  return function (constructor: TClass, propertyKey: string | symbol, parameterIndex: number) {
+  return function (constructor: TClass, propertyKey?: string | symbol, parameterIndex?: number) {
     const implementation = constructor as ImplementationType<TClass>;
 
     // if class inherited from another one the static property will contain the same array ref,
@@ -15,7 +15,9 @@ function inject<TClass extends Constructor, TDependency extends Dependency>(depe
     if (!implementation[dependenciesSymbol] || injectInNewClass) {
       implementation[dependenciesSymbol] = [];
     }
-    implementation[dependenciesSymbol]![parameterIndex] = dependency;
+    if (parameterIndex) {
+      implementation[dependenciesSymbol]![parameterIndex] = dependency;
+    }
 
     InheritancePreserver.constructorModified(constructor);
   };

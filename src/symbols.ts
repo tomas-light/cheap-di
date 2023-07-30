@@ -6,6 +6,7 @@ const inheritancePreserveSymbol = Symbol('cheap-di injected constructor');
 
 export {
   dependenciesSymbol,
+  dependenciesSymbol as dependenciesSymbolCheapDI,
   singletonSymbol,
   injectionSymbol,
   inheritancePreserveSymbol,
