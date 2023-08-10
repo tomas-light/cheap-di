@@ -1,4 +1,4 @@
-import { dependenciesSymbolCheapDI } from './symbols';
+import { dependenciesSymbolCheapDI } from '../symbols';
 
 test('new decorator', () => {
   class TestClass {
