@@ -1,5 +1,4 @@
-import { inject } from './inject';
-import { dependenciesSymbol } from '../symbols';
+import { inject, dependenciesSymbol } from '@cheap-di/lib';
 
 test('', () => {
   class Service {

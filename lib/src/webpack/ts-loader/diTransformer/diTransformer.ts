@@ -1,7 +1,7 @@
 import ts from 'typescript';
 import { makeClassFinder } from './makeClassFinder';
 
-export const transformerProgram = (program: ts.Program): ts.TransformerFactory<ts.SourceFile> => {
+export const diTransformer = (program: ts.Program): ts.TransformerFactory<ts.SourceFile> => {
   const typeChecker = program.getTypeChecker();
 
   return (context) => {
@@ -19,21 +19,17 @@ export const transformerProgram = (program: ts.Program): ts.TransformerFactory<t
       return ts.factory.updateSourceFile(
         transformedSourceFile,
         [
-          // "import { dependenciesSymbolCheapDI } from './dependenciesSymbolCheapDI';"
+          // "import { cheapDiSymbol } from '@cheap-di/lib';"
           ts.factory.createImportDeclaration(
             undefined,
             ts.factory.createImportClause(
               false,
               undefined,
               ts.factory.createNamedImports([
-                ts.factory.createImportSpecifier(
-                  false,
-                  undefined,
-                  ts.factory.createIdentifier('dependenciesSymbolCheapDI')
-                ),
+                ts.factory.createImportSpecifier(false, undefined, ts.factory.createIdentifier('cheapDiSymbol')),
               ])
             ),
-            ts.factory.createStringLiteral('./dependenciesSymbolCheapDI')
+            ts.factory.createStringLiteral('@cheap-di/lib')
           ),
           ...transformedSourceFile.statements,
         ],

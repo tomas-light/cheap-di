@@ -1,5 +1,4 @@
-import { container } from './ContainerImpl';
-import { dependencies, singleton, inject, di } from './decorators';
+import { container, dependencies, singleton, inject, di } from '@cheap-di/lib';
 
 beforeEach(() => {
   container.clear();
@@ -215,7 +214,7 @@ describe('resolving several dependencies', () => {
           this.dispatch();
           return '123';
         },
-      }
+      };
     }
   }
 
@@ -223,7 +222,7 @@ describe('resolving several dependencies', () => {
   class ApiBase {
     constructor(public readonly interceptor: ApiInterceptor) {
       if (!interceptor) {
-        throw new Error(`Can't instantiate Api. Have not enough arguments.`);
+        throw new Error("Can't instantiate Api. Have not enough arguments.");
       }
     }
 
@@ -259,8 +258,7 @@ describe('resolving several dependencies', () => {
 describe('singletons', () => {
   test('with decorator', () => {
     @singleton
-    class Service {
-    }
+    class Service {}
 
     container.registerType(Service);
     const entity1 = container.resolve(Service);
@@ -270,8 +268,7 @@ describe('singletons', () => {
 
   test('with decorator', () => {
     @metadata
-    class Service {
-    }
+    class Service {}
 
     container.registerType(Service).asSingleton();
     const entity1 = container.resolve(Service);
@@ -292,8 +289,7 @@ describe('nested resolve', () => {
 
     @metadata
     class Repository {
-      constructor(private db: Database) {
-      }
+      constructor(private db: Database) {}
 
       list() {
         return this.db.entities;
@@ -302,8 +298,7 @@ describe('nested resolve', () => {
 
     @metadata
     class Service {
-      constructor(private repository: Repository) {
-      }
+      constructor(private repository: Repository) {}
 
       myList() {
         const entities = this.repository.list();
@@ -318,11 +313,7 @@ describe('nested resolve', () => {
 
     const service = container.resolve(Service)!;
     const list = service.myList();
-    expect(list).toEqual([
-      'entity 1',
-      'entity 2',
-      'service entity',
-    ]);
+    expect(list).toEqual(['entity 1', 'entity 2', 'service entity']);
   });
 
   test('auto resolve service', () => {
@@ -336,8 +327,7 @@ describe('nested resolve', () => {
 
     @metadata
     class Repository {
-      constructor(private db: Database) {
-      }
+      constructor(private db: Database) {}
 
       defaultList() {
         return this.db.entities;
@@ -346,8 +336,7 @@ describe('nested resolve', () => {
 
     @metadata
     class Service {
-      constructor(private repository: Repository) {
-      }
+      constructor(private repository: Repository) {}
 
       myList() {
         const entities = this.repository.defaultList();
@@ -357,10 +346,7 @@ describe('nested resolve', () => {
 
     const service = container.resolve(Service)!;
     const list = service.myList();
-    expect(list).toEqual([
-      'default',
-      'service entity',
-    ]);
+    expect(list).toEqual(['default', 'service entity']);
   });
 });
 
@@ -388,8 +374,7 @@ describe('with decorators', () => {
   }
 
   class Repository {
-    constructor(@inject(Database) private db: Database) {
-    }
+    constructor(@inject(Database) private db: Database) {}
 
     list() {
       return this.db.entities;
@@ -397,8 +382,7 @@ describe('with decorators', () => {
   }
 
   class Service {
-    constructor(@inject(Repository) private repository: Repository) {
-    }
+    constructor(@inject(Repository) private repository: Repository) {}
 
     myList() {
       const entities = this.repository.list();
@@ -412,11 +396,7 @@ describe('with decorators', () => {
 
     const service = container.resolve(resolveType)!;
     const list = service.myList();
-    expect(list).toEqual([
-      'entity 1',
-      'entity 2',
-      'service entity',
-    ]);
+    expect(list).toEqual(['entity 1', 'entity 2', 'service entity']);
   }
 
   beforeEach(() => {
@@ -468,8 +448,7 @@ describe('with decorators', () => {
 
     @dependencies(Database)
     class Repository {
-      constructor(private db: Database) {
-      }
+      constructor(private db: Database) {}
 
       list() {
         return this.db.entities;
@@ -478,8 +457,7 @@ describe('with decorators', () => {
 
     @dependencies(Repository)
     class Service {
-      constructor(private repository: Repository) {
-      }
+      constructor(private repository: Repository) {}
 
       myList() {
         const entities = this.repository.list();
@@ -492,11 +470,7 @@ describe('with decorators', () => {
 
     const service = container.resolve(Service)!;
     const list = service.myList();
-    expect(list).toEqual([
-      'entity 1',
-      'entity 2',
-      'service entity',
-    ]);
+    expect(list).toEqual(['entity 1', 'entity 2', 'service entity']);
   });
 });
 
@@ -519,7 +493,7 @@ describe('arguments order', () => {
       public repository: Repository,
       public db: Database,
       public message: string,
-      public message2: string,
+      public message2: string
     ) {}
     list1() {
       const entities = this.repository.list();
@@ -544,18 +518,10 @@ describe('arguments order', () => {
     const service = container.resolve(type)!;
 
     const list1 = service.list1();
-    expect(list1).toEqual([
-      'test 1',
-      'test 2',
-      'service entity',
-    ]);
+    expect(list1).toEqual(['test 1', 'test 2', 'service entity']);
 
     const list2 = service.list2();
-    expect(list2).toEqual([
-      'entity 1',
-      'entity 2',
-      'service entity',
-    ]);
+    expect(list2).toEqual(['entity 1', 'entity 2', 'service entity']);
 
     expect(service.message).toBe(message1);
     expect(service.message2).toBe(message2);
@@ -576,7 +542,7 @@ describe('arguments order', () => {
         @inject(Repository) public repository: Repository,
         @inject(Database) public db: Database,
         message: string,
-        message2: string,
+        message2: string
       ) {
         super(repository, db, message, message2);
       }
@@ -591,7 +557,7 @@ describe('arguments order', () => {
         @inject(Repository) public repository: Repository,
         message: string,
         @inject(Database) public db: Database,
-        message2: string,
+        message2: string
       ) {
         super(repository, db, message, message2);
       }
@@ -606,7 +572,7 @@ describe('arguments order', () => {
         message: string,
         @inject(Repository) public repository: Repository,
         @inject(Database) public db: Database,
-        message2: string,
+        message2: string
       ) {
         super(repository, db, message, message2);
       }
@@ -621,7 +587,7 @@ describe('arguments order', () => {
         message: string,
         @inject(Repository) public repository: Repository,
         message2: string,
-        @inject(Database) public db: Database,
+        @inject(Database) public db: Database
       ) {
         super(repository, db, message, message2);
       }
@@ -637,7 +603,7 @@ describe('arguments order', () => {
         message: string,
         public repository: Repository,
         message2: string,
-        public db: Database,
+        public db: Database
       ) {
         super(repository, db, message, message2);
       }
@@ -648,8 +614,7 @@ describe('arguments order', () => {
 
   test('case 6', () => {
     class AnotherService {
-      constructor(private num: number) {
-      }
+      constructor(private num: number) {}
 
       some() {
         return this.num;

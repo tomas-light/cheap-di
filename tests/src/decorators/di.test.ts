@@ -1,6 +1,4 @@
-import { dependenciesSymbol } from '../symbols';
-import { ImplementationTypeWithInjection } from '../types';
-import { di } from './di';
+import { dependenciesSymbol, ImplementationTypeWithInjection, di } from '@cheap-di/lib';
 
 test('', () => {
   class Service {
@@ -13,8 +11,7 @@ test('', () => {
 
   @di
   class Test {
-    constructor(car: ICar, service: Service) {
-    }
+    constructor(car: ICar, service: Service) {}
   }
 
   expect((Test as ImplementationTypeWithInjection<any>)[dependenciesSymbol]).toEqual([undefined, Service]);

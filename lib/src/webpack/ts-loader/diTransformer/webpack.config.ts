@@ -1,7 +1,7 @@
 import path from 'path';
 import ts from 'typescript';
 import { Configuration } from 'webpack';
-import { transformerProgram } from './dependenciesTransformer';
+import { diTransformer } from './diTransformer';
 
 const testDirectory = path.join(__dirname, '__tests');
 const tsconfig = path.join(__dirname, '..', '..', 'tsconfig.test.json');
@@ -25,7 +25,7 @@ const config: Configuration = {
         test: /\.ts$/,
         options: {
           getCustomTransformers: (program: ts.Program) => ({
-            before: [transformerProgram(program)],
+            before: [diTransformer(program)],
             // after: [yourAfterTransformer(program, { customConfig: true })],
           }),
           configFile: tsconfig,

@@ -1,21 +1,19 @@
-import { dependencies } from './dependencies';
-import { dependenciesSymbol as dependencies_s } from '../symbols';
-import { ImplementationType } from '../types';
+import { dependencies, dependenciesSymbol as dependencies_s, ImplementationType } from '@cheap-di/lib';
 
 test('case 1', () => {
   class Service1 {
-    get() {
-    }
+    get() {}
   }
   class Service2 {
-    get2() {
-    }
+    get2() {}
   }
 
   @dependencies(Service1, Service2)
   class MyClass {
-    constructor(private service: Service1, private service2: Service2) {
-    }
+    constructor(
+      private service: Service1,
+      private service2: Service2
+    ) {}
   }
 
   expect((MyClass as ImplementationType<MyClass>)[dependencies_s]).toEqual([Service1, Service2]);
@@ -23,14 +21,12 @@ test('case 1', () => {
 
 test('class name preserving', () => {
   class Service1 {
-    get() {
-    }
+    get() {}
   }
 
   @dependencies(Service1)
   class MyClass {
-    constructor(private service: Service1) {
-    }
+    constructor(private service: Service1) {}
   }
 
   expect(MyClass.name).toBe('MyClass');
@@ -38,8 +34,7 @@ test('class name preserving', () => {
 
 test('static members', () => {
   class Service1 {
-    get() {
-    }
+    get() {}
   }
 
   const text = 'static do';
@@ -50,8 +45,7 @@ test('static members', () => {
       return text;
     }
 
-    constructor(private service: Service1) {
-    }
+    constructor(private service: Service1) {}
   }
 
   expect((MyClass as ImplementationType<MyClass>)[dependencies_s]).toEqual([Service1]);
@@ -76,20 +70,17 @@ test('check types: injection params allowing', () => {
 
   @dependencies(AService)
   class Consumer1 {
-    constructor(service: AService) {
-    }
+    constructor(service: AService) {}
   }
 
   @dependencies(AService, BService)
   class Consumer2 {
-    constructor(service1: AService, service2: BService) {
-    }
+    constructor(service1: AService, service2: BService) {}
   }
 
   @dependencies(AService)
   class Consumer3 {
-    constructor(service1: AService, service2: BService) {
-    }
+    constructor(service1: AService, service2: BService) {}
   }
 
   expect((Consumer1 as ImplementationType<Consumer1>)[dependencies_s]).toEqual([AService]);
