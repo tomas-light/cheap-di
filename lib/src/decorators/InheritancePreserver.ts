@@ -1,14 +1,15 @@
-import { inheritancePreserveSymbol } from '../symbols';
+import { cheapDiSymbol } from '../cheapDiSymbol';
 import { Constructor, ImplementationType } from '../types';
+import { workWithDiSettings } from '../workWithDiSettings';
 
-class InheritancePreserver {
+export class InheritancePreserver {
   static constructorModified(constructor: Constructor) {
-    (constructor as ImplementationType<any>)[inheritancePreserveSymbol] = constructor;
+    workWithDiSettings(constructor, (settings) => {
+      settings.modifiedClass = constructor;
+    });
   }
 
   static getModifiedConstructor(constructor: Constructor) {
-    return (constructor as ImplementationType<any>)[inheritancePreserveSymbol];
+    return (constructor as ImplementationType<any>)[cheapDiSymbol]?.modifiedClass;
   }
 }
-
-export { InheritancePreserver };

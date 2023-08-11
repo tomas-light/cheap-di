@@ -1,17 +1,16 @@
-import { singletonSymbol, dependenciesSymbol, injectionSymbol, inheritancePreserveSymbol } from './symbols';
+import { cheapDiSymbol } from './cheapDiSymbol';
 
-type AbstractConstructor<T = any> = abstract new(...args: any[]) => T;
-type Constructor<T = any> = new(...args: any[]) => T;
-type Dependency<T = any> = (Constructor<T> | AbstractConstructor<T>);
+type AbstractConstructor<T = any> = abstract new (...args: any[]) => T;
+type Constructor<T = any> = new (...args: any[]) => T;
+type Dependency<T = any> = Constructor<T> | AbstractConstructor<T>;
 
 type ImplementationType<TClass> = Constructor<TClass> & {
-  [singletonSymbol]?: boolean;
-  [dependenciesSymbol]?: Dependency[];
-  [inheritancePreserveSymbol]?: TClass;
-};
-
-type ImplementationTypeWithInjection<TInstance> = ImplementationType<TInstance> & {
-  [injectionSymbol]?: any[];
+  [cheapDiSymbol]?: {
+    singleton?: boolean;
+    dependencies?: Dependency[];
+    modifiedClass?: TClass;
+    injected?: unknown[];
+  };
 };
 
 type RegistrationType<TInstance> = Constructor<TInstance> | AbstractConstructor<TInstance>;
@@ -29,16 +28,22 @@ interface DependencyRegistrator<RegisterTypeExtension = {}, RegisterInstanceExte
 
     /** as singleton (optionally super class) */
     asSingleton: <TBase extends Partial<TClass>>(type?: RegistrationType<TBase>) => WithInjectionParams;
-  } & WithInjectionParams & RegisterTypeExtension;
+  } & WithInjectionParams &
+    RegisterTypeExtension;
 
   /** register any object as it constructor */
-  registerInstance: <TInstance extends Object>(instance: TInstance) => {
+  registerInstance: <TInstance extends Object>(
+    instance: TInstance
+  ) => {
     /** or register the object as any class */
     as: <TBase extends Partial<TInstance>>(type: RegistrationType<TBase>) => void;
   } & RegisterInstanceExtension;
 }
 
-type Resolver = <TInstance>(type: Constructor<TInstance> | AbstractConstructor<TInstance>, ...args: any[]) => TInstance | undefined;
+type Resolver = <TInstance>(
+  type: Constructor<TInstance> | AbstractConstructor<TInstance>,
+  ...args: any[]
+) => TInstance | undefined;
 
 interface DependencyResolver {
   /** instantiate (or get instance for singleton) by class */
@@ -49,19 +54,17 @@ interface DependencyResolver {
 }
 
 interface Container<RegisterTypeExtension = {}, RegisterInstanceExtension = {}>
-  extends
-    DependencyRegistrator<RegisterTypeExtension, RegisterInstanceExtension>,
-    DependencyResolver {
-}
+  extends DependencyRegistrator<RegisterTypeExtension, RegisterInstanceExtension>,
+    DependencyResolver {}
 
 interface IHaveSingletons {
-  singletons: Map<ImplementationTypeWithInjection<any>, Object>;
+  singletons: Map<ImplementationType<any>, Object>;
 }
 interface IHaveInstances {
   instances: Map<RegistrationType<any>, any>;
 }
 interface IHaveDependencies {
-  dependencies: Map<RegistrationType<any>, ImplementationTypeWithInjection<any> | Object>;
+  dependencies: Map<RegistrationType<any>, ImplementationType<any> | Object>;
 }
 
 export type {
@@ -72,7 +75,6 @@ export type {
   DependencyRegistrator,
   DependencyResolver,
   ImplementationType,
-  ImplementationTypeWithInjection,
   RegistrationType,
   WithInjectionParams,
   IHaveSingletons,

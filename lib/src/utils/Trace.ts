@@ -22,13 +22,13 @@ class Trace {
     }
 
     const traces = this.getTrace();
-    const implementations = traces.map(trace => trace.implemented);
+    const implementations = traces.map((trace) => trace.implemented);
 
     let firstLoopIndex = -1;
-    const loopImplementation = implementations.find(impl => {
+    const loopImplementation = implementations.find((impl) => {
       firstLoopIndex = implementations.indexOf(impl);
-      const lastIndex =  implementations.lastIndexOf(impl);
-      return firstLoopIndex != lastIndex
+      const lastIndex = implementations.lastIndexOf(impl);
+      return firstLoopIndex != lastIndex;
     });
 
     if (!loopImplementation) {
@@ -41,7 +41,7 @@ class Trace {
     const secondLoopIndex = copy.indexOf(loopImplementation) + 1;
 
     const loop = traces.slice(firstLoopIndex, secondLoopIndex + 1);
-    const trace = loop.map(types => `(${types.type}, ${types.implemented})`).join(' -> ');
+    const trace = loop.map((types) => `(${types.type}, ${types.implemented})`).join(' -> ');
     return trace;
   }
 
@@ -52,7 +52,7 @@ class Trace {
     };
 
     if (!this.trace) {
-      return [_type]
+      return [_type];
     }
 
     const nestedTrace = this.trace.getTrace();

@@ -1,10 +1,4 @@
-import {
-  getDependencies,
-  getInjectedParams,
-  setInjectedParams,
-  isSingleton,
-  di,
-} from './decorators';
+import { isSingleton } from './decorators';
 import { modifySingleton } from './decorators/singleton';
 import { CircularDependencyError } from './errors';
 import {
@@ -13,23 +7,27 @@ import {
   RegistrationType,
   AbstractConstructor,
   ImplementationType,
-  ImplementationTypeWithInjection,
   Dependency,
   IHaveSingletons,
   IHaveInstances,
   IHaveDependencies,
 } from './types';
 import { Trace } from './utils';
+import { cheapDiSymbol } from './cheapDiSymbol';
+import { InheritancePreserver } from './decorators/InheritancePreserver';
+import { modifyConstructor } from './modifyConstructor';
 
 class ContainerImpl<RegisterTypeExtension = {}, RegisterInstanceExtension = {}>
-  implements Container<RegisterTypeExtension, RegisterInstanceExtension>,
+  implements
+    Container<RegisterTypeExtension, RegisterInstanceExtension>,
     IHaveSingletons,
     IHaveInstances,
-    IHaveDependencies, Disposable {
-
-  singletons: Map<ImplementationTypeWithInjection<any>, Object>;
+    IHaveDependencies,
+    Disposable
+{
+  singletons: Map<ImplementationType<any>, Object>;
   instances: Map<RegistrationType<any>, any>;
-  dependencies: Map<RegistrationType<any>, ImplementationTypeWithInjection<any> | Object>;
+  dependencies: Map<RegistrationType<any>, ImplementationType<any> | Object>;
 
   constructor() {
     this.singletons = new Map();
@@ -40,7 +38,9 @@ class ContainerImpl<RegisterTypeExtension = {}, RegisterInstanceExtension = {}>
   /** register class */
   registerType<TInstance>(implementationType: ImplementationType<TInstance>) {
     const withInjection = (...injectionParams: any[]) => {
-      setInjectedParams(implementationType, injectionParams);
+      modifyConstructor(implementationType, (settings) => {
+        settings.injected = injectionParams;
+      });
     };
 
     this.dependencies.set(implementationType, implementationType);
@@ -100,12 +100,14 @@ class ContainerImpl<RegisterTypeExtension = {}, RegisterInstanceExtension = {}>
   }
 
   /** instantiate (or get instance for singleton) by class */
-  resolve<TInstance>(type: Constructor<TInstance> | AbstractConstructor<TInstance>, ...args: any[]): TInstance | undefined {
+  resolve<TInstance>(
+    type: Constructor<TInstance> | AbstractConstructor<TInstance>,
+    ...args: any[]
+  ): TInstance | undefined {
     const trace = new Trace(type.name);
     try {
       return this.internalResolve(type, trace, ...args);
-    }
-    catch (error) {
+    } catch (error) {
       if (error instanceof RangeError) {
         const tree = trace.build();
         console.warn('cheap-di, circular dependencies tree', tree);
@@ -155,10 +157,7 @@ class ContainerImpl<RegisterTypeExtension = {}, RegisterInstanceExtension = {}>
     trace.implemented = implementation.name;
 
     let injectableArguments: any[] = [];
-    const injectionParams: any[] = [
-      ...getInjectedParams(implementation),
-      ...args,
-    ];
+    const injectionParams: any[] = [...getInjectedParams(implementation), ...args];
 
     let index = 0;
     let injectionParamsIndex = 0;
@@ -166,7 +165,7 @@ class ContainerImpl<RegisterTypeExtension = {}, RegisterInstanceExtension = {}>
     const dependencies = getDependencies(implementation);
     if (dependencies.length) {
       let has = true;
-      const injectableDependencies = dependencies.filter(d => d);
+      const injectableDependencies = dependencies.filter((d) => d);
       const length = injectableDependencies.length + injectionParams.length;
 
       while (has) {
@@ -176,21 +175,16 @@ class ContainerImpl<RegisterTypeExtension = {}, RegisterInstanceExtension = {}>
 
           const instance = this.internalResolve(dependencyType, trace.trace!);
           if (
-            !(
-              this.isRegisteredInstance(dependencyType, instance)
-              || this.isRegisteredType(dependencyType, instance)
-            )
-            && injectionParams[injectionParamsIndex] instanceof Object
-            && injectionParams[injectionParamsIndex].constructor === dependencyType
+            !(this.isRegisteredInstance(dependencyType, instance) || this.isRegisteredType(dependencyType, instance)) &&
+            injectionParams[injectionParamsIndex] instanceof Object &&
+            injectionParams[injectionParamsIndex].constructor === dependencyType
           ) {
             injectableArguments[index] = injectionParams[injectionParamsIndex];
             injectionParamsIndex++;
-          }
-          else {
+          } else {
             injectableArguments[index] = instance;
           }
-        }
-        else if (injectionParams[injectionParamsIndex]) {
+        } else if (injectionParams[injectionParamsIndex]) {
           injectableArguments[index] = injectionParams[injectionParamsIndex];
           injectionParamsIndex++;
         }
@@ -201,8 +195,7 @@ class ContainerImpl<RegisterTypeExtension = {}, RegisterInstanceExtension = {}>
           has = false;
         }
       }
-    }
-    else {
+    } else {
       injectableArguments = injectionParams;
     }
 
@@ -216,7 +209,9 @@ class ContainerImpl<RegisterTypeExtension = {}, RegisterInstanceExtension = {}>
     return target;
   }
 
-  getInstance<TInstance>(type: Constructor<TInstance> | AbstractConstructor<TInstance>): ImplementationTypeWithInjection<TInstance> | Object | undefined {
+  getInstance<TInstance>(
+    type: Constructor<TInstance> | AbstractConstructor<TInstance>
+  ): ImplementationType<TInstance> | Object | undefined {
     if (this.instances.has(type)) {
       return this.instances.get(type)!;
     }
@@ -224,7 +219,9 @@ class ContainerImpl<RegisterTypeExtension = {}, RegisterInstanceExtension = {}>
     return undefined;
   }
 
-  getImplementation<TInstance>(type: Constructor<TInstance> | AbstractConstructor<TInstance>): ImplementationTypeWithInjection<TInstance> | Object | undefined {
+  getImplementation<TInstance>(
+    type: Constructor<TInstance> | AbstractConstructor<TInstance>
+  ): ImplementationType<TInstance> | Object | undefined {
     if (this.dependencies.has(type)) {
       return this.dependencies.get(type)!;
     }
@@ -245,12 +242,9 @@ class ContainerImpl<RegisterTypeExtension = {}, RegisterInstanceExtension = {}>
   }
 }
 
-function isImplementationType(value: any): value is ImplementationTypeWithInjection<any> {
+function isImplementationType(value: any): value is ImplementationType<any> {
   return typeof value === 'function';
 }
 
 const container = new ContainerImpl();
-export {
-  ContainerImpl,
-  container,
-};
+export { ContainerImpl, container };
