@@ -3,19 +3,20 @@
     "allowSyntheticDefaultImports": true,
     "declaration": true,
     "esModuleInterop": true,
+    "inlineSources": true,
+    "isolatedModules": true,
     "lib": [
       "es2022",
       "esnext.decorators",
       "esnext.disposable",
       "dom"
     ],
-    "module": "CommonJS",
+    "module": "ESNext",
     "moduleResolution": "node",
     "noErrorTruncation": true,
     "skipLibCheck": true,
-    "strict": true,
     "sourceMap": true,
-    "inlineSources": true,
-    "target": "ES2022"
+    "strict": true,
+    "target": "ESNext"
   }
 }

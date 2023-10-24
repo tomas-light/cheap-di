@@ -3,4 +3,4 @@ export * from './decorators';
 export * from './errors';
 export * from './types';
 export * from './cheapDiSymbol';
-export * from './webpack/ts-loader/diTransformer';
+export * from './plugins/webpack';

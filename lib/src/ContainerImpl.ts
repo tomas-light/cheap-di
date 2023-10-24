@@ -1,6 +1,7 @@
 import { isSingleton } from './decorators';
 import { modifySingleton } from './decorators/singleton';
 import { CircularDependencyError } from './errors';
+import { findMetadata, findOrCreateMetadata } from './findMetadata';
 import {
   Constructor,
   Container,
@@ -11,23 +12,16 @@ import {
   IHaveSingletons,
   IHaveInstances,
   IHaveDependencies,
+  DiMetadataStorage,
 } from './types';
 import { Trace } from './utils';
 import { cheapDiSymbol } from './cheapDiSymbol';
-import { InheritancePreserver } from './decorators/InheritancePreserver';
 import { modifyConstructor } from './modifyConstructor';
 
-class ContainerImpl<RegisterTypeExtension = {}, RegisterInstanceExtension = {}>
-  implements
-    Container<RegisterTypeExtension, RegisterInstanceExtension>,
-    IHaveSingletons,
-    IHaveInstances,
-    IHaveDependencies,
-    Disposable
-{
-  singletons: Map<ImplementationType<any>, Object>;
+class ContainerImpl implements Container, IHaveSingletons, IHaveInstances, IHaveDependencies, Disposable {
+  singletons: Map<ImplementationType<any>, object>;
   instances: Map<RegistrationType<any>, any>;
-  dependencies: Map<RegistrationType<any>, ImplementationType<any> | Object>;
+  dependencies: Map<RegistrationType<any>, ImplementationType<any> | object>;
 
   constructor() {
     this.singletons = new Map();
@@ -39,14 +33,12 @@ class ContainerImpl<RegisterTypeExtension = {}, RegisterInstanceExtension = {}>
   registerType<TInstance>(implementationType: ImplementationType<TInstance>) {
     const withInjection = (...injectionParams: any[]) => {
       modifyConstructor(implementationType, (settings) => {
-        settings.injected = injectionParams;
+        const metadata = findOrCreateMetadata(settings);
+        metadata.injected = injectionParams;
       });
     };
 
     this.dependencies.set(implementationType, implementationType);
-    if (!getDependencies(implementationType).length) {
-      di(implementationType);
-    }
 
     return {
       /** as super class */
@@ -76,12 +68,11 @@ class ContainerImpl<RegisterTypeExtension = {}, RegisterInstanceExtension = {}>
       },
       /** add parameters that will be passed to the class constructor */
       with: withInjection,
-      ...({} as RegisterTypeExtension),
     };
   }
 
   /** register any object as its constructor */
-  registerInstance<TInstance extends Object>(instance: TInstance) {
+  registerInstance<TInstance extends object>(instance: TInstance) {
     const constructor = instance.constructor as Constructor<TInstance>;
     if (constructor) {
       this.instances.set(constructor, instance);
@@ -95,7 +86,6 @@ class ContainerImpl<RegisterTypeExtension = {}, RegisterInstanceExtension = {}>
         }
         this.instances.set(type, instance);
       },
-      ...({} as RegisterInstanceExtension),
     };
   }
 
@@ -144,7 +134,7 @@ class ContainerImpl<RegisterTypeExtension = {}, RegisterInstanceExtension = {}>
 
     const implementation = this.getImplementation(type) || type;
     if (!isImplementationType(implementation)) {
-      return implementation as Object as TInstance;
+      return implementation as object as TInstance;
     }
 
     if (isSingleton(implementation)) {
@@ -156,19 +146,24 @@ class ContainerImpl<RegisterTypeExtension = {}, RegisterInstanceExtension = {}>
 
     trace.implemented = implementation.name;
 
+    const metadata = findMetadata<TInstance | object>(implementation);
+
     let injectableArguments: any[] = [];
-    const injectionParams: any[] = [...getInjectedParams(implementation), ...args];
+    const injectionParams: any[] = [];
+    if (metadata?.injected) {
+      injectionParams.push(...metadata.injected);
+    }
+    injectionParams.push(...args);
 
     let index = 0;
     let injectionParamsIndex = 0;
 
-    const dependencies = getDependencies(implementation);
-    if (dependencies.length) {
-      let has = true;
+    const { dependencies } = metadata ?? {};
+    if (dependencies?.length) {
       const injectableDependencies = dependencies.filter((d) => d);
       const length = injectableDependencies.length + injectionParams.length;
 
-      while (has) {
+      while (true) {
         const dependencyType = dependencies[index];
         if (dependencyType) {
           trace.addTrace(dependencyType.name);
@@ -192,7 +187,7 @@ class ContainerImpl<RegisterTypeExtension = {}, RegisterInstanceExtension = {}>
         index++;
 
         if (index >= length) {
-          has = false;
+          break;
         }
       }
     } else {
@@ -211,7 +206,7 @@ class ContainerImpl<RegisterTypeExtension = {}, RegisterInstanceExtension = {}>
 
   getInstance<TInstance>(
     type: Constructor<TInstance> | AbstractConstructor<TInstance>
-  ): ImplementationType<TInstance> | Object | undefined {
+  ): ImplementationType<TInstance> | object | undefined {
     if (this.instances.has(type)) {
       return this.instances.get(type)!;
     }
@@ -221,7 +216,7 @@ class ContainerImpl<RegisterTypeExtension = {}, RegisterInstanceExtension = {}>
 
   getImplementation<TInstance>(
     type: Constructor<TInstance> | AbstractConstructor<TInstance>
-  ): ImplementationType<TInstance> | Object | undefined {
+  ): ImplementationType<TInstance> | object | undefined {
     if (this.dependencies.has(type)) {
       return this.dependencies.get(type)!;
     }

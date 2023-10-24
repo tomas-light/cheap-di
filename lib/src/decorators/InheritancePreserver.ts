@@ -1,15 +1,16 @@
-import { cheapDiSymbol } from '../cheapDiSymbol';
+import { findMetadata, findOrCreateMetadata } from '../findMetadata';
 import { Constructor, ImplementationType } from '../types';
 import { workWithDiSettings } from '../workWithDiSettings';
 
 export class InheritancePreserver {
   static constructorModified(constructor: Constructor) {
     workWithDiSettings(constructor, (settings) => {
-      settings.modifiedClass = constructor;
+      const metadata = findOrCreateMetadata(settings);
+      metadata.modifiedClass = constructor;
     });
   }
 
   static getModifiedConstructor(constructor: Constructor) {
-    return (constructor as ImplementationType<any>)[cheapDiSymbol]?.modifiedClass;
+    return findMetadata(constructor as ImplementationType<any>)?.modifiedClass;
   }
 }

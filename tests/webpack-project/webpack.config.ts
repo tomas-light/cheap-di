@@ -1,16 +1,15 @@
 import path from 'path';
 import ts from 'typescript';
 import { Configuration } from 'webpack';
-import { diTransformer } from './diTransformer';
+import { cheapDiWebpackPlugin } from '@cheap-di/lib';
 
-const testDirectory = path.join(__dirname, '__tests');
-const tsconfig = path.join(__dirname, '..', '..', 'tsconfig.test.json');
+const tsconfig = path.join(__dirname, '..', '..', '..', 'tsconfig.test.json');
 
 const config: Configuration = {
   mode: 'development',
   devtool: false,
   entry: {
-    fileToTransform: path.join(testDirectory, 'fileToTransform.ts'),
+    fileToTransform: path.join(__dirname, 'source', 'fileToTransform.ts'),
   },
   output: {
     path: path.join(__dirname, 'compiled'),
@@ -25,8 +24,7 @@ const config: Configuration = {
         test: /\.ts$/,
         options: {
           getCustomTransformers: (program: ts.Program) => ({
-            before: [diTransformer(program)],
-            // after: [yourAfterTransformer(program, { customConfig: true })],
+            before: [cheapDiWebpackPlugin(program)],
           }),
           configFile: tsconfig,
         },

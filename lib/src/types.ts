@@ -5,13 +5,19 @@ type Constructor<T = any> = new (...args: any[]) => T;
 type Dependency<T = any> = Constructor<T> | AbstractConstructor<T>;
 
 type ImplementationType<TClass> = Constructor<TClass> & {
-  [cheapDiSymbol]?: {
-    singleton?: boolean;
-    dependencies?: Dependency[];
-    modifiedClass?: TClass;
-    injected?: unknown[];
-  };
+  [Symbol.metadata]: DiMetadataStorage<TClass>;
 };
+
+type DiMetadataStorage<TClass> = {
+  [cheapDiSymbol]?: DiMetadata<TClass>;
+};
+
+interface DiMetadata<TClass> {
+  singleton?: boolean;
+  dependencies?: Dependency[];
+  modifiedClass?: TClass;
+  injected?: unknown[];
+}
 
 type RegistrationType<TInstance> = Constructor<TInstance> | AbstractConstructor<TInstance>;
 
@@ -20,7 +26,7 @@ interface WithInjectionParams {
   with: (...injectionParams: any[]) => void;
 }
 
-interface DependencyRegistrator<RegisterTypeExtension = {}, RegisterInstanceExtension = {}> {
+interface DependencyRegistrator<RegisterTypeExtension = object, RegisterInstanceExtension = object> {
   /** register class */
   registerType: <TClass>(implementationType: ImplementationType<TClass>) => {
     /** as super class */
@@ -32,7 +38,7 @@ interface DependencyRegistrator<RegisterTypeExtension = {}, RegisterInstanceExte
     RegisterTypeExtension;
 
   /** register any object as it constructor */
-  registerInstance: <TInstance extends Object>(
+  registerInstance: <TInstance extends object>(
     instance: TInstance
   ) => {
     /** or register the object as any class */
@@ -53,18 +59,18 @@ interface DependencyResolver {
   clear(): void;
 }
 
-interface Container<RegisterTypeExtension = {}, RegisterInstanceExtension = {}>
+interface Container<RegisterTypeExtension = object, RegisterInstanceExtension = object>
   extends DependencyRegistrator<RegisterTypeExtension, RegisterInstanceExtension>,
     DependencyResolver {}
 
 interface IHaveSingletons {
-  singletons: Map<ImplementationType<any>, Object>;
+  singletons: Map<ImplementationType<any>, object>;
 }
 interface IHaveInstances {
   instances: Map<RegistrationType<any>, any>;
 }
 interface IHaveDependencies {
-  dependencies: Map<RegistrationType<any>, ImplementationType<any> | Object>;
+  dependencies: Map<RegistrationType<any>, ImplementationType<any> | object>;
 }
 
 export type {
@@ -74,10 +80,12 @@ export type {
   Dependency,
   DependencyRegistrator,
   DependencyResolver,
+  DiMetadata,
+  DiMetadataStorage,
+  IHaveDependencies,
+  IHaveInstances,
+  IHaveSingletons,
   ImplementationType,
   RegistrationType,
   WithInjectionParams,
-  IHaveSingletons,
-  IHaveInstances,
-  IHaveDependencies,
 };

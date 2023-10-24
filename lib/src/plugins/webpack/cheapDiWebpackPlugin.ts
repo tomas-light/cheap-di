@@ -1,7 +1,7 @@
 import ts from 'typescript';
 import { makeClassFinder } from './makeClassFinder';
 
-export const diTransformer = (program: ts.Program): ts.TransformerFactory<ts.SourceFile> => {
+export const cheapDiWebpackPlugin = (program: ts.Program): ts.TransformerFactory<ts.SourceFile> => {
   const typeChecker = program.getTypeChecker();
 
   return (context) => {

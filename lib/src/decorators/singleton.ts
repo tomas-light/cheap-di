@@ -1,8 +1,8 @@
-import { InheritancePreserver } from './InheritancePreserver';
-import { cheapDiSymbol } from '../cheapDiSymbol';
+import { findMetadata, findOrCreateMetadata } from '../findMetadata';
 import { Constructor, ImplementationType } from '../types';
+import { InheritancePreserver } from './InheritancePreserver';
 
-export function singleton<TClass extends Constructor>(constructor: TClass): TClass {
+export function singleton<TClass extends Constructor>(constructor: TClass, context: ClassDecoratorContext): TClass {
   modifySingleton(constructor);
   return constructor;
 }
@@ -10,10 +10,8 @@ export function singleton<TClass extends Constructor>(constructor: TClass): TCla
 export function modifySingleton<TClass extends Constructor>(constructor: TClass) {
   const implementationType = constructor as unknown as ImplementationType<TClass>;
 
-  if (!implementationType[cheapDiSymbol]) {
-    implementationType[cheapDiSymbol] = {};
-  }
-  implementationType[cheapDiSymbol]!.singleton = true;
+  const metadata = findOrCreateMetadata(implementationType);
+  metadata.singleton = true;
 
   InheritancePreserver.constructorModified(constructor);
 }
@@ -28,5 +26,5 @@ export function isSingleton<TClass extends Constructor>(constructor: TClass): bo
   }
 
   const implementationType = constructor as unknown as ImplementationType<TClass>;
-  return implementationType[cheapDiSymbol]?.singleton === true;
+  return findMetadata(implementationType)?.singleton === true;
 }

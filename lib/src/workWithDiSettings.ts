@@ -1,5 +1,5 @@
+import { findOrCreateMetadata } from './findMetadata';
 import { Constructor, ImplementationType } from './types';
-import { cheapDiSymbol } from './cheapDiSymbol';
 
 export function workWithDiSettings<TClass>(
   constructor: Constructor<TClass>,
@@ -7,9 +7,7 @@ export function workWithDiSettings<TClass>(
 ) {
   const implementationType = constructor as unknown as ImplementationType<TClass>;
 
-  if (!implementationType[cheapDiSymbol]) {
-    implementationType[cheapDiSymbol] = {};
-  }
+  findOrCreateMetadata(implementationType);
 
-  modification(implementationType[cheapDiSymbol]!);
+  modification(implementationType);
 }

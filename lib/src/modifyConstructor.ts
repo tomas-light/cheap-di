@@ -7,5 +7,5 @@ export function modifyConstructor<TClass>(
   modification: (settings: NonNullable<ImplementationType<TClass>>) => void
 ) {
   workWithDiSettings(constructor, modification);
-  InheritancePreserver.constructorModified(implementationType);
+  InheritancePreserver.constructorModified(constructor);
 }

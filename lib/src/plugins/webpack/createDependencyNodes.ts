@@ -6,13 +6,17 @@ import { ClassConstructorParameter } from './ClassConstructorParameter';
 //     <className>[Symbol.metadata] = {};
 //   }
 //
-//   const metadata = (${classLocalName}[Symbol.metadata]) as { [dependenciesSymbolCheapDI]?: any[] };
-//   if (!metadata[dependenciesSymbolCheapDI]) {
-//     metadata[dependenciesSymbolCheapDI] = [];
+//   const metadata = (${classLocalName}[Symbol.metadata]) as { [cheapDiSymbol]?: any[] };
+//   if (!metadata[cheapDiSymbol]) {
+//     metadata[cheapDiSymbol] = [];
 //   }
 //
-//   metadata[dependenciesSymbolCheapDI].push(<parameters>);
+//   metadata[cheapDiSymbol].push(<parameters>);
 // } catch {
+
+const metadataSymbolTextName = 'metadata';
+const diMetadataSymbolTextName = 'cheapDiSymbol';
+
 export function createDependencyNodes(className: string, parameters: ClassConstructorParameter[]) {
   const parameterNodes = parameters.reduce((expressions, parameter) => {
     if (parameter.type === 'class' && parameter.classReferenceLocalName) {
@@ -32,7 +36,7 @@ export function createDependencyNodes(className: string, parameters: ClassConstr
             ts.factory.createVariableDeclarationList(
               [
                 ts.factory.createVariableDeclaration(
-                  ts.factory.createIdentifier('metadata'),
+                  ts.factory.createIdentifier(metadataSymbolTextName),
                   undefined,
                   undefined,
                   ts.factory.createAsExpression(
@@ -41,14 +45,14 @@ export function createDependencyNodes(className: string, parameters: ClassConstr
                         ts.factory.createIdentifier(className),
                         ts.factory.createPropertyAccessExpression(
                           ts.factory.createIdentifier('Symbol'),
-                          ts.factory.createIdentifier('metadata')
+                          ts.factory.createIdentifier(metadataSymbolTextName)
                         )
                       )
                     ),
                     ts.factory.createTypeLiteralNode([
                       ts.factory.createPropertySignature(
                         undefined,
-                        ts.factory.createComputedPropertyName(ts.factory.createIdentifier('dependenciesSymbolCheapDI')),
+                        ts.factory.createComputedPropertyName(ts.factory.createIdentifier(diMetadataSymbolTextName)),
                         ts.factory.createToken(ts.SyntaxKind.QuestionToken),
                         ts.factory.createArrayTypeNode(ts.factory.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword))
                       ),
@@ -63,8 +67,8 @@ export function createDependencyNodes(className: string, parameters: ClassConstr
             ts.factory.createPrefixUnaryExpression(
               ts.SyntaxKind.ExclamationToken,
               ts.factory.createElementAccessExpression(
-                ts.factory.createIdentifier('metadata'),
-                ts.factory.createIdentifier('dependenciesSymbolCheapDI')
+                ts.factory.createIdentifier(metadataSymbolTextName),
+                ts.factory.createIdentifier(diMetadataSymbolTextName)
               )
             ),
             ts.factory.createBlock(
@@ -72,8 +76,8 @@ export function createDependencyNodes(className: string, parameters: ClassConstr
                 ts.factory.createExpressionStatement(
                   ts.factory.createBinaryExpression(
                     ts.factory.createElementAccessExpression(
-                      ts.factory.createIdentifier('metadata'),
-                      ts.factory.createIdentifier('dependenciesSymbolCheapDI')
+                      ts.factory.createIdentifier(metadataSymbolTextName),
+                      ts.factory.createIdentifier(diMetadataSymbolTextName)
                     ),
                     ts.factory.createToken(ts.SyntaxKind.FirstAssignment),
                     ts.factory.createArrayLiteralExpression([], false)
@@ -88,8 +92,8 @@ export function createDependencyNodes(className: string, parameters: ClassConstr
             ts.factory.createCallExpression(
               ts.factory.createPropertyAccessExpression(
                 ts.factory.createElementAccessExpression(
-                  ts.factory.createIdentifier('metadata'),
-                  ts.factory.createIdentifier('dependenciesSymbolCheapDI')
+                  ts.factory.createIdentifier(metadataSymbolTextName),
+                  ts.factory.createIdentifier(diMetadataSymbolTextName)
                 ),
                 ts.factory.createIdentifier('push')
               ),
@@ -137,6 +141,6 @@ const metadataAccessNode = (className: string) =>
     ts.factory.createIdentifier(className),
     ts.factory.createPropertyAccessExpression(
       ts.factory.createIdentifier('Symbol'),
-      ts.factory.createIdentifier('metadata')
+      ts.factory.createIdentifier(metadataSymbolTextName)
     )
   );

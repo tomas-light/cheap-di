@@ -1,4 +1,4 @@
-import { container, dependencies, singleton, inject, di } from '@cheap-di/lib';
+import { container, singleton } from '@cheap-di/lib';
 
 beforeEach(() => {
   container.clear();
@@ -193,8 +193,6 @@ describe('register instance', () => {
   });
 });
 
-const metadata = <T>(constructor: T): T => constructor;
-
 describe('resolving several dependencies', () => {
   class ApiInterceptor {
     static singleton: ApiInterceptor;
@@ -218,7 +216,6 @@ describe('resolving several dependencies', () => {
     }
   }
 
-  @metadata
   class ApiBase {
     constructor(public readonly interceptor: ApiInterceptor) {
       if (!interceptor) {
@@ -267,7 +264,6 @@ describe('singletons', () => {
   });
 
   test('with decorator', () => {
-    @metadata
     class Service {}
 
     container.registerType(Service).asSingleton();
@@ -287,7 +283,6 @@ describe('nested resolve', () => {
       }
     }
 
-    @metadata
     class Repository {
       constructor(private db: Database) {}
 
@@ -296,7 +291,6 @@ describe('nested resolve', () => {
       }
     }
 
-    @metadata
     class Service {
       constructor(private repository: Repository) {}
 
@@ -325,7 +319,6 @@ describe('nested resolve', () => {
       }
     }
 
-    @metadata
     class Repository {
       constructor(private db: Database) {}
 
@@ -334,7 +327,6 @@ describe('nested resolve', () => {
       }
     }
 
-    @metadata
     class Service {
       constructor(private repository: Repository) {}
 
@@ -374,7 +366,7 @@ describe('with decorators', () => {
   }
 
   class Repository {
-    constructor(@inject(Database) private db: Database) {}
+    constructor(private db: Database) {}
 
     list() {
       return this.db.entities;
@@ -382,7 +374,7 @@ describe('with decorators', () => {
   }
 
   class Service {
-    constructor(@inject(Repository) private repository: Repository) {}
+    constructor(private repository: Repository) {}
 
     myList() {
       const entities = this.repository.list();
@@ -405,13 +397,13 @@ describe('with decorators', () => {
 
   test('with inject decorator', () => {
     class _Repository extends Repository {
-      constructor(@inject(Database) db: Database) {
+      constructor(db: Database) {
         super(db);
       }
     }
 
     class _Service extends Service {
-      constructor(@inject(_Repository) repository: _Repository) {
+      constructor(repository: _Repository) {
         super(repository);
       }
     }
@@ -420,14 +412,12 @@ describe('with decorators', () => {
   });
 
   test('with di decorator', () => {
-    @di
     class _Repository extends Repository {
       constructor(db: Database) {
         super(db);
       }
     }
 
-    @di
     class _Service extends Service {
       constructor(repository: _Repository) {
         super(repository);
@@ -446,7 +436,6 @@ describe('with decorators', () => {
       }
     }
 
-    @dependencies(Database)
     class Repository {
       constructor(private db: Database) {}
 
@@ -455,7 +444,6 @@ describe('with decorators', () => {
       }
     }
 
-    @dependencies(Repository)
     class Service {
       constructor(private repository: Repository) {}
 
@@ -539,8 +527,8 @@ describe('arguments order', () => {
   test('case 1', () => {
     class Service1 extends Service {
       constructor(
-        @inject(Repository) public repository: Repository,
-        @inject(Database) public db: Database,
+        public repository: Repository,
+        public db: Database,
         message: string,
         message2: string
       ) {
@@ -554,9 +542,9 @@ describe('arguments order', () => {
   test('case 2', () => {
     class Service2 extends Service {
       constructor(
-        @inject(Repository) public repository: Repository,
+        public repository: Repository,
         message: string,
-        @inject(Database) public db: Database,
+        public db: Database,
         message2: string
       ) {
         super(repository, db, message, message2);
@@ -570,8 +558,8 @@ describe('arguments order', () => {
     class Service3 extends Service {
       constructor(
         message: string,
-        @inject(Repository) public repository: Repository,
-        @inject(Database) public db: Database,
+        public repository: Repository,
+        public db: Database,
         message2: string
       ) {
         super(repository, db, message, message2);
@@ -585,9 +573,9 @@ describe('arguments order', () => {
     class Service4 extends Service {
       constructor(
         message: string,
-        @inject(Repository) public repository: Repository,
+        public repository: Repository,
         message2: string,
-        @inject(Database) public db: Database
+        public db: Database
       ) {
         super(repository, db, message, message2);
       }
@@ -597,7 +585,6 @@ describe('arguments order', () => {
   });
 
   test('case 5', () => {
-    @di
     class Service5 extends Service {
       constructor(
         message: string,
@@ -629,7 +616,6 @@ describe('arguments order', () => {
       prop: 'qwe',
     };
 
-    @di
     class Service6 extends Service {
       constructor(
         message: string,
