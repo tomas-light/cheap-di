@@ -1,11 +1,11 @@
 {
-  "name": "@cheap-di/tests",
+  "name": "@cheap-di/webpack-project",
   "version": "0.0.0",
   "scripts": {
-    "dev": "",
-    "test:transformer": "webpack --config webpack.config.ts"
+    "test": "node compiled/case_01.js",
+    "webpack:dev": "webpack --config webpack.dev.js",
+    "webpack:prod": "webpack --config webpack.prod.ts"
   },
-  "type": "module",
   "dependencies": {
     "@cheap-di/lib": "0.0.0",
     "react": "18.2.0",

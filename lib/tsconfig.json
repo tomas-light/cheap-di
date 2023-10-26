@@ -14,7 +14,6 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "noErrorTruncation": true,
-    "noImplicitAny": false,
     "outDir": "./dist",
     "skipLibCheck": true,
     "sourceMap": true,

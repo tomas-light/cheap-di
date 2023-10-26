@@ -1,22 +1,19 @@
-import { isSingleton } from './decorators';
-import { modifySingleton } from './decorators/singleton';
-import { CircularDependencyError } from './errors';
+import { isSingleton, modifySingleton } from './decorators/singleton';
+import { CircularDependencyError } from './errors/CircularDependencyError';
 import { findMetadata, findOrCreateMetadata } from './findMetadata';
+import { modifyConstructor } from './modifyConstructor';
 import {
+  AbstractConstructor,
   Constructor,
   Container,
-  RegistrationType,
-  AbstractConstructor,
-  ImplementationType,
   Dependency,
-  IHaveSingletons,
-  IHaveInstances,
   IHaveDependencies,
-  DiMetadataStorage,
+  IHaveInstances,
+  IHaveSingletons,
+  ImplementationType,
+  RegistrationType,
 } from './types';
-import { Trace } from './utils';
-import { cheapDiSymbol } from './cheapDiSymbol';
-import { modifyConstructor } from './modifyConstructor';
+import { Trace } from './utils/Trace';
 
 class ContainerImpl implements Container, IHaveSingletons, IHaveInstances, IHaveDependencies, Disposable {
   singletons: Map<ImplementationType<any>, object>;

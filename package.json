@@ -6,10 +6,9 @@
     "lib",
     "tests/*"
   ],
-  "type": "module",
   "scripts": {
-    "build": "tsc --project tsconfig.build.json",
-    "test": "yarn workspace @cheap-di/tests run test"
+    "build": "yarn workspace @cheap-di/lib run build",
+    "test": "yarn workspace @cheap-di/webpack-project run webpack:dev"
   },
   "dependencies": {
     "typescript": "5.2.2"
@@ -20,11 +19,6 @@
     "eslint": "8.52.0",
     "prettier": "3.0.3"
   },
-  "files": [
-    "lib/dist/**/*"
-  ],
-  "main": "lib/dist/index.js",
-  "types": "lib/dist/index.d.ts",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/TomasLight/cheap-di.git"
@@ -40,5 +34,17 @@
     "cheap di",
     "instance type"
   ],
-  "packageManager": "yarn@4.0.0"
+  "packageManager": "yarn@4.0.0",
+  "main": "./lib/dist/cjs/lib.js",
+  "module": "./lib/dist/esm/lib.js",
+  "types": "index.d.ts",
+  "exports": {
+    "./*": {
+      "types": "./lib/dist/types/*.d.ts",
+      "require": "./lib/dist/cjs/*.js",
+      "import": "./lib/dist/esm/*.js",
+      "default": "./lib/dist/esm/*.js"
+    },
+    "./package.json": "./lib/package.json"
+  }
 }

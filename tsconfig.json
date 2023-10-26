@@ -12,7 +12,6 @@
       "dom"
     ],
     "module": "ESNext",
-    "moduleResolution": "node",
     "noErrorTruncation": true,
     "skipLibCheck": true,
     "sourceMap": true,
