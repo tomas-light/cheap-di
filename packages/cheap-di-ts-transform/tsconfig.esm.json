@@ -4,5 +4,6 @@
     "module": "esnext",
     "outDir": "dist/esm",
     "target": "esnext"
-  }
+  },
+  "exclude": ["node_modules", "dist", "src/testCodeGeneration.ts"]
 }
