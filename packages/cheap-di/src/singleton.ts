@@ -1,6 +1,6 @@
-import { findMetadata, findOrCreateMetadata } from './findMetadata';
-import { Constructor, ImplementationType } from './types';
-import { InheritancePreserver } from './InheritancePreserver';
+import { findMetadata, findOrCreateMetadata } from './findMetadata.js';
+import { Constructor, ImplementationType } from './types.js';
+import { InheritancePreserver } from './InheritancePreserver.js';
 
 export function singleton<TClass extends Constructor>(constructor: TClass, context?: ClassDecoratorContext): TClass {
   modifySingleton(constructor);

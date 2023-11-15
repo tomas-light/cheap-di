@@ -405,4 +405,4 @@ export class UserService {
 
 You can see more examples in `cheap-di/src/ContainerImpl.test.ts`
 
-[Changelog](./CHANGELOG.md)
+[Changelog](../../CHANGELOG.md)

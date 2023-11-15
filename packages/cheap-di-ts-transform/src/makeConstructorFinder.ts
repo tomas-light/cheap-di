@@ -1,5 +1,5 @@
 import ts from 'typescript';
-import { ClassConstructorParameter } from './ClassConstructorParameter';
+import { ClassConstructorParameter } from './ClassConstructorParameter.js';
 
 export function makeConstructorFinder(context: ts.TransformationContext, typeChecker: ts.TypeChecker) {
   const ref = {

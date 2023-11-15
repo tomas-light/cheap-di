@@ -1,5 +1,5 @@
 import ts from 'typescript';
-import { makeClassFinder } from './makeClassFinder';
+import { makeClassFinder } from './makeClassFinder.js';
 
 export const transformer = (program: ts.Program): ts.TransformerFactory<ts.SourceFile> => {
   const typeChecker = program.getTypeChecker();

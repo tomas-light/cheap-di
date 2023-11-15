@@ -1,6 +1,6 @@
 import ts from 'typescript';
-import { makeConstructorFinder } from './makeConstructorFinder';
-import { createDependencyNodes } from './createDependencyNodes';
+import { makeConstructorFinder } from './makeConstructorFinder.js';
+import { createDependencyNodes } from './createDependencyNodes.js';
 
 export function makeClassFinder(context: ts.TransformationContext, typeChecker: ts.TypeChecker) {
   const fileRef = {

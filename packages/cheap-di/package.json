@@ -3,8 +3,8 @@
   "description": "TypeScript dependency injection like Autofac in .Net",
   "version": "4.0.0-rc.1",
   "scripts": {
-    "compile": "tsc --build ./tsconfig.cjs.json ./tsconfig.esm.json ./tsconfig.types.json",
-    "prepare-package-json": "ts-node ./scripts/prepare-package-json.ts",
+    "compile": "tsc --build tsconfig.cjs.json ./tsconfig.esm.json ./tsconfig.types.json",
+    "prepare-package-json": "ts-node scripts/prepare-package-json.ts",
     "build:clean": "rimraf -rf ./dist",
     "build": "npm-run-all build:clean compile prepare-package-json"
   },

@@ -1,14 +1,13 @@
 {
   "workspaces": [
-    "lib",
-    "ts-loader",
+    "packages/*",
     "tests/*"
   ],
   "scripts": {
-    "build:lib": "npm run build --workspace cheap-di",
-    "build:ts-loader": "npm run build --workspace cheap-di-ts-transform",
-    "build": "npm-run-all build:lib build:ts-loader",
-    "test": "npm run webpack:dev --workspace @tests/webpack-project"
+    "build:cheap-di": "npm run build --workspace cheap-di",
+    "build:cheap-di-ts-transform": "npm run build --workspace cheap-di-ts-transform",
+    "build": "npm-run-all build:cheap-di build:cheap-di-ts-transform",
+    "test:webpack": "npm run webpack:dev --workspace @tests/webpack-project"
   },
   "dependencies": {
     "typescript": "5.2.2"
