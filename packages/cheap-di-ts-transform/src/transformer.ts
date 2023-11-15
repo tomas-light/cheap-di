@@ -1,4 +1,5 @@
 import ts from 'typescript';
+import { importDeclaration } from './generation/importDeclaration.js';
 import { makeClassFinder } from './makeClassFinder.js';
 
 export const transformer = (program: ts.Program): ts.TransformerFactory<ts.SourceFile> => {
@@ -19,18 +20,8 @@ export const transformer = (program: ts.Program): ts.TransformerFactory<ts.Sourc
       return ts.factory.updateSourceFile(
         transformedSourceFile,
         [
-          // "import { cheapDiSymbol } from 'cheap-di';"
-          ts.factory.createImportDeclaration(
-            undefined,
-            ts.factory.createImportClause(
-              false,
-              undefined,
-              ts.factory.createNamedImports([
-                ts.factory.createImportSpecifier(false, undefined, ts.factory.createIdentifier('cheapDiSymbol')),
-              ])
-            ),
-            ts.factory.createStringLiteral('cheap-di')
-          ),
+          // import { findOrCreateMetadata } from 'cheap-di';
+          importDeclaration('findOrCreateMetadata').from('cheap-di'),
           ...transformedSourceFile.statements,
         ],
         transformedSourceFile.isDeclarationFile,
