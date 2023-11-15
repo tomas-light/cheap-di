@@ -4,6 +4,8 @@ type AbstractConstructor<T = any> = abstract new (...args: any[]) => T;
 type Constructor<T = any> = new (...args: any[]) => T;
 type Dependency<T = any> = Constructor<T> | AbstractConstructor<T>;
 
+type SomeDependency = Dependency | 'unknown';
+
 type ImplementationType<TClass> = Constructor<TClass> & {
   [Symbol.metadata]: DiMetadataStorage<TClass>;
 };
@@ -14,7 +16,7 @@ type DiMetadataStorage<TClass> = {
 
 interface DiMetadata<TClass> {
   singleton?: boolean;
-  dependencies?: Dependency[];
+  dependencies?: SomeDependency[];
   modifiedClass?: TClass;
   injected?: unknown[];
 }
@@ -23,12 +25,12 @@ type RegistrationType<TInstance> = Constructor<TInstance> | AbstractConstructor<
 
 interface WithInjectionParams {
   /** add parameters that will be passed to the class constructor */
-  with: (...injectionParams: any[]) => void;
+  inject: (...injectionParams: any[]) => void;
 }
 
 interface DependencyRegistrator<RegisterTypeExtension = object, RegisterInstanceExtension = object> {
-  /** register class */
-  registerType: <TClass>(implementationType: ImplementationType<TClass>) => {
+  /** register implementation class */
+  registerImplementation: <TClass>(implementationType: ImplementationType<TClass>) => {
     /** as super class */
     as: <TBase extends Partial<TClass>>(type: RegistrationType<TBase>) => WithInjectionParams;
 
@@ -87,5 +89,6 @@ export type {
   IHaveSingletons,
   ImplementationType,
   RegistrationType,
+  SomeDependency,
   WithInjectionParams,
 };

@@ -7,8 +7,8 @@
     "webpack:prod": "webpack --config webpack/webpack.prod.ts"
   },
   "dependencies": {
-    "cheap-di": "4.0.0-rc.1",
-    "cheap-di-ts-transform": "1.0.0-rc-1",
+    "cheap-di": "4.0.0-rc.2",
+    "cheap-di-ts-transform": "1.0.0-rc-2",
     "react": "18.2.0",
     "react-dom": "18.2.0"
   },

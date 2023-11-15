@@ -18,10 +18,10 @@ class Service {
  * With cheap-di-ts-transform here will be added information about Service dependencies.
  * It will looks like:
  * @example
+ * import { findOrCreateMetadata } from 'cheap-di';
+ * 
  * // for Logger
  * try {
- *   import { findOrCreateMetadata } from 'cheap-di';
- *   
  *   const metadata = findOrCreateMetadata(Logger);
  *   
  *   // only classes may be instantiated with DI, other parameters can be filled with argument injection
@@ -30,8 +30,6 @@ class Service {
  *
  * // for Service
  * try {
- *   import { cheapDiSymbol, findOrCreateMetadata } from 'cheap-di';
- *   
  *   const metadata = findOrCreateMetadata(Service);
  *   
  *   metadata.dependencies = [Logger];

@@ -1,7 +1,7 @@
 {
   "name": "cheap-di",
   "description": "TypeScript dependency injection like Autofac in .Net",
-  "version": "4.0.0-rc.1",
+  "version": "4.0.0-rc.2",
   "scripts": {
     "compile": "tsc --build tsconfig.cjs.json ./tsconfig.esm.json ./tsconfig.types.json",
     "prepare-package-json": "ts-node scripts/prepare-package-json.ts",

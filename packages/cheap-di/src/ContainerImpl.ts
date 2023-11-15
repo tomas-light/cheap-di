@@ -1,7 +1,8 @@
-import { isSingleton, modifySingleton } from './singleton.js';
 import { CircularDependencyError } from './CircularDependencyError.js';
 import { findMetadata, findOrCreateMetadata } from './findMetadata.js';
+import { isSingleton } from './isSingleton.js';
 import { modifyConstructor } from './modifyConstructor.js';
+import { Trace } from './Trace.js';
 import {
   AbstractConstructor,
   Constructor,
@@ -13,7 +14,7 @@ import {
   ImplementationType,
   RegistrationType,
 } from './types.js';
-import { Trace } from './Trace.js';
+import { workWithDiSettings } from './workWithDiSettings.js';
 
 class ContainerImpl implements Container, IHaveSingletons, IHaveInstances, IHaveDependencies, Disposable {
   singletons: Map<ImplementationType<any>, object>;
@@ -26,9 +27,9 @@ class ContainerImpl implements Container, IHaveSingletons, IHaveInstances, IHave
     this.dependencies = new Map();
   }
 
-  /** register class */
-  registerType<TInstance>(implementationType: ImplementationType<TInstance>) {
-    const withInjection = (...injectionParams: any[]) => {
+  /** register implementation class */
+  registerImplementation<TInstance>(implementationType: ImplementationType<TInstance>) {
+    const inject = (...injectionParams: any[]) => {
       modifyConstructor(implementationType, (settings) => {
         const metadata = findOrCreateMetadata(settings);
         metadata.injected = injectionParams;
@@ -44,10 +45,10 @@ class ContainerImpl implements Container, IHaveSingletons, IHaveInstances, IHave
         this.dependencies.set(type, implementationType);
         return {
           /** add parameters that will be passed to the class constructor */
-          with: withInjection,
+          inject,
         };
       },
-      /** as singleton (optionally super class). Only if you didn't use @singleton decorator */
+      /** as singleton (optionally super class) */
       asSingleton: <TBase extends Partial<TInstance>>(type?: RegistrationType<TBase>) => {
         if (type) {
           this.dependencies.delete(implementationType);
@@ -55,16 +56,20 @@ class ContainerImpl implements Container, IHaveSingletons, IHaveInstances, IHave
         }
 
         if (!isSingleton(implementationType)) {
-          modifySingleton(implementationType);
+          workWithDiSettings(implementationType, (settings) => {
+            const metadata = findOrCreateMetadata(settings);
+            metadata.modifiedClass = implementationType as TInstance;
+            metadata.singleton = true;
+          });
         }
 
         return {
           /** add parameters that will be passed to the class constructor */
-          with: withInjection,
+          inject,
         };
       },
       /** add parameters that will be passed to the class constructor */
-      with: withInjection,
+      inject,
     };
   }
 
@@ -157,11 +162,11 @@ class ContainerImpl implements Container, IHaveSingletons, IHaveInstances, IHave
 
     const { dependencies } = metadata ?? {};
     if (dependencies?.length) {
-      const injectableDependencies = dependencies.filter((d) => d);
-      const length = injectableDependencies.length + injectionParams.length;
+      const injectableDependencies = dependencies.filter((dependency) => dependency !== 'unknown') as Dependency[];
+      // const length = injectableDependencies.length + injectionParams.length;
 
       while (true) {
-        const dependencyType = dependencies[index];
+        const dependencyType = injectableDependencies[index];
         if (dependencyType) {
           trace.addTrace(dependencyType.name);
 
@@ -183,7 +188,8 @@ class ContainerImpl implements Container, IHaveSingletons, IHaveInstances, IHave
 
         index++;
 
-        if (index >= length) {
+        // if (index >= length) {
+        if (index >= injectableDependencies.length) {
           break;
         }
       }

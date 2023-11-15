@@ -1,10 +1,11 @@
 import path from 'path';
+import { Configuration } from 'webpack';
 import { transformer } from 'cheap-di-ts-transform';
 
 const packageRoot = path.join(__dirname, '..');
 const tsconfig = path.join(packageRoot, 'tsconfig.json');
 
-const config = {
+const config: Configuration = {
   mode: 'development',
   devtool: false,
   entry: {
