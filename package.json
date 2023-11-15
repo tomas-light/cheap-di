@@ -1,50 +1,23 @@
 {
-  "name": "cheap-di",
-  "version": "4.0.0-rc.1",
-  "description": "TypeScript dependency injection like Autofac in .Net",
   "workspaces": [
     "lib",
+    "ts-loader",
     "tests/*"
   ],
   "scripts": {
-    "build": "yarn workspace @cheap-di/lib run build",
-    "test": "yarn workspace @cheap-di/webpack-project run webpack:dev"
+    "build:lib": "npm run build --workspace cheap-di",
+    "build:ts-loader": "npm run build --workspace cheap-di-ts-transform",
+    "build": "npm-run-all build:lib build:ts-loader",
+    "test": "npm run webpack:dev --workspace @tests/webpack-project"
   },
   "dependencies": {
     "typescript": "5.2.2"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "6.9.0",
-    "@typescript-eslint/parser": "6.9.0",
-    "eslint": "8.52.0",
+    "@typescript-eslint/eslint-plugin": "6.9.1",
+    "@typescript-eslint/parser": "6.9.1",
+    "eslint": "8.53.0",
+    "npm-run-all": "4.1.5",
     "prettier": "3.0.3"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/TomasLight/cheap-di.git"
-  },
-  "author": "TomasLight",
-  "license": "MIT",
-  "homepage": "https://github.com/TomasLight/cheap-di#readme",
-  "keywords": [
-    "dependency",
-    "injection",
-    "dependency injection",
-    "di",
-    "cheap di",
-    "instance type"
-  ],
-  "packageManager": "yarn@4.0.0",
-  "main": "./lib/dist/cjs/lib.js",
-  "module": "./lib/dist/esm/lib.js",
-  "types": "index.d.ts",
-  "exports": {
-    "./*": {
-      "types": "./lib/dist/types/*.d.ts",
-      "require": "./lib/dist/cjs/*.js",
-      "import": "./lib/dist/esm/*.js",
-      "default": "./lib/dist/esm/*.js"
-    },
-    "./package.json": "./lib/package.json"
   }
 }

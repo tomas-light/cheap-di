@@ -1,7 +1,7 @@
 import ts from 'typescript';
 import { makeClassFinder } from './makeClassFinder';
 
-export const cheapDiWebpackPlugin = (program: ts.Program): ts.TransformerFactory<ts.SourceFile> => {
+export const transformer = (program: ts.Program): ts.TransformerFactory<ts.SourceFile> => {
   const typeChecker = program.getTypeChecker();
 
   return (context) => {
@@ -19,7 +19,7 @@ export const cheapDiWebpackPlugin = (program: ts.Program): ts.TransformerFactory
       return ts.factory.updateSourceFile(
         transformedSourceFile,
         [
-          // "import { cheapDiSymbol } from '@cheap-di/lib';"
+          // "import { cheapDiSymbol } from 'cheap-di';"
           ts.factory.createImportDeclaration(
             undefined,
             ts.factory.createImportClause(
@@ -29,7 +29,7 @@ export const cheapDiWebpackPlugin = (program: ts.Program): ts.TransformerFactory
                 ts.factory.createImportSpecifier(false, undefined, ts.factory.createIdentifier('cheapDiSymbol')),
               ])
             ),
-            ts.factory.createStringLiteral('@cheap-di/lib')
+            ts.factory.createStringLiteral('cheap-di')
           ),
           ...transformedSourceFile.statements,
         ],

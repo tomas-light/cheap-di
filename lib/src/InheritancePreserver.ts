@@ -1,6 +1,6 @@
-import { findMetadata, findOrCreateMetadata } from '../findMetadata';
-import { Constructor, ImplementationType } from '../types';
-import { workWithDiSettings } from '../workWithDiSettings';
+import { findMetadata, findOrCreateMetadata } from './findMetadata';
+import { Constructor, ImplementationType } from './types';
+import { workWithDiSettings } from './workWithDiSettings';
 
 export class InheritancePreserver {
   static constructorModified(constructor: Constructor) {

@@ -1,5 +1,5 @@
-import { findOrCreateMetadata } from './findMetadata';
-import { Constructor, ImplementationType } from './types';
+import { findOrCreateMetadata } from './findMetadata.js';
+import { Constructor, ImplementationType } from './types.js';
 
 export function workWithDiSettings<TClass>(
   constructor: Constructor<TClass>,

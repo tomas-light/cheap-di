@@ -1,6 +1,6 @@
-import { InheritancePreserver } from './decorators/InheritancePreserver';
-import { Constructor, ImplementationType } from './types';
-import { workWithDiSettings } from './workWithDiSettings';
+import { InheritancePreserver } from './InheritancePreserver';
+import { Constructor, ImplementationType } from './types.js';
+import { workWithDiSettings } from './workWithDiSettings.js';
 
 export function modifyConstructor<TClass>(
   constructor: Constructor<TClass>,

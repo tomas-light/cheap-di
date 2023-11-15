@@ -1,7 +1,6 @@
 {
-  "name": "cheap-di",
-  "description": "TypeScript dependency injection like Autofac in .Net",
-  "version": "4.0.0-rc.1",
+  "name": "cheap-di-ts-transform",
+  "version": "1.0.0-rc-1",
   "scripts": {
     "compile": "tsc --build ./tsconfig.cjs.json ./tsconfig.esm.json ./tsconfig.types.json",
     "prepare-package-json": "ts-node ./scripts/prepare-package-json.ts",
@@ -9,6 +8,7 @@
     "build": "npm-run-all build:clean compile prepare-package-json"
   },
   "dependencies": {
+    "cheap-di": "4.0.0-rc.1",
     "ts-creator": "1.2.5",
     "typescript": "5.2.2"
   },
@@ -19,20 +19,5 @@
   },
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
-  "types": "./dist/types/index.d.ts",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/TomasLight/cheap-di.git"
-  },
-  "author": "TomasLight",
-  "license": "MIT",
-  "homepage": "https://github.com/TomasLight/cheap-di#readme",
-  "keywords": [
-    "dependency",
-    "injection",
-    "dependency injection",
-    "di",
-    "cheap di",
-    "instance type"
-  ]
+  "types": "./dist/types/index.d.ts"
 }

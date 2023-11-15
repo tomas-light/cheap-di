@@ -1,6 +1,6 @@
 import path from 'path';
 import { Configuration } from 'webpack';
-import { cheapDiWebpackPlugin } from '@cheap-di/lib';
+import { transformer } from 'cheap-di-ts-transform';
 
 const tsconfig = path.join(__dirname, '..', '..', 'tsconfig.test.json');
 
@@ -23,7 +23,7 @@ const config: Configuration = {
         test: /\.ts$/,
         options: {
           getCustomTransformers: (program: any) => ({
-            before: [cheapDiWebpackPlugin(program)],
+            before: [transformer(program)],
           }),
           configFile: tsconfig,
         },

@@ -1,5 +1,5 @@
-import { cheapDiSymbol } from './cheapDiSymbol';
-import { DiMetadataStorage, ImplementationType } from './types';
+import { cheapDiSymbol } from './cheapDiSymbol.js';
+import { DiMetadataStorage, ImplementationType } from './types.js';
 
 export function findOrCreateMetadata<TClass>(settings: NonNullable<ImplementationType<TClass>>) {
   let metadataStorage = settings[Symbol.metadata] as DiMetadataStorage<TClass>;

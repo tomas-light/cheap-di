@@ -1,25 +1,30 @@
 {
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
-    "declaration": true,
+    "declaration": false,
     "esModuleInterop": true /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables 'allowSyntheticDefaultImports' for type compatibility. */,
     "inlineSources": true,
     "isolatedModules": true,
     "lib": [
-      "es2022",
+      "esnext",
       "esnext.decorators",
       "esnext.disposable",
       "dom"
     ],
-    "module": "commonjs",
+    "listEmittedFiles": false,
+    "listFiles": false,
+    "module": "CommonJS",
     "moduleResolution": "node",
     "noErrorTruncation": true,
+    "noFallthroughCasesInSwitch": true,
     "noImplicitAny": false,
     "outDir": "./dist",
+    "pretty": true,
     "skipLibCheck": true,
     "sourceMap": true,
     "strict": true,
-    "target": "ESNext"
+    "target": "ESNext",
+    "traceResolution": false
   },
-  "include": ["src"]
+  "include": ["src", "webpack"]
 }
