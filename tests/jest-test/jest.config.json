@@ -10,7 +10,8 @@
       "ts-jest",
       {
         "astTransformers": {
-          "before": ["cheap-di-ts-transform"]
+           "before": ["cheap-di-ts-transform"]
+//          "before": ["<rootDir>/../../packages/cheap-di-ts-transform/src/index.ts"]
         }
       }
     ]
