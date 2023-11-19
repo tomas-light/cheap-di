@@ -7,5 +7,9 @@
     "outDir": "dist/types",
     "target": "esnext"
   },
-  "exclude": ["node_modules", "dist", "src/testCodeGeneration.ts"]
+  "exclude": [
+    "node_modules",
+    "dist",
+    "src/helpers"
+  ]
 }

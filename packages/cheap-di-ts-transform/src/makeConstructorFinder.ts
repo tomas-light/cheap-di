@@ -30,47 +30,34 @@ export function makeConstructorFinder(context: ts.TransformationContext, typeChe
     });
 
     for (const parameterDeclaration of parameterDeclarations) {
-      const parameter: ClassConstructorParameter = {
+      const classConstructorParameter: ClassConstructorParameter = {
         type: 'unknown',
       };
-      ref.parameters.push(parameter);
+      ref.parameters.push(classConstructorParameter);
 
+      /** handle case when some of dependencies can be missed because of your container setup
+       * class Service {
+       *   constructor(some?: SomeService | null | undefined) {}
+       * }
+       * */
       parameterDeclaration.forEachChild((parameterNode) => {
-        if (parameterNode.kind !== ts.SyntaxKind.TypeReference) {
-          return;
-        }
+        if (ts.isUnionTypeNode(parameterNode)) {
+          let typeReferencedNode: ts.TypeReferenceNode | undefined;
 
-        let identifierSymbol: ts.Symbol | undefined;
-        for (const nodeChild of parameterNode.getChildren()) {
-          if (ts.isIdentifier(nodeChild)) {
-            identifierSymbol = typeChecker.getSymbolAtLocation(nodeChild);
-            break;
+          parameterNode.forEachChild((unionNode) => {
+            if (!typeReferencedNode && ts.isTypeReferenceNode(unionNode)) {
+              typeReferencedNode = unionNode;
+            }
+          });
+
+          if (typeReferencedNode) {
+            correctClassParameterIfItIsValid(typeChecker, typeReferencedNode, classConstructorParameter);
           }
-        }
-
-        if (!identifierSymbol) {
           return;
         }
 
-        const symbolDeclarations = identifierSymbol.getDeclarations();
-        if (!symbolDeclarations?.length) {
-          return;
-        }
-
-        let isClass = false;
-        let parameterClassDeclaration: ts.ClassDeclaration | undefined;
-
-        for (const declaration of symbolDeclarations) {
-          if (ts.isClassDeclaration(declaration)) {
-            isClass = true;
-            parameterClassDeclaration = declaration;
-            break;
-          }
-        }
-
-        if (isClass) {
-          parameter.type = 'class';
-          parameter.classReferenceLocalName = identifierSymbol.escapedName.toString();
+        if (ts.isTypeReferenceNode(parameterNode)) {
+          correctClassParameterIfItIsValid(typeChecker, parameterNode, classConstructorParameter);
         }
       });
     }
@@ -82,4 +69,41 @@ export function makeConstructorFinder(context: ts.TransformationContext, typeChe
     ref,
     constructorFinder,
   };
+}
+
+function correctClassParameterIfItIsValid(
+  typeChecker: ts.TypeChecker,
+  tsNode: ts.Node,
+  outClassConstructorParameter: ClassConstructorParameter
+) {
+  let identifierSymbol: ts.Symbol | undefined;
+  for (const nodeChild of tsNode.getChildren()) {
+    if (ts.isIdentifier(nodeChild)) {
+      identifierSymbol = typeChecker.getSymbolAtLocation(nodeChild);
+      break;
+    }
+  }
+
+  if (!identifierSymbol) {
+    return;
+  }
+
+  const symbolDeclarations = identifierSymbol.getDeclarations();
+  if (!symbolDeclarations?.length) {
+    return;
+  }
+
+  let isClass = false;
+
+  for (const declaration of symbolDeclarations) {
+    if (ts.isClassDeclaration(declaration)) {
+      isClass = true;
+      break;
+    }
+  }
+
+  if (isClass) {
+    outClassConstructorParameter.type = 'class';
+    outClassConstructorParameter.classReferenceLocalName = identifierSymbol.escapedName.toString();
+  }
 }

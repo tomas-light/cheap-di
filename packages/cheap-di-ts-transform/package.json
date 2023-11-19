@@ -1,8 +1,8 @@
 {
   "name": "cheap-di-ts-transform",
-  "version": "1.0.0-rc-5",
+  "version": "1.0.0-rc-6",
   "scripts": {
-    "check-code-gen": "ts-node src/testCodeGeneration.ts",
+    "check-code-gen": "ts-node src/helpers/testCodeGeneration.ts",
     "compile": "tsc --build tsconfig.cjs.json ./tsconfig.esm.json ./tsconfig.types.json",
     "prepare-package-json": "ts-node scripts/prepare-package-json.ts",
     "build:clean": "rimraf -rf ./dist",

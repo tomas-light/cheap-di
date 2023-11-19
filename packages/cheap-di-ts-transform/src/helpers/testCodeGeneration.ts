@@ -1,5 +1,5 @@
 import tsCreator from 'ts-creator';
-import { ClassConstructorParameter } from './ClassConstructorParameter.js';
+import { ClassConstructorParameter } from '../ClassConstructorParameter.js';
 
 const classLocalName = 'MyService';
 
