@@ -39,7 +39,7 @@ class Service {
 import { container } from 'cheap-di';
 
 const myLogPrefix = 'INFO: ';
-container.registerType(ConsoleLogger).as(Logger).with(myLogPrefix);
+container.registerImplementation(ConsoleLogger).as(Logger).inject(myLogPrefix);
 
 // somewhere in inside your code
 // or you may use some middleware to do this, to get rid of Service Locator antipattern
@@ -74,6 +74,7 @@ class ConsoleLogger implements Logger {
   }
 }
 
+@inject(InfoLogger)
 class Service {
   constructor(private logger: InfoLogger) {}
 
@@ -86,10 +87,10 @@ class Service {
 import { container } from 'cheap-di';
 
 const infoPrefix = 'INFO: ';
-container.registerType(ConsoleLogger).as(InfoLogger).with(infoPrefix);
+container.registerImplementation(ConsoleLogger).as(InfoLogger).inject(infoPrefix);
 
 const errorPrefix = 'ERROR: ';
-container.registerType(ConsoleLogger).as(ErrorLogger).with(errorPrefix);
+container.registerImplementation(ConsoleLogger).as(ErrorLogger).inject(errorPrefix);
 
 // somewhere in inside your code
 // or you may use some middleware to do this, to get rid of Service Locator antipattern

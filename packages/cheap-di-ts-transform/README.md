@@ -69,3 +69,21 @@ const config = {
 
 export default config;
 ```
+
+ts-jest:
+```json
+{
+  // [...]
+  "transform": {
+    "^.+\\.ts?$": [
+      "ts-jest",
+      {
+        "astTransformers": {
+           "before": ["cheap-di-ts-transform"]
+        }
+      }
+    ]
+  }
+}
+
+```
