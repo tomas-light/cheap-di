@@ -1,8 +1,14 @@
 import ts from 'typescript';
-import { importDeclaration } from './generation/importDeclaration.js';
 import { makeClassFinder } from './makeClassFinder.js';
 
-export const transformer = (program: ts.Program): ts.TransformerFactory<ts.SourceFile> => {
+type FactoryParameters = {
+  program: ts.Program;
+};
+
+type TransformerFactory = (parameters: FactoryParameters) => ts.TransformerFactory<ts.SourceFile>;
+
+export const transformer: TransformerFactory = (parameters) => {
+  const { program } = parameters;
   const typeChecker = program.getTypeChecker();
 
   return (context) => {
@@ -19,11 +25,7 @@ export const transformer = (program: ts.Program): ts.TransformerFactory<ts.Sourc
 
       return ts.factory.updateSourceFile(
         transformedSourceFile,
-        [
-          // import { findOrCreateMetadata } from 'cheap-di';
-          importDeclaration('findOrCreateMetadata').from('cheap-di'),
-          ...transformedSourceFile.statements,
-        ],
+        transformedSourceFile.statements,
         transformedSourceFile.isDeclarationFile,
         transformedSourceFile.referencedFiles,
         transformedSourceFile.typeReferenceDirectives,

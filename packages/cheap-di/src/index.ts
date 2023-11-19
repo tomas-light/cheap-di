@@ -6,3 +6,23 @@ export * from './findMetadata.js';
 export * from './isSingleton.js';
 export * from './Trace.js';
 export * from './types.js';
+
+import { cheapDiSymbol } from './cheapDiSymbol.js';
+import { CircularDependencyError } from './CircularDependencyError.js';
+import { container, ContainerImpl } from './ContainerImpl.js';
+import { inject } from './decorators/inject.js';
+import { findMetadata, findOrCreateMetadata } from './findMetadata.js';
+import { isSingleton } from './isSingleton.js';
+import { Trace } from './Trace.js';
+
+export default {
+  cheapDiSymbol,
+  CircularDependencyError,
+  container,
+  ContainerImpl,
+  inject,
+  findMetadata,
+  findOrCreateMetadata,
+  isSingleton,
+  Trace,
+};

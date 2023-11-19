@@ -33,24 +33,6 @@ class Service {
 }
 /**
  * With cheap-di-ts-transform here will be added information about Service dependencies.
- * It will looks like:
- * @example
- * import { findOrCreateMetadata } from 'cheap-di';
- * 
- * // for Logger
- * try {
- *   const metadata = findOrCreateMetadata(Logger);
- *
- *   // only classes may be instantiated with DI, other parameters can be filled with argument injection
- *   metadata.dependencies = ["unknown"];
- * } catch {}
- *
- * // for Service
- * try {
- *   const metadata = findOrCreateMetadata(Service);
- *
- *   metadata.dependencies = [Logger];
- * } catch {}
  * */ 
 
 // somewhere in you application initialization

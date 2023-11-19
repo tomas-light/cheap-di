@@ -18,22 +18,23 @@ class Service {
  * With cheap-di-ts-transform here will be added information about Service dependencies.
  * It will looks like:
  * @example
- * import { findOrCreateMetadata } from 'cheap-di';
- * 
  * // for Logger
  * try {
- *   const metadata = findOrCreateMetadata(Logger);
- *   
- *   // only classes may be instantiated with DI, other parameters can be filled with argument injection
+ *   const cheapDi = require('cheap-di');
+ *   const metadata = cheapDi.findOrCreateMetadata(Logger);
  *   metadata.dependencies = ["unknown"];
- * } catch {}
+ * } catch (error: unknown) {
+ *   console.warn(error);
+ * }
  *
  * // for Service
  * try {
- *   const metadata = findOrCreateMetadata(Service);
- *   
+ *   const cheapDi = require('cheap-di');
+ *   const metadata = cheapDi.findOrCreateMetadata(Service);
  *   metadata.dependencies = [Logger];
- * } catch {}
+ * } catch (error: unknown) {
+ *   console.warn(error);
+ * }
  * */
 ```
 
@@ -57,7 +58,7 @@ const config = {
         test: /\.ts$/,
         options: {
           getCustomTransformers: (program) => ({
-            before: [transformer(program)],
+            before: [transformer({ program })],
           }),
           configFile: tsconfigFilePath,
         },

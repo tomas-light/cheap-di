@@ -24,7 +24,7 @@ const config: Configuration = {
         test: /\.ts$/,
         options: {
           getCustomTransformers: (program) => ({
-            before: [transformer(program)],
+            before: [transformer({ program })],
           }),
           configFile: tsconfig,
         },

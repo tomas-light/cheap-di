@@ -29,7 +29,7 @@ const parametersToArrayItems = parameters.reduce((sourceString, parameter) => {
   return `"${parameter.type}"`;
 }, '');
 
-const code = `\    
+const code1 = `\    
 try {
   import { findOrCreateMetadata } from 'cheap-di';
   const metadata = findOrCreateMetadata(${classLocalName});
@@ -37,5 +37,38 @@ try {
 } catch {}\
     `;
 
-const nodeGenerationCode = tsCreator(code);
-debugger;
+const code2 = `\    
+try {
+  import cheapDi from 'cheap-di';
+  const metadata = cheapDi.findOrCreateMetadata(${classLocalName});
+  metadata.dependencies = [${parametersToArrayItems}];
+} catch {}\
+    `;
+
+const code3 = `\    
+try {
+  import ('cheap-di').then((module) => {
+    try {
+      const metadata = module.findOrCreateMetadata(Service);
+      metadata.dependencies = [Logger];
+    } catch (error: unknown) {
+      console.warn(error);
+    }
+  });
+} catch (error: unknown) {
+  console.warn(error);
+}\
+    `;
+
+const code4 = `\    
+try {
+  const cheapDi = require('cheap-di');
+  const metadata = cheapDi.findOrCreateMetadata(Service);
+  metadata.dependencies = [Logger];
+} catch (error) {
+  console.warn(error);
+}\
+    `;
+
+const nodeGenerationCode = tsCreator(code4);
+console.log(nodeGenerationCode);

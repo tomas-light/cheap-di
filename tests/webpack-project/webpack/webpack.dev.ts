@@ -10,6 +10,7 @@ const config: Configuration = {
   devtool: false,
   entry: {
     case_01: path.join(packageRoot, 'src', 'case_01'),
+    case_02: path.join(packageRoot, 'src', 'case_02'),
   },
   output: {
     path: path.join(packageRoot, 'compiled'),
@@ -24,7 +25,7 @@ const config: Configuration = {
         test: /\.ts$/,
         options: {
           getCustomTransformers: (program) => ({
-            before: [transformer(program)],
+            before: [transformer({ program })],
           }),
           configFile: tsconfig,
         },

@@ -2,7 +2,11 @@ import ts from 'typescript';
 import { createDependencyNodes } from './createDependencyNodes.js';
 import { makeConstructorFinder } from './makeConstructorFinder.js';
 
-export function makeClassFinder(context: ts.TransformationContext, typeChecker: ts.TypeChecker) {
+export function makeClassFinder(
+  context: ts.TransformationContext,
+  typeChecker: ts.TypeChecker,
+  ids?: Parameters<typeof createDependencyNodes>[2]
+) {
   const fileRef = {
     hasDependencies: false,
   };
@@ -26,7 +30,7 @@ export function makeClassFinder(context: ts.TransformationContext, typeChecker: 
 
     fileRef.hasDependencies = true;
 
-    const dependencyRegistrationNodes = createDependencyNodes(classLocalName, parameters);
+    const dependencyRegistrationNodes = createDependencyNodes(classLocalName, parameters, ids);
     return [classDeclaration, ...dependencyRegistrationNodes];
   }
 

@@ -8,11 +8,21 @@ import { objectAccessor } from './generation/objectAccessor.js';
 import { tryCatchStatement } from './generation/tryCatchStatement.js';
 
 // try {
-//   const metadata = findOrCreateMetadata(<className>);
+//   const cheapDi = require('cheap-di');
+//   const metadata = cheapDi.findOrCreateMetadata(<className>);
 //   metadata.dependencies = [<parameters>];
-// } catch {}
+// } catch (error: unknown) {
+//   console.warn(error);
+// }
 
-export function createDependencyNodes(className: string, parameters: ClassConstructorParameter[]) {
+export function createDependencyNodes(
+  className: string,
+  parameters: ClassConstructorParameter[],
+  ids?: {
+    findOrCreateMetadataFunc?: ts.Identifier;
+    cheapDiIdentifier?: ts.Identifier;
+  }
+) {
   const parameterNodes = parameters.reduce((expressions, parameter) => {
     if (parameter.type === 'class' && parameter.classReferenceLocalName) {
       return expressions.concat(ts.factory.createIdentifier(parameter.classReferenceLocalName));
@@ -21,14 +31,21 @@ export function createDependencyNodes(className: string, parameters: ClassConstr
     return expressions.concat(ts.factory.createStringLiteral('unknown'));
   }, [] as ts.Expression[]);
 
+  const cheapDiId = ts.factory.createIdentifier('cheapDi');
+
   return [
     tryCatchStatement([
-      // const metadata = findOrCreateMetadata(<className>);
+      // const cheapDi = require('cheap-di');
+      constVariable(cheapDiId, callFunction('require', ts.factory.createStringLiteral('cheap-di'))),
+
+      // const metadata = cheapDi.findOrCreateMetadata(<className>);
       constVariable(
         'metadata',
-
-        // findOrCreateMetadata(<className>);
-        callFunction('findOrCreateMetadata', ts.factory.createIdentifier(className))
+        callFunction(
+          // cheapDi.findOrCreateMetadata
+          objectAccessor(cheapDiId).property('findOrCreateMetadata'),
+          ts.factory.createIdentifier(className)
+        )
       ),
 
       // metadata.dependencies = [<parameters>];

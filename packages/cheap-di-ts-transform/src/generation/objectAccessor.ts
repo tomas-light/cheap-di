@@ -1,17 +1,16 @@
 import ts from 'typescript';
+import { makeIdentifier } from './makeIdentifier.js';
 
 /**
  * generates object property accessing expression
  * @example
  * <object>.<property>
  * */
-export function objectAccessor(objectName: string) {
+export function objectAccessor(objectNameOrIdentifier: string | ts.Identifier) {
   return {
     property: (propertyName: string) => {
-      return ts.factory.createPropertyAccessExpression(
-        ts.factory.createIdentifier(objectName),
-        ts.factory.createIdentifier(propertyName)
-      );
+      const identifier = makeIdentifier(objectNameOrIdentifier);
+      return ts.factory.createPropertyAccessExpression(identifier, ts.factory.createIdentifier(propertyName));
     },
   };
 }
