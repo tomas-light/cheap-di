@@ -1,0 +1,13 @@
+{
+  "preset": "ts-jest",
+  "transform": {
+    "^.+\\.ts?$": [
+      "ts-jest",
+      {
+        "astTransformers": {
+          "before": ["cheap-di-ts-transform"]
+        }
+      }
+    ]
+  }
+}

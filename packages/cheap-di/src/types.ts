@@ -30,7 +30,7 @@ interface WithInjectionParams {
 
 interface DependencyRegistrator<RegisterTypeExtension = object, RegisterInstanceExtension = object> {
   /** register implementation class */
-  registerImplementation: <TClass>(implementationType: ImplementationType<TClass>) => {
+  registerImplementation: <TClass>(implementationType: Constructor<TClass>) => {
     /** as super class */
     as: <TBase extends Partial<TClass>>(type: RegistrationType<TBase>) => WithInjectionParams;
 

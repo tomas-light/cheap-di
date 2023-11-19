@@ -18,7 +18,7 @@ import { workWithDiSettings } from './workWithDiSettings.js';
 
 class ContainerImpl implements Container, IHaveSingletons, IHaveInstances, IHaveDependencies, Disposable {
   singletons: Map<ImplementationType<any>, object>;
-  instances: Map<RegistrationType<any>, any>;
+  instances: Map<RegistrationType<any>, object>;
   dependencies: Map<RegistrationType<any>, ImplementationType<any> | object>;
 
   constructor() {
@@ -28,7 +28,7 @@ class ContainerImpl implements Container, IHaveSingletons, IHaveInstances, IHave
   }
 
   /** register implementation class */
-  registerImplementation<TInstance>(implementationType: ImplementationType<TInstance>) {
+  registerImplementation<TInstance>(implementationType: Constructor<TInstance>) {
     const inject = (...injectionParams: any[]) => {
       modifyConstructor(implementationType, (settings) => {
         const metadata = findOrCreateMetadata(settings);
@@ -162,36 +162,99 @@ class ContainerImpl implements Container, IHaveSingletons, IHaveInstances, IHave
 
     const { dependencies } = metadata ?? {};
     if (dependencies?.length) {
-      const injectableDependencies = dependencies.filter((dependency) => dependency !== 'unknown') as Dependency[];
-      // const length = injectableDependencies.length + injectionParams.length;
+      const resolvedDependencies: any[] = [];
+      const definedDependencies = dependencies.filter((dependency) => dependency !== 'unknown') as Dependency[];
 
       while (true) {
-        const dependencyType = injectableDependencies[index];
+        const dependencyType = definedDependencies[index];
         if (dependencyType) {
           trace.addTrace(dependencyType.name);
 
           const instance = this.internalResolve(dependencyType, trace.trace!);
+          const isNewInstance =
+            !this.isRegisteredInstance(dependencyType, instance) && !this.isRegisteredType(dependencyType, instance);
           if (
-            !(this.isRegisteredInstance(dependencyType, instance) || this.isRegisteredType(dependencyType, instance)) &&
+            // todo: can't remember why is it, have to add comment ...
+            isNewInstance &&
             injectionParams[injectionParamsIndex] instanceof Object &&
             injectionParams[injectionParamsIndex].constructor === dependencyType
           ) {
-            injectableArguments[index] = injectionParams[injectionParamsIndex];
+            resolvedDependencies[index] = injectionParams[injectionParamsIndex];
             injectionParamsIndex++;
           } else {
-            injectableArguments[index] = instance;
+            resolvedDependencies[index] = instance;
           }
         } else if (injectionParams[injectionParamsIndex]) {
-          injectableArguments[index] = injectionParams[injectionParamsIndex];
+          resolvedDependencies[index] = injectionParams[injectionParamsIndex];
           injectionParamsIndex++;
         }
 
         index++;
 
-        // if (index >= length) {
-        if (index >= injectableDependencies.length) {
+        if (index >= definedDependencies.length) {
           break;
         }
+      }
+
+      // put resolved dependencies and injection params in the defined order
+      let dependencyIndex = 0;
+      let paramsIndex = 0;
+      for (let index = 0; index < dependencies.length; index++) {
+        const dependency = dependencies[index];
+        if (dependency === 'unknown') {
+          const injectionParam = injectionParams[paramsIndex];
+          paramsIndex++;
+          injectableArguments[index] = injectionParam;
+        } else {
+          const resolvedDependency = resolvedDependencies[dependencyIndex];
+          dependencyIndex++;
+          injectableArguments[index] = resolvedDependency;
+        }
+      }
+
+      // pass rest arguments to the end
+      if (paramsIndex < injectionParams.length) {
+        const restParams = injectionParams.slice(paramsIndex);
+        const notReplacedParams: any[] = [];
+
+        /**
+         * @example
+         * class MyService {
+         *   constructor(public some: string) {}
+         * }
+         *
+         * @inject(MyService)
+         * class Some {
+         *   constructor(public service: MyService) {}
+         * }
+         *
+         * container.registerImplementation(Some).inject(new MyService('123'));
+         *
+         * container.resolve(Some); // here you would like to get Some with MyService with '123', and not auto-resolved MyService
+         * */
+        restParams.forEach((restParameter) => {
+          if (!restParameter) {
+            notReplacedParams.push(restParameter);
+            return;
+          }
+          if (typeof restParameter !== 'object') {
+            notReplacedParams.push(restParameter);
+            return;
+          }
+
+          const replaceableIndex = injectableArguments.findIndex(
+            (argument) =>
+              argument != null && typeof argument === 'object' && argument instanceof restParameter.constructor
+          );
+          if (replaceableIndex === -1) {
+            notReplacedParams.push(restParameter);
+            return;
+          }
+
+          injectableArguments.splice(replaceableIndex, 1, restParameter);
+        });
+
+        injectableArguments.push(...restParams);
       }
     } else {
       injectableArguments = injectionParams;
