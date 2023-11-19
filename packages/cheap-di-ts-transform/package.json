@@ -9,7 +9,7 @@
     "build": "npm-run-all build:clean compile prepare-package-json"
   },
   "dependencies": {
-    "cheap-di": "4.0.0-rc-3",
+    "cheap-di": "4.0.0-rc-4",
     "ts-creator": "1.2.5",
     "typescript": "5.2.2"
   },
