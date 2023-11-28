@@ -1,4 +1,5 @@
 import ts from 'typescript';
+import { constVariableDeclaration } from './constVariableDeclaration.js';
 import { makeIdentifier } from './makeIdentifier.js';
 
 /**
@@ -8,12 +9,5 @@ import { makeIdentifier } from './makeIdentifier.js';
  * */
 export function constVariable(variableName: string | ts.Identifier, initializer?: ts.Expression | undefined) {
   const identifier = makeIdentifier(variableName);
-
-  return ts.factory.createVariableStatement(
-    undefined,
-    ts.factory.createVariableDeclarationList(
-      [ts.factory.createVariableDeclaration(identifier, undefined, undefined, initializer)],
-      ts.NodeFlags.Const
-    )
-  );
+  return constVariableDeclaration(identifier, initializer);
 }

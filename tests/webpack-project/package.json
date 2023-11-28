@@ -2,13 +2,14 @@
   "name": "@tests/webpack-project",
   "version": "0.0.0",
   "scripts": {
-    "test": "node compiled/case_02.js",
+    "test": "node compiled/case_03.js",
     "webpack:dev": "webpack --config webpack/webpack.dev.ts --stats-error-details",
     "webpack:prod": "webpack --config webpack/webpack.prod.ts"
   },
   "dependencies": {
+    "package1": "0.0.0",
     "cheap-di": "4.0.0-rc-5",
-    "cheap-di-ts-transform": "1.0.0-rc-5",
+    "cheap-di-ts-transform": "1.0.0-rc-7",
     "react": "18.2.0",
     "react-dom": "18.2.0"
   },

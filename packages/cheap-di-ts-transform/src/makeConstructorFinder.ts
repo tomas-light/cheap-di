@@ -1,5 +1,9 @@
 import ts from 'typescript';
-import { ClassConstructorParameter } from './ClassConstructorParameter.js';
+import { ClassConstructorParameter, ClassParameter, ImportedClass, LocalClass } from './ClassConstructorParameter.js';
+import { correctClassParameterIfItIsValid } from './correctClassParameterIfItIsValid.js';
+import { findClassIdentifierSymbol } from './findClassIdentifierSymbol.js';
+import { findImports } from './findImports.js';
+import { isThereClassInDeclarations } from './isThereClassInDeclarations.js';
 
 export function makeConstructorFinder(context: ts.TransformationContext, typeChecker: ts.TypeChecker) {
   const ref = {
@@ -69,41 +73,4 @@ export function makeConstructorFinder(context: ts.TransformationContext, typeChe
     ref,
     constructorFinder,
   };
-}
-
-function correctClassParameterIfItIsValid(
-  typeChecker: ts.TypeChecker,
-  tsNode: ts.Node,
-  outClassConstructorParameter: ClassConstructorParameter
-) {
-  let identifierSymbol: ts.Symbol | undefined;
-  for (const nodeChild of tsNode.getChildren()) {
-    if (ts.isIdentifier(nodeChild)) {
-      identifierSymbol = typeChecker.getSymbolAtLocation(nodeChild);
-      break;
-    }
-  }
-
-  if (!identifierSymbol) {
-    return;
-  }
-
-  const symbolDeclarations = identifierSymbol.getDeclarations();
-  if (!symbolDeclarations?.length) {
-    return;
-  }
-
-  let isClass = false;
-
-  for (const declaration of symbolDeclarations) {
-    if (ts.isClassDeclaration(declaration)) {
-      isClass = true;
-      break;
-    }
-  }
-
-  if (isClass) {
-    outClassConstructorParameter.type = 'class';
-    outClassConstructorParameter.classReferenceLocalName = identifierSymbol.escapedName.toString();
-  }
 }

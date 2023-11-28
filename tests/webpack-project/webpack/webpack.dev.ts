@@ -9,8 +9,9 @@ const config: Configuration = {
   mode: 'development',
   devtool: false,
   entry: {
-    case_01: path.join(packageRoot, 'src', 'case_01'),
-    case_02: path.join(packageRoot, 'src', 'case_02'),
+    // case_01: path.join(packageRoot, 'src', 'case_01'),
+    // case_02: path.join(packageRoot, 'src', 'case_02'),
+    case_03: path.join(packageRoot, 'src', 'case_03'),
   },
   output: {
     path: path.join(packageRoot, 'compiled'),
