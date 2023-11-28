@@ -1,9 +1,6 @@
 import ts from 'typescript';
-import { ClassConstructorParameter, ClassParameter, ImportedClass, LocalClass } from './ClassConstructorParameter.js';
-import { correctClassParameterIfItIsValid } from './correctClassParameterIfItIsValid.js';
-import { findClassIdentifierSymbol } from './findClassIdentifierSymbol.js';
-import { findImports } from './findImports.js';
-import { isThereClassInDeclarations } from './isThereClassInDeclarations.js';
+import { ClassConstructorParameter } from './ClassConstructorParameter.js';
+import { findClassConstructorParameters } from './findClassConstructorParameters.js';
 
 export function makeConstructorFinder(context: ts.TransformationContext, typeChecker: ts.TypeChecker) {
   const ref = {
@@ -11,62 +8,23 @@ export function makeConstructorFinder(context: ts.TransformationContext, typeChe
     parameters: [] as ClassConstructorParameter[],
   };
 
-  function constructorFinder(classNode: ts.Node): ts.Node {
-    if (ts.isIdentifier(classNode)) {
+  function constructorFinder(nodeInsideClass: ts.Node): ts.Node {
+    if (ts.isIdentifier(nodeInsideClass)) {
+      // first identifier in class is a class identifier (class reference)
       if (!ref.classLocalName) {
-        const identifierSymbol = typeChecker.getSymbolAtLocation(classNode);
+        const identifierSymbol = typeChecker.getSymbolAtLocation(nodeInsideClass);
         ref.classLocalName = identifierSymbol?.escapedName.toString();
       }
-      return classNode;
+      return nodeInsideClass;
     }
 
-    if (!ts.isConstructorDeclaration(classNode)) {
-      return ts.visitEachChild(classNode, constructorFinder, context);
+    if (!ts.isConstructorDeclaration(nodeInsideClass)) {
+      return ts.visitEachChild(nodeInsideClass, constructorFinder, context);
     }
 
-    const constructorDeclaration: ts.ConstructorDeclaration = classNode;
+    findClassConstructorParameters(typeChecker, nodeInsideClass, ref.parameters);
 
-    const parameterDeclarations: ts.ParameterDeclaration[] = [];
-    constructorDeclaration.forEachChild((node) => {
-      if (ts.isParameter(node)) {
-        parameterDeclarations.push(node);
-      }
-    });
-
-    for (const parameterDeclaration of parameterDeclarations) {
-      const classConstructorParameter: ClassConstructorParameter = {
-        type: 'unknown',
-      };
-      ref.parameters.push(classConstructorParameter);
-
-      /** handle case when some of dependencies can be missed because of your container setup
-       * class Service {
-       *   constructor(some?: SomeService | null | undefined) {}
-       * }
-       * */
-      parameterDeclaration.forEachChild((parameterNode) => {
-        if (ts.isUnionTypeNode(parameterNode)) {
-          let typeReferencedNode: ts.TypeReferenceNode | undefined;
-
-          parameterNode.forEachChild((unionNode) => {
-            if (!typeReferencedNode && ts.isTypeReferenceNode(unionNode)) {
-              typeReferencedNode = unionNode;
-            }
-          });
-
-          if (typeReferencedNode) {
-            correctClassParameterIfItIsValid(typeChecker, typeReferencedNode, classConstructorParameter);
-          }
-          return;
-        }
-
-        if (ts.isTypeReferenceNode(parameterNode)) {
-          correctClassParameterIfItIsValid(typeChecker, parameterNode, classConstructorParameter);
-        }
-      });
-    }
-
-    return constructorDeclaration;
+    return nodeInsideClass;
   }
 
   return {

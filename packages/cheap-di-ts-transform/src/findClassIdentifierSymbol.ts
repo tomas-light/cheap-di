@@ -1,11 +1,15 @@
 import ts from 'typescript';
-import { ImportedClass, LocalClass } from './ClassConstructorParameter.js';
+import { ClassConstructorParameter, ImportedClass, LocalClass } from './ClassConstructorParameter.js';
 import { findImports } from './findImports.js';
 import { isThereClassInDeclarations } from './isThereClassInDeclarations.js';
 
 export function findClassIdentifierSymbol(
   typeChecker: ts.TypeChecker,
-  tsNode: ts.Node
+  tsNode: ts.Node,
+  findClassConstructorParameters: (
+    classNode: ts.Node,
+    constructorParameters?: ClassConstructorParameter[]
+  ) => ClassConstructorParameter[] | undefined
 ): LocalClass | ImportedClass | undefined {
   let identifier: ts.Identifier | undefined;
   let identifierSymbol: ts.Symbol | undefined;
@@ -33,8 +37,8 @@ export function findClassIdentifierSymbol(
   );
 
   if (!isImport) {
-    const isClass = isThereClassInDeclarations(symbolDeclarations);
-    if (isClass) {
+    const classDeclaration = isThereClassInDeclarations(symbolDeclarations);
+    if (classDeclaration) {
       return {
         localName: identifierSymbol.escapedName.toString(),
       };
@@ -58,12 +62,13 @@ export function findClassIdentifierSymbol(
   const tsType = typeChecker.getTypeAtLocation(identifier);
   const typeDeclarations = (tsType.symbol ?? tsType.aliasSymbol)?.getDeclarations();
 
-  const isClass = isThereClassInDeclarations(typeDeclarations);
-  if (isClass) {
+  const classDeclaration = isThereClassInDeclarations(typeDeclarations);
+  if (classDeclaration) {
     return {
       importedFrom: importedType.nameFromWhereImportIs,
       classNameInImport: importedType.identifier.getFullText().trim(),
       importType: importedType.importType,
+      constructorParameters: findClassConstructorParameters(classDeclaration),
     };
   }
   return undefined;

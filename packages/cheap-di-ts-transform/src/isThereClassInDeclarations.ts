@@ -5,14 +5,14 @@ export function isThereClassInDeclarations(symbolDeclarations?: ts.Declaration[]
     return false;
   }
 
-  let isClass = false;
+  let classDeclaration: ts.ClassDeclaration | undefined;
 
   for (const declaration of symbolDeclarations) {
     if (ts.isClassDeclaration(declaration)) {
-      isClass = true;
+      classDeclaration = declaration;
       break;
     }
   }
 
-  return isClass;
+  return classDeclaration;
 }

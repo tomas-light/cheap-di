@@ -44,6 +44,9 @@ export interface ImportedClass {
    * import react from "react"; // => "default"
    * */
   importType: ImportType;
+
+  /** if imported dependency has its own dependencies in its package we have to get them all as well */
+  constructorParameters?: ClassConstructorParameter[];
 }
 export function isImportedClass(classReference: LocalClass | ImportedClass): classReference is ImportedClass {
   return (
