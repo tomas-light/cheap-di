@@ -1,5 +1,12 @@
 # cheap-di-ts-transform
 
+* [What is it](#what-is-it)
+* [How to use:](#how-to-use)
+  * [Webpack + ts-loader](#ts-loader)
+  * [ts-jest](#ts-jest)
+
+## <a name="what-is-it"></a> What is it
+
 Typescript code transformer. It produces constructor dependencies information to be able to use Dependency Injection approach with `cheap-di` package
 
 ```ts
@@ -96,9 +103,49 @@ class Example2 {
  * */
 ```
 
-## How to use
+in case when you use class from some package:
+```ts
+import { SomeClass } from 'some-package';
 
-Webpack + ts-loader:
+class Example3 {
+  constructor(service: SomeClass) {}
+}
+/** cheap-di-ts-transform will add folowwing code:
+ * @example
+ * try {
+ *   const cheapDi = require('cheap-di');
+ *   const metadata = cheapDi.findOrCreateMetadata(Example3);
+ *
+ *   const { SomeClass } = require('some-package');
+ *   metadata.dependencies = [SomeClass];
+ * } catch (error: unknown) {
+ *   console.warn(error);
+ * }
+ * */
+```
+
+if imported class also used class in its constructor:
+```ts
+/** 'some-package/src/SomeClass.ts'
+ * @example
+ * import { AnotherClass } from './AnotherClass';
+ * 
+ * class SomeClass {
+ *  constructor(anotherClass: AnotherClass) {}
+ * }
+ * */
+import { SomeClass } from 'some-package';
+
+class Example3 {
+  constructor(service: SomeClass) {}
+}
+
+// todo: add registration for such cases as well
+```
+
+## <a name="how-to-use"></a> How to use
+
+### <a name="ts-loader"></a> Webpack + ts-loader:
 ```ts
 // webpack.config.ts
 import path from 'path';
@@ -128,7 +175,7 @@ const config = {
 export default config;
 ```
 
-ts-jest:
+### <a name="ts-jest"></a> ts-jest:
 ```json
 {
   // [...]
