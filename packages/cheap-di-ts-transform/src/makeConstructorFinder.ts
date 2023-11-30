@@ -22,7 +22,11 @@ export function makeConstructorFinder(context: ts.TransformationContext, typeChe
       return ts.visitEachChild(nodeInsideClass, constructorFinder, context);
     }
 
-    findClassConstructorParameters(typeChecker, nodeInsideClass, ref.parameters);
+    findClassConstructorParameters({
+      typeChecker,
+      classNode: nodeInsideClass,
+      constructorParameters: ref.parameters,
+    });
 
     return nodeInsideClass;
   }

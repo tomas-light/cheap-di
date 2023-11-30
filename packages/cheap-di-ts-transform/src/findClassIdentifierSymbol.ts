@@ -6,10 +6,12 @@ import { isThereClassInDeclarations } from './isThereClassInDeclarations.js';
 export function findClassIdentifierSymbol(
   typeChecker: ts.TypeChecker,
   tsNode: ts.Node,
-  findClassConstructorParameters: (
-    classNode: ts.Node,
-    constructorParameters?: ClassConstructorParameter[]
-  ) => ClassConstructorParameter[] | undefined
+  currentImportFrom: string | undefined,
+  findClassConstructorParameters: (parameters: {
+    classNode: ts.Node;
+    currentImportFrom?: string;
+    constructorParameters?: ClassConstructorParameter[];
+  }) => ClassConstructorParameter[] | undefined
 ): LocalClass | ImportedClass | undefined {
   let identifier: ts.Identifier | undefined;
   let identifierSymbol: ts.Symbol | undefined;
@@ -64,11 +66,36 @@ export function findClassIdentifierSymbol(
 
   const classDeclaration = isThereClassInDeclarations(typeDeclarations);
   if (classDeclaration) {
+    const isLocalImport = importedType.nameFromWhereImportIs.startsWith('.');
+
+    if (!isLocalImport) {
+      return {
+        importedFrom: importedType.nameFromWhereImportIs,
+        classNameInImport: importedType.identifier.getFullText().trim(),
+        importType: importedType.importType,
+        constructorParameters: findClassConstructorParameters({
+          classNode: classDeclaration,
+          currentImportFrom: importedType.nameFromWhereImportIs,
+        }),
+      };
+    }
+
+    let importedFrom: string;
+
+    if (currentImportFrom) {
+      importedFrom = currentImportFrom;
+    } else {
+      importedFrom = importedType.nameFromWhereImportIs;
+    }
+
     return {
-      importedFrom: importedType.nameFromWhereImportIs,
+      importedFrom,
       classNameInImport: importedType.identifier.getFullText().trim(),
       importType: importedType.importType,
-      constructorParameters: findClassConstructorParameters(classDeclaration),
+      constructorParameters: findClassConstructorParameters({
+        classNode: classDeclaration,
+        currentImportFrom: importedFrom,
+      }),
     };
   }
   return undefined;

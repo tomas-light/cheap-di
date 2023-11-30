@@ -2,11 +2,20 @@ import ts, { SyntaxKind } from 'typescript';
 import { ClassConstructorParameter } from './ClassConstructorParameter.js';
 import { correctClassParameterIfItIsValid } from './correctClassParameterIfItIsValid.js';
 
-export function findClassConstructorParameters(
-  typeChecker: ts.TypeChecker,
-  classNode: ts.Node,
-  constructorParameters: ClassConstructorParameter[] = []
-): ClassConstructorParameter[] | undefined {
+export function findClassConstructorParameters(parameters: {
+  currentImportFrom?: string;
+  typeChecker: ts.TypeChecker;
+  classNode: ts.Node;
+  constructorParameters?: ClassConstructorParameter[];
+}): ClassConstructorParameter[] | undefined {
+  const {
+    //
+    currentImportFrom,
+    typeChecker,
+    classNode,
+    constructorParameters = [],
+  } = parameters;
+
   let constructorDeclaration: ts.ConstructorDeclaration | undefined;
 
   if (ts.isConstructorDeclaration(classNode)) {
@@ -23,8 +32,11 @@ export function findClassConstructorParameters(
           break;
         }
       }
-      // no need to iterate over other nodes
-      break;
+
+      if (constructorDeclaration) {
+        // no need to iterate over other nodes
+        break;
+      }
     }
   }
 
@@ -45,8 +57,6 @@ export function findClassConstructorParameters(
     };
     constructorParameters.push(classConstructorParameter);
 
-    const nextFindParameters = findClassConstructorParameters.bind(null, typeChecker);
-
     /** handle case when some of the dependencies can be missed because of your container setup
      * class Service {
      *   constructor(some?: SomeService | null | undefined) {}
@@ -63,18 +73,27 @@ export function findClassConstructorParameters(
         });
 
         if (typeReferencedNode) {
-          correctClassParameterIfItIsValid(
+          correctClassParameterIfItIsValid({
             typeChecker,
-            typeReferencedNode,
-            classConstructorParameter,
-            nextFindParameters
-          );
+            tsNode: typeReferencedNode,
+            outClassConstructorParameter: classConstructorParameter,
+            currentImportFrom,
+            findClassConstructorParameters: (_parameters) =>
+              findClassConstructorParameters({ typeChecker, ..._parameters }),
+          });
         }
         return;
       }
 
       if (ts.isTypeReferenceNode(parameterNode)) {
-        correctClassParameterIfItIsValid(typeChecker, parameterNode, classConstructorParameter, nextFindParameters);
+        correctClassParameterIfItIsValid({
+          typeChecker,
+          tsNode: parameterNode,
+          outClassConstructorParameter: classConstructorParameter,
+          currentImportFrom,
+          findClassConstructorParameters: (_parameters) =>
+            findClassConstructorParameters({ typeChecker, ..._parameters }),
+        });
       }
     });
   }

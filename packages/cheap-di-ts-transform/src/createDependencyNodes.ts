@@ -14,13 +14,36 @@ import { constVariableWithDestructor } from './generation/constVariableWithDestr
 import { objectAccessor } from './generation/objectAccessor.js';
 import { tryCatchStatement } from './generation/tryCatchStatement.js';
 
-// try {
-//   const cheapDi = require('cheap-di');
-//   const metadata = cheapDi.findOrCreateMetadata(<className>);
-//   metadata.dependencies = [<parameters>];
-// } catch (error: unknown) {
-//   console.warn(error);
-// }
+/**
+ * @example
+ * try {
+ *  const cheapDi = require('cheap-di');
+ *  const metadata = cheapDi.findOrCreateMetadata(<className>);
+ *  const { SomeClass } = require('some-package');
+ *  const { SomeAnotherClass } = require('another-package');
+ *  metadata.dependencies = [SomeClass, SomeAnotherClass, <...parameters>];
+ *
+ *  try {
+ *    const metadata = cheapDi.findOrCreateMetadata(SomeClass);
+ *    const { SomeService } = require('some-package');
+ *    metadata.dependencies = [SomeService];
+ *    // ...
+ *  } catch (error: unknown) {
+ *    console.warn(error);
+ *  }
+
+ *  try {
+ *    const metadata = cheapDi.findOrCreateMetadata(SomeAnotherClass);
+ *    const { SomeService } = require('some-package');
+ *    metadata.dependencies = [SomeService];
+ *    // ...
+ *  } catch (error: unknown) {
+ *    console.warn(error);
+ *  }
+ * } catch (error: unknown) {
+ *  console.warn(error);
+ * }
+*/
 
 export function createDependencyNodes(
   className: string,
@@ -30,64 +53,92 @@ export function createDependencyNodes(
     cheapDiIdentifier?: ts.Identifier;
   }
 ) {
-  const parameterNodes = parameters.reduce(
-    (_parameters, parameter) => {
-      const unknown = () => {
-        const unknownString = ts.factory.createStringLiteral('unknown');
-        _parameters.expressions.push(unknownString);
-        return _parameters;
-      };
-
-      if (isClassParameter(parameter)) {
-        if (!parameter.classReference) {
-          return unknown();
-        }
-
-        if (isLocalClass(parameter.classReference)) {
-          const id = ts.factory.createIdentifier(parameter.classReference.localName);
-          _parameters.expressions.push(id);
-          return _parameters;
-        }
-
-        if (isImportedClass(parameter.classReference)) {
-          const id = ts.factory.createIdentifier(parameter.classReference.classNameInImport);
-          _parameters.expressions.push(id);
-          _parameters.imports.push({
-            identifier: id,
-            importedFrom: parameter.classReference.importedFrom,
-            importType: parameter.classReference.importType,
-          });
-          return _parameters;
-        }
-      }
-
-      return unknown();
-    },
-    {
-      expressions: [] as ts.Expression[],
-      imports: [] as (Omit<ImportedClass, 'classNameInImport'> & {
-        identifier: ts.Identifier;
-      })[],
-    }
-  );
-
+  // const parameterNodes = constructorParametersToExpressions(parameters);
   const cheapDiId = ts.factory.createIdentifier('cheapDi');
+  const classID = ts.factory.createIdentifier(className);
 
   return [
     tryCatchStatement([
       // const cheapDi = require('cheap-di');
       constVariable(cheapDiId, callFunction('require', ts.factory.createStringLiteral('cheap-di'))),
 
+      ...addDependenciesOfImportedDependencies(cheapDiId, classID, parameters),
+    ]),
+  ];
+}
+
+function constructorParametersToExpressions(parameters: ClassConstructorParameter[] | undefined) {
+  const initial = {
+    expressions: [] as ts.Expression[],
+    imports: [] as Import[],
+  };
+
+  if (!parameters) {
+    return initial;
+  }
+
+  return parameters.reduce((_parameters, parameter) => {
+    const unknown = () => {
+      const unknownString = ts.factory.createStringLiteral('unknown');
+      _parameters.expressions.push(unknownString);
+      return _parameters;
+    };
+
+    if (isClassParameter(parameter)) {
+      if (!parameter.classReference) {
+        return unknown();
+      }
+
+      if (isLocalClass(parameter.classReference)) {
+        const id = ts.factory.createIdentifier(parameter.classReference.localName);
+        _parameters.expressions.push(id);
+        return _parameters;
+      }
+
+      if (isImportedClass(parameter.classReference)) {
+        const id = ts.factory.createIdentifier(parameter.classReference.classNameInImport);
+        _parameters.expressions.push(id);
+        _parameters.imports.push({
+          identifier: id,
+          ...parameter.classReference,
+        });
+        return _parameters;
+      }
+    }
+
+    return unknown();
+  }, initial);
+}
+
+type Import = Omit<ImportedClass, 'classNameInImport'> & {
+  identifier: ts.Identifier;
+};
+
+function addDependenciesOfImportedDependencies(
+  cheapDiID: ts.Identifier,
+  currentClassID: ts.Identifier,
+  constructorParameters: ClassConstructorParameter[] | undefined
+): ts.Statement[] {
+  if (!constructorParameters) {
+    return [];
+  }
+
+  const parameterNodes = constructorParametersToExpressions(constructorParameters ?? []);
+
+  return [
+    tryCatchStatement([
       // const metadata = cheapDi.findOrCreateMetadata(<className>);
       constVariable(
         'metadata',
         callFunction(
           // cheapDi.findOrCreateMetadata
-          objectAccessor(cheapDiId).property('findOrCreateMetadata'),
-          ts.factory.createIdentifier(className)
+          objectAccessor(cheapDiID).property('findOrCreateMetadata'),
+          currentClassID
         )
       ),
 
+      // const { SomeClass } = require('some-package');
+      // const { SomeAnotherClass } = require('another-package');
       ...parameterNodes.imports.map(({ identifier, importedFrom, importType }) => {
         switch (importType) {
           case 'named':
@@ -109,6 +160,10 @@ export function createDependencyNodes(
       ).value(
         // [<parameters>]
         arrayExpression(...parameterNodes.expressions)
+      ),
+
+      ...parameterNodes.imports.flatMap(({ identifier, constructorParameters }) =>
+        addDependenciesOfImportedDependencies(cheapDiID, identifier, constructorParameters)
       ),
     ]),
   ];

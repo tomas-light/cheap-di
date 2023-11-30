@@ -126,21 +126,61 @@ class Example3 {
 
 if imported class also used class in its constructor:
 ```ts
-/** 'some-package/src/SomeClass.ts'
- * @example
- * import { AnotherClass } from './AnotherClass';
- * 
- * class SomeClass {
- *  constructor(anotherClass: AnotherClass) {}
- * }
- * */
+// "some-package"
+// there are 3 files:
+// SomeClass.ts, AnotherClass.ts, index.ts
+
+// AnotherClass.ts
+export class AnotherClass {}
+
+// SomeClass.ts
+import { AnotherClass } from './AnotherClass';
+
+export class SomeClass {
+  constructor(anotherClass: AnotherClass) {}
+}
+
+// index.ts
+export * from './AnotherClass';
+export * from './SomeClass';
+
+// end of "some-package"
+
+// your application
 import { SomeClass } from 'some-package';
 
 class Example3 {
   constructor(service: SomeClass) {}
 }
 
-// todo: add registration for such cases as well
+/** cheap-di-ts-transform will add folowwing code:
+ * @example
+ * try {
+ *  const cheapDi = require('cheap-di');
+ *  const metadata = cheapDi.findOrCreateMetadata(Example3);
+ *  const { SomeClass } = require('some-package');
+ *  metadata.dependencies = [SomeClass];
+ *
+ *  try {
+ *    const metadata = cheapDi.findOrCreateMetadata(SomeClass);
+ *    const { AnotherClass } = require('some-package');
+ *    metadata.dependencies = [AnotherClass];
+ *  } catch (error: unknown) {
+ *    console.warn(error);
+ *  }
+ * } catch (error: unknown) {
+ *  console.warn(error);
+ * }
+ */
+```
+> Be careful. If you use dependencies from package, that use another depenedncies in this package, that are not exported from there. You will get an error during bundling with webpack.
+
+```ts
+// if "index.ts" in "some-package" from example above will look like:
+export * from './SomeClass';
+// and no export of AnotherClass
+
+// you will get error during in bunlding time
 ```
 
 ## <a name="how-to-use"></a> How to use
