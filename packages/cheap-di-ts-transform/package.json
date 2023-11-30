@@ -1,6 +1,6 @@
 {
   "name": "cheap-di-ts-transform",
-  "version": "1.0.0-rc-8",
+  "version": "1.0.0-rc-9",
   "scripts": {
     "check-code-gen": "ts-node src/helpers/testCodeGeneration.ts",
     "compile": "tsc --build tsconfig.cjs.json ./tsconfig.esm.json ./tsconfig.types.json",
@@ -9,7 +9,7 @@
     "build": "npm-run-all build:clean compile prepare-package-json"
   },
   "dependencies": {
-    "cheap-di": "4.0.0-rc-5",
+    "cheap-di": "4.0.0-rc-6",
     "ts-creator": "1.2.5",
     "typescript": "5.2.2"
   },
@@ -18,6 +18,11 @@
     "rimraf": "5.0.5",
     "ts-node": "10.9.1"
   },
+  "peerDependencies": {
+    "cheap-di": ">= 4.0.0",
+    "typescript": ">= 5.2.2"
+  },
+  "files": ["dist/**/*", "package.json", "README.md"],
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
   "types": "./dist/types/index.d.ts"

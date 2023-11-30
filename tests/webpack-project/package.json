@@ -8,8 +8,8 @@
   },
   "dependencies": {
     "package1": "0.0.0",
-    "cheap-di": "4.0.0-rc-5",
-    "cheap-di-ts-transform": "1.0.0-rc-8",
+    "cheap-di": "4.0.0-rc-6",
+    "cheap-di-ts-transform": "1.0.0-rc-9",
     "react": "18.2.0",
     "react-dom": "18.2.0"
   },
