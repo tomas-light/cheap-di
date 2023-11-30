@@ -6,8 +6,8 @@
   },
   "dependencies": {
     "cheap-di": "4.0.0-rc-6",
-    "cheap-di-react": "4.1.0-rc-2",
-    "cheap-di-ts-transform": "1.0.0-rc-9",
+    "cheap-di-react": "4.1.0-rc-3",
+    "cheap-di-ts-transform": "1.0.0-rc-10",
     "jest-environment-jsdom": "29.7.0",
     "react": "18.2.0",
     "react-dom": "18.2.0"

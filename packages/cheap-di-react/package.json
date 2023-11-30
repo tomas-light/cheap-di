@@ -1,6 +1,6 @@
 {
   "name": "cheap-di-react",
-  "version": "4.1.0-rc-2",
+  "version": "4.1.0-rc-3",
   "description": "Dependency injection based on cheap-di for using in React components with React Context",
   "scripts": {
     "compile": "tsc --build tsconfig.cjs.json ./tsconfig.esm.json ./tsconfig.types.json",
@@ -19,7 +19,7 @@
     "typescript": "5.2.2"
   },
   "peerDependencies": {
-    "cheap-di": ">= 4.0.0",
+    "cheap-di": ">= 4.0.0-rc-6",
     "react": ">= 18.2.0",
     "react-dom": ">= 18.2.0"
   },

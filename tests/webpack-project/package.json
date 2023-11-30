@@ -9,7 +9,7 @@
   "dependencies": {
     "package1": "0.0.0",
     "cheap-di": "4.0.0-rc-6",
-    "cheap-di-ts-transform": "1.0.0-rc-9",
+    "cheap-di-ts-transform": "1.0.0-rc-10",
     "react": "18.2.0",
     "react-dom": "18.2.0"
   },
