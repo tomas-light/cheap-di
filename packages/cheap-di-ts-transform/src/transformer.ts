@@ -8,7 +8,14 @@ type FactoryParameters = {
 type TransformerFactory = (parameters: FactoryParameters) => ts.TransformerFactory<ts.SourceFile>;
 
 export const transformer: TransformerFactory = (parameters) => {
-  const { program } = parameters;
+  let program: ts.Program;
+  if ('getTypeChecker' in parameters && typeof parameters.getTypeChecker === 'function') {
+    // when executing from ts-patch, it passes program directly
+    program = parameters as unknown as ts.Program;
+  } else {
+    ({ program } = parameters);
+  }
+
   const typeChecker = program.getTypeChecker();
 
   return (context) => {
