@@ -45,15 +45,7 @@ import { tryCatchStatement } from './generation/tryCatchStatement.js';
  * }
 */
 
-export function createDependencyNodes(
-  className: string,
-  parameters: ClassConstructorParameter[],
-  ids?: {
-    findOrCreateMetadataFunc?: ts.Identifier;
-    cheapDiIdentifier?: ts.Identifier;
-  }
-) {
-  // const parameterNodes = constructorParametersToExpressions(parameters);
+export function createDependencyNodes(className: string, parameters: ClassConstructorParameter[]) {
   const cheapDiId = ts.factory.createIdentifier('cheapDi');
   const classID = ts.factory.createIdentifier(className);
 
@@ -65,49 +57,6 @@ export function createDependencyNodes(
       ...addDependenciesOfImportedDependencies(cheapDiId, classID, parameters),
     ]),
   ];
-}
-
-function constructorParametersToExpressions(parameters: ClassConstructorParameter[] | undefined) {
-  const initial = {
-    expressions: [] as ts.Expression[],
-    imports: [] as Import[],
-  };
-
-  if (!parameters) {
-    return initial;
-  }
-
-  return parameters.reduce((_parameters, parameter) => {
-    const unknown = () => {
-      const unknownString = ts.factory.createStringLiteral('unknown');
-      _parameters.expressions.push(unknownString);
-      return _parameters;
-    };
-
-    if (isClassParameter(parameter)) {
-      if (!parameter.classReference) {
-        return unknown();
-      }
-
-      if (isLocalClass(parameter.classReference)) {
-        const id = ts.factory.createIdentifier(parameter.classReference.localName);
-        _parameters.expressions.push(id);
-        return _parameters;
-      }
-
-      if (isImportedClass(parameter.classReference)) {
-        const id = ts.factory.createIdentifier(parameter.classReference.classNameInImport);
-        _parameters.expressions.push(id);
-        _parameters.imports.push({
-          identifier: id,
-          ...parameter.classReference,
-        });
-        return _parameters;
-      }
-    }
-
-    return unknown();
-  }, initial);
 }
 
 type Import = Omit<ImportedClass, 'classNameInImport'> & {
@@ -167,4 +116,47 @@ function addDependenciesOfImportedDependencies(
       ),
     ]),
   ];
+}
+
+function constructorParametersToExpressions(parameters: ClassConstructorParameter[] | undefined) {
+  const initial = {
+    expressions: [] as ts.Expression[],
+    imports: [] as Import[],
+  };
+
+  if (!parameters) {
+    return initial;
+  }
+
+  return parameters.reduce((_parameters, parameter) => {
+    const unknown = () => {
+      const unknownString = ts.factory.createStringLiteral('unknown');
+      _parameters.expressions.push(unknownString);
+      return _parameters;
+    };
+
+    if (isClassParameter(parameter)) {
+      if (!parameter.classReference) {
+        return unknown();
+      }
+
+      if (isLocalClass(parameter.classReference)) {
+        const id = ts.factory.createIdentifier(parameter.classReference.localName);
+        _parameters.expressions.push(id);
+        return _parameters;
+      }
+
+      if (isImportedClass(parameter.classReference)) {
+        const id = ts.factory.createIdentifier(parameter.classReference.classNameInImport);
+        _parameters.expressions.push(id);
+        _parameters.imports.push({
+          identifier: id,
+          ...parameter.classReference,
+        });
+        return _parameters;
+      }
+    }
+
+    return unknown();
+  }, initial);
 }
