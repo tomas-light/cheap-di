@@ -1,6 +1,6 @@
 {
   "name": "cheap-di-react",
-  "version": "4.1.0-rc-3",
+  "version": "4.1.0-rc-4",
   "description": "Dependency injection based on cheap-di for using in React components with React Context",
   "scripts": {
     "compile": "tsc --build tsconfig.cjs.json ./tsconfig.esm.json ./tsconfig.types.json",

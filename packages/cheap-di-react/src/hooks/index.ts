@@ -1,2 +1,2 @@
-export * from './useDiContext';
-export * from './use';
+export * from './useDiContext.js';
+export * from './use.js';

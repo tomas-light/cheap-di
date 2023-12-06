@@ -1,4 +1,4 @@
-export * from './DiContext';
+export * from './DiContext.js';
 export * from './Providers';
-export * from './ReactContainer';
+export * from './ReactContainer.js';
 export * from './hooks';
