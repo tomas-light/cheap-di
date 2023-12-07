@@ -1,4 +1,4 @@
-import ts, { SyntaxKind } from 'typescript';
+import ts from 'typescript';
 import { makeIdentifier } from './makeIdentifier.js';
 
 /**
@@ -22,6 +22,6 @@ function isPropertyAccessExpression(
   funcOrNameOrIdentifier: string | ts.Identifier | ts.PropertyAccessExpression
 ): funcOrNameOrIdentifier is ts.PropertyAccessExpression {
   return (
-    typeof funcOrNameOrIdentifier === 'object' && funcOrNameOrIdentifier.kind === SyntaxKind.PropertyAccessExpression
+    typeof funcOrNameOrIdentifier === 'object' && funcOrNameOrIdentifier.kind === ts.SyntaxKind.PropertyAccessExpression
   );
 }

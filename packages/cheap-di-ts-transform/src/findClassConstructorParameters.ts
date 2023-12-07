@@ -1,4 +1,4 @@
-import ts, { SyntaxKind } from 'typescript';
+import ts from 'typescript';
 import { ClassConstructorParameter } from './ClassConstructorParameter.js';
 import { correctClassParameterIfItIsValid } from './correctClassParameterIfItIsValid.js';
 import { TransformOptions } from './TransformOptions.js';
@@ -27,7 +27,7 @@ export function findClassConstructorParameters(parameters: {
   } else {
     for (const childNode of classNode.getChildren()) {
       const childNodeText = options?.debug ? childNode.getFullText() : '';
-      if (childNode.kind !== SyntaxKind.SyntaxList) {
+      if (childNode.kind !== ts.SyntaxKind.SyntaxList) {
         continue;
       }
 

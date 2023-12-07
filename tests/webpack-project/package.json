@@ -1,19 +1,23 @@
 {
   "name": "@tests/webpack-project",
   "version": "0.0.0",
+  "type": "module",
   "scripts": {
-    "test": "node compiled/case_03.js",
-    "webpack:dev": "webpack --config webpack/webpack.dev.ts --stats-error-details",
-    "webpack:prod": "webpack --config webpack/webpack.prod.ts"
+    "test": "node compiled/case_04.js",
+    "webpack:dev": "webpack --config webpack/config.dev.ts --stats-error-details",
+    "webpack:dev2": "node --loader ts-node/esm ../../node_modules/.bin/webpack --config webpack/config.dev.ts --stats-error-details",
+    "webpack:dev3": "cross-env NODE_OPTIONS=\"--loader ts-node/esm\" npx webpack --config webpack/config.dev.ts --stats-error-details",
+    "webpack:prod": "webpack --config webpack/config.prod.ts"
   },
   "dependencies": {
     "package1": "0.0.0",
     "cheap-di": "4.0.0-rc-7",
-    "cheap-di-ts-transform": "1.0.0-rc-16",
+    "cheap-di-ts-transform": "1.0.0-rc-17",
     "react": "18.2.0",
     "react-dom": "18.2.0"
   },
   "devDependencies": {
+    "cross-env": "7.0.3",
     "@types/node": "20.8.10",
     "@types/react": "18.2.35",
     "@types/react-dom": "18.2.14",

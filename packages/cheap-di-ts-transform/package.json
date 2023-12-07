@@ -1,6 +1,7 @@
 {
   "name": "cheap-di-ts-transform",
-  "version": "1.0.0-rc-16",
+  "version": "1.0.0-rc-17",
+  "type": "module",
   "scripts": {
     "check-code-gen": "ts-node src/helpers/testCodeGeneration.ts",
     "compile": "tsc --build tsconfig.cjs.json ./tsconfig.esm.json ./tsconfig.types.json",
@@ -22,8 +23,9 @@
     "cheap-di": ">= 4.0.0-rc-6",
     "typescript": ">= 5.2.2"
   },
-  "files": ["dist/**/*", "package.json", "README.md"],
-  "main": "./dist/cjs/index.js",
-  "module": "./dist/esm/index.js",
-  "types": "./dist/types/index.d.ts"
+  "_files": ["dist/**/*", "package.json", "README.md"],
+  "main": "./src/index.ts",
+  "_main": "./dist/cjs/index.js",
+  "_module": "./dist/esm/index.js",
+  "_types": "./dist/types/index.d.ts"
 }

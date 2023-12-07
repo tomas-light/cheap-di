@@ -1,6 +1,10 @@
 import path from 'path';
 import { Configuration } from 'webpack';
-import { transformer } from 'cheap-di-ts-transform';
+import transformer from 'cheap-di-ts-transform';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const packageRoot = path.join(__dirname, '..');
 const tsconfig = path.join(packageRoot, 'tsconfig.json');
@@ -11,7 +15,8 @@ const config: Configuration = {
   entry: {
     // case_01: path.join(packageRoot, 'src', 'case_01'),
     // case_02: path.join(packageRoot, 'src', 'case_02'),
-    case_03: path.join(packageRoot, 'src', 'case_03'),
+    // case_03: path.join(packageRoot, 'src', 'case_03'),
+    case_04: path.join(packageRoot, 'src', 'case_04'),
   },
   output: {
     path: path.join(packageRoot, 'compiled'),
@@ -35,4 +40,4 @@ const config: Configuration = {
   },
 };
 
-module.exports = config;
+export default config;
