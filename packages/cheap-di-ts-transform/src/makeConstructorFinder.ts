@@ -16,6 +16,16 @@ export function makeConstructorFinder(
   function constructorFinder(nodeInsideClass: ts.Node): ts.Node {
     const nodeText = options?.debug ? nodeInsideClass.getFullText() : '';
 
+    /**
+     * skip class decorators
+     * @example
+     * @myDecorator
+     * class MyClass {}
+     * */
+    if (ts.isDecorator(nodeInsideClass)) {
+      return nodeInsideClass;
+    }
+
     if (ts.isIdentifier(nodeInsideClass)) {
       // first identifier in class is a class identifier (class reference)
       if (!ref.classLocalName) {
