@@ -22,6 +22,8 @@ export function correctClassParameterIfItIsValid(parameters: {
     findClassConstructorParameters,
   } = parameters;
 
+  const nodeText = tsNode.getFullText();
+
   const classReference = findClassIdentifierSymbol(
     typeChecker,
     tsNode,

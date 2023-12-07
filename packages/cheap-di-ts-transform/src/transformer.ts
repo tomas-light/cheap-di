@@ -1,13 +1,17 @@
 import ts from 'typescript';
 import { makeClassFinder } from './makeClassFinder.js';
+import { TransformOptions } from './TransformOptions.js';
 
 type FactoryParameters = {
   program: ts.Program;
 };
 
-type TransformerFactory = (parameters: FactoryParameters) => ts.TransformerFactory<ts.SourceFile>;
+type TransformerFactory = (
+  parameters: FactoryParameters,
+  options?: TransformOptions
+) => ts.TransformerFactory<ts.SourceFile>;
 
-export const transformer: TransformerFactory = (parameters) => {
+export const transformer: TransformerFactory = (parameters, options: TransformOptions = { debug: true }) => {
   let program: ts.Program;
   if ('getTypeChecker' in parameters && typeof parameters.getTypeChecker === 'function') {
     // when executing from ts-patch, it passes program directly
@@ -20,9 +24,10 @@ export const transformer: TransformerFactory = (parameters) => {
 
   return (context) => {
     return (sourceFile) => {
-      const { classFinder, ref } = makeClassFinder(context, typeChecker);
+      const { classFinder, ref } = makeClassFinder(context, typeChecker, options);
 
       const transformedSourceFile = ts.visitNode(sourceFile, (tsNode) => {
+        const nodeText = options?.debug ? tsNode.getFullText() : '';
         return ts.visitEachChild(tsNode, classFinder, context);
       }) as ts.SourceFile;
 

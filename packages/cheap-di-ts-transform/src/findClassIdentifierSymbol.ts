@@ -13,6 +13,8 @@ export function findClassIdentifierSymbol(
     constructorParameters?: ClassConstructorParameter[];
   }) => ClassConstructorParameter[] | undefined
 ): LocalClass | ImportedClass | undefined {
+  const nodeText = tsNode.getFullText();
+
   let identifier: ts.Identifier | undefined;
   let identifierSymbol: ts.Symbol | undefined;
 

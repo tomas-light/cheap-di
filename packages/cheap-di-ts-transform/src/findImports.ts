@@ -10,6 +10,7 @@ export function findImports(sourceFile: ts.SourceFile) {
   }[] = [];
 
   ts.forEachChild(sourceFile, (tsNode) => {
+    const nodeText = tsNode.getFullText();
     if (!ts.isImportDeclaration(tsNode)) {
       return;
     }

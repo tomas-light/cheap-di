@@ -12,7 +12,12 @@
       {
         "astTransformers": {
           "before": [
-            "cheap-di-ts-transform"
+            {
+              "path": "cheap-di-ts-transform",
+              "options": {
+                "debug": "123"
+              }
+            }
           ]
         }
       }

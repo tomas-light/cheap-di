@@ -1,12 +1,14 @@
 import ts, { SyntaxKind } from 'typescript';
 import { ClassConstructorParameter } from './ClassConstructorParameter.js';
 import { correctClassParameterIfItIsValid } from './correctClassParameterIfItIsValid.js';
+import { TransformOptions } from './TransformOptions.js';
 
 export function findClassConstructorParameters(parameters: {
   currentImportFrom?: string;
   typeChecker: ts.TypeChecker;
   classNode: ts.Node;
   constructorParameters?: ClassConstructorParameter[];
+  options: TransformOptions;
 }): ClassConstructorParameter[] | undefined {
   const {
     //
@@ -14,19 +16,23 @@ export function findClassConstructorParameters(parameters: {
     typeChecker,
     classNode,
     constructorParameters = [],
+    options,
   } = parameters;
 
   let constructorDeclaration: ts.ConstructorDeclaration | undefined;
 
+  const classNodeText = options?.debug ? classNode.getFullText() : '';
   if (ts.isConstructorDeclaration(classNode)) {
     constructorDeclaration = classNode;
   } else {
     for (const childNode of classNode.getChildren()) {
+      const childNodeText = options?.debug ? childNode.getFullText() : '';
       if (childNode.kind !== SyntaxKind.SyntaxList) {
         continue;
       }
 
       for (const tsNode of childNode.getChildren()) {
+        const nodeText = options?.debug ? tsNode.getFullText() : '';
         if (ts.isConstructorDeclaration(tsNode)) {
           constructorDeclaration = tsNode;
           break;
@@ -46,6 +52,7 @@ export function findClassConstructorParameters(parameters: {
 
   const parameterDeclarations: ts.ParameterDeclaration[] = [];
   constructorDeclaration.forEachChild((node) => {
+    const nodeText2 = options?.debug ? node.getFullText() : '';
     if (ts.isParameter(node)) {
       parameterDeclarations.push(node);
     }
@@ -63,6 +70,7 @@ export function findClassConstructorParameters(parameters: {
      * }
      * */
     parameterDeclaration.forEachChild((parameterNode) => {
+      const nodeText3 = options?.debug ? parameterNode.getFullText() : '';
       if (ts.isUnionTypeNode(parameterNode)) {
         let typeReferencedNode: ts.TypeReferenceNode | undefined;
 
@@ -79,7 +87,11 @@ export function findClassConstructorParameters(parameters: {
             outClassConstructorParameter: classConstructorParameter,
             currentImportFrom,
             findClassConstructorParameters: (_parameters) =>
-              findClassConstructorParameters({ typeChecker, ..._parameters }),
+              findClassConstructorParameters({
+                typeChecker,
+                ..._parameters,
+                options,
+              }),
           });
         }
         return;
@@ -92,7 +104,11 @@ export function findClassConstructorParameters(parameters: {
           outClassConstructorParameter: classConstructorParameter,
           currentImportFrom,
           findClassConstructorParameters: (_parameters) =>
-            findClassConstructorParameters({ typeChecker, ..._parameters }),
+            findClassConstructorParameters({
+              typeChecker,
+              ..._parameters,
+              options,
+            }),
         });
       }
     });
