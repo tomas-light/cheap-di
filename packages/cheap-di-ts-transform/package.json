@@ -1,6 +1,6 @@
 {
   "name": "cheap-di-ts-transform",
-  "version": "1.0.0-rc-15",
+  "version": "1.0.0-rc-16",
   "scripts": {
     "check-code-gen": "ts-node src/helpers/testCodeGeneration.ts",
     "compile": "tsc --build tsconfig.cjs.json ./tsconfig.esm.json ./tsconfig.types.json",
