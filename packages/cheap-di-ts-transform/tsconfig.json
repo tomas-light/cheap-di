@@ -13,7 +13,7 @@
     ],
     "listEmittedFiles": false,
     "listFiles": false,
-    "module": "ESNext",
+    "module": "CommonJS",
     "moduleResolution": "node",
     "noErrorTruncation": true,
     "noFallthroughCasesInSwitch": true,

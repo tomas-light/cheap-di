@@ -29,8 +29,7 @@ export function makeConstructorFinder(
     if (ts.isIdentifier(nodeInsideClass)) {
       // first identifier in class is a class identifier (class reference)
       if (!ref.classLocalName) {
-        const identifierSymbol = typeChecker.getSymbolAtLocation(nodeInsideClass);
-        ref.classLocalName = identifierSymbol?.escapedName.toString();
+        ref.classLocalName = nodeInsideClass.getFullText().trim();
       }
       return nodeInsideClass;
     }
