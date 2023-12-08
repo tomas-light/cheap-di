@@ -100,6 +100,18 @@ const service = container.resolve(Service);
 service.doSome();
 ```
 
+To use stage 2 decorators you need to adjust your tsconfig.json like:
+```json
+{
+  "compilerOptions": {
+    // ...
+    "experimentalDecorators": true
+  }
+}
+```
+
+To use stage 3 decorators you don't need extra setup.
+
 ## <a name="registration-variants"></a> Registration variants
 
 #### <a name="register-implementation"></a> registerImplementation
