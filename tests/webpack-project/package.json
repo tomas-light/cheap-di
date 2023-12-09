@@ -4,14 +4,15 @@
   "scripts": {
     "test:3": "node compiled/case_03.js",
     "test:4": "node compiled/case_04.js",
-    "webpack:dev": "webpack --config webpack/config.dev.ts --stats-error-details",
+    "test:5": "node compiled/case_05.js",
+    "test:webpack": "webpack --config webpack/config.dev.ts --stats-error-details",
     "webpack:dev3": "cross-env NODE_OPTIONS=\"--loader ts-node/esm\" npx webpack --config webpack/config.dev.ts --stats-error-details",
     "webpack:prod": "webpack --config webpack/config.prod.ts"
   },
   "dependencies": {
     "package1": "0.0.0",
-    "cheap-di": "4.0.0-rc-7",
-    "cheap-di-ts-transform": "1.0.0-rc-17",
+    "cheap-di": "4.0.0-rc-8",
+    "cheap-di-ts-transform": "1.0.0-rc-18",
     "react": "18.2.0",
     "react-dom": "18.2.0"
   },

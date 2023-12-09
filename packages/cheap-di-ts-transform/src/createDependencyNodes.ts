@@ -5,6 +5,7 @@ import {
   isClassParameter,
   isImportedClass,
   isLocalClass,
+  isPrimitiveParameter,
 } from './ClassConstructorParameter.js';
 import { arrayExpression } from './generation/arrayExpression.js';
 import { assignValue } from './generation/assignValue.js';
@@ -130,8 +131,11 @@ function constructorParametersToExpressions(parameters: ClassConstructorParamete
 
   return parameters.reduce((_parameters, parameter) => {
     const unknown = () => {
-      const unknownString = ts.factory.createStringLiteral('unknown');
-      _parameters.expressions.push(unknownString);
+      const parameterName = !isClassParameter(parameter) ? parameter.name : '<no_name>';
+      const unknownString = `unknown /${parameterName}/`;
+
+      const unknownStringLiteral = ts.factory.createStringLiteral(unknownString);
+      _parameters.expressions.push(unknownStringLiteral);
       return _parameters;
     };
 
@@ -155,6 +159,21 @@ function constructorParametersToExpressions(parameters: ClassConstructorParamete
         });
         return _parameters;
       }
+    } else if (isPrimitiveParameter(parameter)) {
+      let primitiveString = 'primitive';
+      if (parameter.name) {
+        primitiveString += ` /${parameter.name}/ `;
+      } else {
+        primitiveString += ' /<no_name>/ ';
+      }
+
+      parameter.primitiveTypes.forEach((type) => {
+        primitiveString += `:${type}`;
+      });
+
+      const primitiveStringLiteral = ts.factory.createStringLiteral(primitiveString);
+      _parameters.expressions.push(primitiveStringLiteral);
+      return _parameters;
     }
 
     return unknown();

@@ -11,7 +11,10 @@ type TransformerFactory = (
   options?: TransformOptions
 ) => ts.TransformerFactory<ts.SourceFile>;
 
-export const transformer: TransformerFactory = (parameters, options: TransformOptions = { debug: true }) => {
+export const transformer: TransformerFactory = (
+  parameters,
+  options: TransformOptions = { debug: false, addDetailsToUnknownParameters: false }
+) => {
   let program: ts.Program;
   if ('getTypeChecker' in parameters && typeof parameters.getTypeChecker === 'function') {
     // when executing from ts-patch, it passes program directly

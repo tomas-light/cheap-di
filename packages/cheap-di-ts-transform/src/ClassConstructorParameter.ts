@@ -1,17 +1,41 @@
 import { ImportType } from './findImports.js';
 
-export type ClassConstructorParameter = UnknownParameter | ClassParameter;
+export type ClassConstructorParameter = UnknownParameter | PrimitiveParameter | ClassParameter;
 
 export interface UnknownParameter {
   type: 'unknown';
+  name?: string | undefined;
+}
+
+export type PrimitiveType =
+  | 'number'
+  | 'boolean'
+  | 'string'
+  | 'undefined'
+  | 'symbol'
+  | 'bigint'
+  | 'any'
+  | 'unknown'
+  | 'function'
+  | 'null';
+
+export interface PrimitiveParameter {
+  type: 'primitive';
+  name?: string | undefined;
+  primitiveTypes: PrimitiveType[];
 }
 
 export interface ClassParameter {
   type: 'class';
   classReference?: LocalClass | ImportedClass;
 }
-export function isClassParameter(parameter: UnknownParameter | ClassParameter): parameter is ClassParameter {
+
+export function isClassParameter(parameter: ClassConstructorParameter): parameter is ClassParameter {
   return parameter.type === 'class';
+}
+
+export function isPrimitiveParameter(parameter: ClassConstructorParameter): parameter is PrimitiveParameter {
+  return parameter.type === 'primitive';
 }
 
 export interface LocalClass {
@@ -21,6 +45,7 @@ export interface LocalClass {
    * */
   localName: string;
 }
+
 export function isLocalClass(classReference: LocalClass | ImportedClass): classReference is LocalClass {
   return ('localName' satisfies keyof LocalClass) in classReference;
 }
@@ -48,6 +73,7 @@ export interface ImportedClass {
   /** if imported dependency has its own dependencies in its package we have to get them all as well */
   constructorParameters?: ClassConstructorParameter[];
 }
+
 export function isImportedClass(classReference: LocalClass | ImportedClass): classReference is ImportedClass {
   return (
     ('classNameInImport' satisfies keyof ImportedClass) in classReference ||

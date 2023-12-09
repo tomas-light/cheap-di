@@ -1,6 +1,6 @@
 {
   "name": "cheap-di-ts-transform",
-  "version": "1.0.0-rc-17",
+  "version": "1.0.0-rc-18",
   "scripts": {
     "check-code-gen": "ts-node src/helpers/testCodeGeneration.ts",
     "compile": "tsc --build tsconfig.cjs.json ./tsconfig.esm.json ./tsconfig.types.json",
@@ -9,7 +9,7 @@
     "build": "npm-run-all build:clean compile prepare-package-json"
   },
   "dependencies": {
-    "cheap-di": "4.0.0-rc-7",
+    "cheap-di": "4.0.0-rc-8",
     "ts-creator": "1.2.5",
     "typescript": "5.2.2"
   },

@@ -26,7 +26,7 @@ export function findClassIdentifierSymbol(
     }
   }
 
-  if (!identifierSymbol) {
+  if (!identifier || !identifierSymbol) {
     return undefined;
   }
 
@@ -44,7 +44,7 @@ export function findClassIdentifierSymbol(
     const classDeclaration = isThereClassInDeclarations(symbolDeclarations);
     if (classDeclaration) {
       return {
-        localName: identifierSymbol.escapedName.toString(),
+        localName: identifier.getFullText().trim(),
       };
     }
     return undefined;

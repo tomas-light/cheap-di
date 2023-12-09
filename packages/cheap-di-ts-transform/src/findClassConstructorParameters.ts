@@ -1,7 +1,8 @@
 import ts from 'typescript';
-import { ClassConstructorParameter } from './ClassConstructorParameter.js';
+import { ClassConstructorParameter, PrimitiveParameter } from './ClassConstructorParameter.js';
 import { correctClassParameterIfItIsValid } from './correctClassParameterIfItIsValid.js';
 import { TransformOptions } from './TransformOptions.js';
+import { findPrimitiveTypes } from './findPrimitiveTypes.js';
 
 export function findClassConstructorParameters(parameters: {
   currentImportFrom?: string;
@@ -69,38 +70,44 @@ export function findClassConstructorParameters(parameters: {
      *   constructor(some?: SomeService | null | undefined) {}
      * }
      * */
+    let identifier: ts.Identifier | undefined;
+
     parameterDeclaration.forEachChild((parameterNode) => {
       const nodeText3 = options?.debug ? parameterNode.getFullText() : '';
-      if (ts.isUnionTypeNode(parameterNode)) {
-        let typeReferencedNode: ts.TypeReferenceNode | undefined;
 
+      if (ts.isDecorator(parameterNode)) {
+        // constructor(@inject parameter: SomeClass)
+        return;
+      }
+      if (ts.isQuestionToken(parameterNode)) {
+        // constructor(parameter?: SomeClass)
+        return;
+      }
+      if (ts.isIdentifier(parameterNode)) {
+        identifier = parameterNode;
+      }
+
+      if (!identifier) {
+        // skip all code on the left of variable name
+        // there may be keywords: public/private/readonly/ may be even decorators
+        return;
+      }
+
+      let typeReferencedNode = parameterNode;
+
+      if (ts.isUnionTypeNode(parameterNode)) {
         parameterNode.forEachChild((unionNode) => {
           if (!typeReferencedNode && ts.isTypeReferenceNode(unionNode)) {
             typeReferencedNode = unionNode;
           }
         });
-
-        if (typeReferencedNode) {
-          correctClassParameterIfItIsValid({
-            typeChecker,
-            tsNode: typeReferencedNode,
-            outClassConstructorParameter: classConstructorParameter,
-            currentImportFrom,
-            findClassConstructorParameters: (_parameters) =>
-              findClassConstructorParameters({
-                typeChecker,
-                ..._parameters,
-                options,
-              }),
-          });
-        }
-        return;
       }
+      const nodeText4 = options?.debug ? typeReferencedNode.getFullText() : '';
 
-      if (ts.isTypeReferenceNode(parameterNode)) {
+      if (ts.isTypeReferenceNode(typeReferencedNode)) {
         correctClassParameterIfItIsValid({
           typeChecker,
-          tsNode: parameterNode,
+          tsNode: typeReferencedNode,
           outClassConstructorParameter: classConstructorParameter,
           currentImportFrom,
           findClassConstructorParameters: (_parameters) =>
@@ -110,6 +117,15 @@ export function findClassConstructorParameters(parameters: {
               options,
             }),
         });
+      } else if (options.addDetailsToUnknownParameters) {
+        classConstructorParameter.name = identifier.getFullText().trim();
+
+        const primitiveTypes = findPrimitiveTypes(parameterNode);
+        if (primitiveTypes.length > 0) {
+          const primitiveParameter = classConstructorParameter as unknown as PrimitiveParameter;
+          primitiveParameter.type = 'primitive';
+          primitiveParameter.primitiveTypes = primitiveTypes;
+        }
       }
     });
   }
