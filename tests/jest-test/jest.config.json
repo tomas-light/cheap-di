@@ -15,7 +15,8 @@
             {
               "path": "cheap-di-ts-transform",
               "options": {
-                "debug": "123"
+                "debug": true,
+                "addDetailsToUnknownParameters": true
               }
             }
           ]

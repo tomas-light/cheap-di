@@ -70,7 +70,7 @@ export function findClassConstructorParameters(parameters: {
      *   constructor(some?: SomeService | null | undefined) {}
      * }
      * */
-    let identifier: ts.Identifier | undefined;
+    let parameterNameIdentifier: ts.Identifier | undefined;
 
     parameterDeclaration.forEachChild((parameterNode) => {
       const nodeText3 = options?.debug ? parameterNode.getFullText() : '';
@@ -84,10 +84,11 @@ export function findClassConstructorParameters(parameters: {
         return;
       }
       if (ts.isIdentifier(parameterNode)) {
-        identifier = parameterNode;
+        parameterNameIdentifier = parameterNode;
+        return;
       }
 
-      if (!identifier) {
+      if (!parameterNameIdentifier) {
         // skip all code on the left of variable name
         // there may be keywords: public/private/readonly/ may be even decorators
         return;
@@ -96,9 +97,11 @@ export function findClassConstructorParameters(parameters: {
       let typeReferencedNode = parameterNode;
 
       if (ts.isUnionTypeNode(parameterNode)) {
+        let founded = false; // take only first type reference
         parameterNode.forEachChild((unionNode) => {
-          if (!typeReferencedNode && ts.isTypeReferenceNode(unionNode)) {
+          if (!founded && ts.isTypeReferenceNode(unionNode)) {
             typeReferencedNode = unionNode;
+            founded = true;
           }
         });
       }
@@ -118,7 +121,7 @@ export function findClassConstructorParameters(parameters: {
             }),
         });
       } else if (options.addDetailsToUnknownParameters) {
-        classConstructorParameter.name = identifier.getFullText().trim();
+        classConstructorParameter.name = parameterNameIdentifier.getFullText().trim();
 
         const primitiveTypes = findPrimitiveTypes(parameterNode);
         if (primitiveTypes.length > 0) {

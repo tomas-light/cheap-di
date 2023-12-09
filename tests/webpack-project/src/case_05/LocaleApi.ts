@@ -1,4 +1,4 @@
-import { ApiBase } from './ApiBase';
+import { ApiBase } from './base/ApiBase';
 
 export class LocaleApi extends ApiBase {
   log() {

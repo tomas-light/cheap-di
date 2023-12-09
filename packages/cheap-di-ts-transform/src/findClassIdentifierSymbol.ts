@@ -63,7 +63,9 @@ export function findClassIdentifierSymbol(
     return undefined;
   }
 
-  const tsType = typeChecker.getTypeAtLocation(identifier);
+  // TODO: IDENTIFIER!!!!!
+  const tsType = typeChecker.getTypeAtLocation(importedType.identifier);
+  // const tsType = typeChecker.getTypeAtLocation(identifier);
   const typeDeclarations = (tsType.symbol ?? tsType.aliasSymbol)?.getDeclarations();
 
   const classDeclaration = isThereClassInDeclarations(typeDeclarations);

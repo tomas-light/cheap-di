@@ -4,7 +4,7 @@ type AbstractConstructor<T = any> = abstract new (...args: any[]) => T;
 type Constructor<T = any> = new (...args: any[]) => T;
 type Dependency<T = any> = Constructor<T> | AbstractConstructor<T>;
 
-type SomeDependency = Dependency | 'unknown';
+type SomeDependency = Dependency | string;
 
 type ImplementationType<TClass> = Constructor<TClass> & {
   [Symbol.metadata]: DiMetadataStorage<TClass>;
