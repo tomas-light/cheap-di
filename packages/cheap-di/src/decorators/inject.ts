@@ -3,13 +3,9 @@ import { Dependency, SomeDependency } from '../types.js';
 import { workWithDiSettings } from '../workWithDiSettings.js';
 
 export interface InjectDecorator {
-  // stage 3 decorator
   <T, TClass extends Dependency<T>>(
     ...dependencies: SomeDependency[]
-  ): (constructor: TClass, context: ClassDecoratorContext) => TClass;
-
-  // stage 2 decorator
-  <T, TClass extends Dependency<T>>(...dependencies: SomeDependency[]): (constructor: TClass) => TClass;
+  ): (constructor: TClass, context?: ClassDecoratorContext) => TClass;
 }
 
 export const inject: InjectDecorator = ((...dependencies) => {
