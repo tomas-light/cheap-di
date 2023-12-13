@@ -1,7 +1,7 @@
 import { findMetadata } from './findMetadata.js';
-import { Constructor, ImplementationType } from './types.js';
+import { Dependency, ImplementationType } from './types.js';
 
-export function isSingleton<TClass extends Constructor>(constructor: TClass): boolean {
+export function isSingleton<T, TClass extends Dependency<T>>(constructor: TClass): boolean {
   const modifiedConstructor = findMetadata(constructor as ImplementationType<any>)?.modifiedClass;
   if (!modifiedConstructor) {
     return false;

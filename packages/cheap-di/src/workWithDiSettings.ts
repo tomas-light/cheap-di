@@ -1,8 +1,8 @@
 import { findOrCreateMetadata } from './findMetadata.js';
-import { Constructor, ImplementationType } from './types.js';
+import { Dependency, ImplementationType } from './types.js';
 
-export function workWithDiSettings<TClass>(
-  constructor: Constructor<TClass>,
+export function workWithDiSettings<T, TClass extends Dependency<T>>(
+  constructor: TClass,
   modification: (settings: NonNullable<ImplementationType<TClass>>) => void
 ) {
   const implementationType = constructor as unknown as ImplementationType<TClass>;

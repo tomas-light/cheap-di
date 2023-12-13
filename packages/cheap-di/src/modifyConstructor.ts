@@ -1,14 +1,14 @@
-import { findOrCreateMetadata } from './findMetadata.js';
-import { Constructor, ImplementationType } from './types.js';
+import { findMetadata } from './findMetadata.js';
+import { Dependency, ImplementationType } from './types.js';
 import { workWithDiSettings } from './workWithDiSettings.js';
 
-export function modifyConstructor<TClass>(
-  constructor: Constructor<TClass>,
+export function modifyConstructor<T, TClass extends Dependency<T>>(
+  constructor: TClass,
   modification: (settings: NonNullable<ImplementationType<TClass>>) => void
 ) {
   workWithDiSettings(constructor, (settings) => {
-    const metadata = findOrCreateMetadata(settings);
-    metadata.modifiedClass = constructor as TClass;
+    const metadata = findMetadata(settings)!;
+    metadata.modifiedClass = constructor;
 
     modification(settings);
   });

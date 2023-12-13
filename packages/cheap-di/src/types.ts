@@ -6,18 +6,17 @@ type Dependency<T = any> = Constructor<T> | AbstractConstructor<T>;
 
 type SomeDependency = Dependency | string;
 
-type ImplementationType<TClass> = Constructor<TClass> & {
-  [Symbol.metadata]: DiMetadataStorage<TClass>;
-};
-
-type DiMetadataStorage<TClass> = {
-  [cheapDiSymbol]?: DiMetadata<TClass>;
+type ImplementationType<TClass> = Dependency<TClass> & {
+  [cheapDiSymbol]: DiMetadata<TClass>;
 };
 
 interface DiMetadata<TClass> {
   singleton?: boolean;
   dependencies?: SomeDependency[];
+  /** parameters are specified with @inject decorator explicitly */
+  injectDependencies?: SomeDependency[];
   modifiedClass?: TClass;
+  /** parameters are passed to container.registerImplementation(...).inject(parameter1, parameter2) */
   injected?: unknown[];
 }
 
@@ -83,7 +82,6 @@ export type {
   DependencyRegistrator,
   DependencyResolver,
   DiMetadata,
-  DiMetadataStorage,
   IHaveDependencies,
   IHaveInstances,
   IHaveSingletons,

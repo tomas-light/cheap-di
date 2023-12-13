@@ -59,48 +59,45 @@ export function findClassIdentifierSymbol(
   if (!importedType) {
     return undefined;
   }
-  if (!identifier) {
-    return undefined;
-  }
 
-  // TODO: IDENTIFIER!!!!!
   const tsType = typeChecker.getTypeAtLocation(importedType.identifier);
-  // const tsType = typeChecker.getTypeAtLocation(identifier);
   const typeDeclarations = (tsType.symbol ?? tsType.aliasSymbol)?.getDeclarations();
 
   const classDeclaration = isThereClassInDeclarations(typeDeclarations);
-  if (classDeclaration) {
-    const isLocalImport = importedType.nameFromWhereImportIs.startsWith('.');
+  if (!classDeclaration) {
+    return undefined;
+  }
 
-    if (!isLocalImport) {
-      return {
-        importedFrom: importedType.nameFromWhereImportIs,
-        classNameInImport: importedType.identifier.getFullText().trim(),
-        importType: importedType.importType,
-        constructorParameters: findClassConstructorParameters({
-          classNode: classDeclaration,
-          currentImportFrom: importedType.nameFromWhereImportIs,
-        }),
-      };
-    }
+  const isLocalImport = importedType.nameFromWhereImportIs.startsWith('.'); // import ... from './Some'
+  const isPackageImport = !isLocalImport; // import ... from 'dayjs'
 
-    let importedFrom: string;
-
-    if (currentImportFrom) {
-      importedFrom = currentImportFrom;
-    } else {
-      importedFrom = importedType.nameFromWhereImportIs;
-    }
-
+  if (isPackageImport) {
     return {
-      importedFrom,
+      importedFrom: importedType.nameFromWhereImportIs,
       classNameInImport: importedType.identifier.getFullText().trim(),
       importType: importedType.importType,
       constructorParameters: findClassConstructorParameters({
         classNode: classDeclaration,
-        currentImportFrom: importedFrom,
+        currentImportFrom: importedType.nameFromWhereImportIs,
       }),
     };
   }
-  return undefined;
+
+  let importedFrom: string;
+
+  if (currentImportFrom) {
+    importedFrom = currentImportFrom;
+  } else {
+    importedFrom = importedType.nameFromWhereImportIs;
+  }
+
+  return {
+    importedFrom,
+    classNameInImport: importedType.identifier.getFullText().trim(),
+    importType: importedType.importType,
+    constructorParameters: findClassConstructorParameters({
+      classNode: classDeclaration,
+      currentImportFrom: importedFrom,
+    }),
+  };
 }

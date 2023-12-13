@@ -27,22 +27,22 @@ export default {
   Trace,
 };
 
-// typescript polyfill
-declare global {
-  interface SymbolConstructor {
-    readonly metadata: unique symbol;
-  }
-
-  interface Function {
-    [Symbol.metadata]: DecoratorMetadata | null;
-  }
-}
-
-type Writable<T> = {
-  -readonly [key in keyof T]: T[key];
-};
-
-// runtime polyfill
-if (Symbol.metadata == null) {
-  (Symbol as Writable<typeof Symbol>).metadata = Symbol('cheap-di Symbol.metadata polyfill') as typeof Symbol.metadata;
-}
+// // typescript polyfill
+// declare global {
+//   interface SymbolConstructor {
+//     readonly metadata: unique symbol;
+//   }
+//
+//   interface Function {
+//     [Symbol.metadata]: DecoratorMetadata | null;
+//   }
+// }
+//
+// type Writable<T> = {
+//   -readonly [key in keyof T]: T[key];
+// };
+//
+// // runtime polyfill
+// if (Symbol.metadata == null) {
+//   (Symbol as Writable<typeof Symbol>).metadata = Symbol('cheap-di Symbol.metadata polyfill') as typeof Symbol.metadata;
+// }

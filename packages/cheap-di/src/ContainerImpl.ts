@@ -57,8 +57,8 @@ class ContainerImpl implements Container, IHaveSingletons, IHaveInstances, IHave
 
         if (!isSingleton(implementationType)) {
           workWithDiSettings(implementationType, (settings) => {
-            const metadata = findOrCreateMetadata(settings);
-            metadata.modifiedClass = implementationType as TInstance;
+            const metadata = findMetadata(settings)!;
+            metadata.modifiedClass = implementationType;
             metadata.singleton = true;
           });
         }
@@ -160,10 +160,15 @@ class ContainerImpl implements Container, IHaveSingletons, IHaveInstances, IHave
     let index = 0;
     let injectionParamsIndex = 0;
 
-    const { dependencies } = metadata ?? {};
-    if (dependencies?.length) {
+    const { dependencies, injectDependencies } = metadata ?? {};
+    // explicit dependencies has priority over implicit
+    const takenDependencies = injectDependencies ?? dependencies;
+
+    if (takenDependencies?.length) {
       const resolvedDependencies: any[] = [];
-      const definedDependencies = dependencies.filter((dependency) => typeof dependency !== 'string') as Dependency[];
+      const definedDependencies = takenDependencies.filter(
+        (dependency) => typeof dependency !== 'string'
+      ) as Dependency[];
 
       while (true) {
         const dependencyType = definedDependencies[index];
@@ -199,8 +204,8 @@ class ContainerImpl implements Container, IHaveSingletons, IHaveInstances, IHave
       // put resolved dependencies and injection params in the defined order
       let dependencyIndex = 0;
       let paramsIndex = 0;
-      for (let index = 0; index < dependencies.length; index++) {
-        const dependency = dependencies[index];
+      for (let index = 0; index < takenDependencies.length; index++) {
+        const dependency = takenDependencies[index];
         if (typeof dependency === 'string') {
           const injectionParam = injectionParams[paramsIndex];
           paramsIndex++;
@@ -260,7 +265,7 @@ class ContainerImpl implements Container, IHaveSingletons, IHaveInstances, IHave
       injectableArguments = injectionParams;
     }
 
-    const target = new implementation(...injectableArguments);
+    const target = new (implementation as Constructor)(...injectableArguments);
 
     if (isSingleton(implementation)) {
       const singletons = this.getSingletons();
