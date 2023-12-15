@@ -32,7 +32,7 @@ export function makeClassFinder(
 
     fileRef.hasDependencies = true;
 
-    const dependencyRegistrationNodes = createDependencyNodes(classLocalName, parameters);
+    const dependencyRegistrationNodes = createDependencyNodes(classLocalName, parameters, options);
     return [classDeclaration, ...dependencyRegistrationNodes];
   }
 

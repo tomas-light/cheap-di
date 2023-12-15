@@ -8,6 +8,7 @@ import { constVariableWithDestructor } from './generation/constVariableWithDestr
 import { objectAccessor } from './generation/objectAccessor.js';
 import { tryCatchStatement } from './generation/tryCatchStatement.js';
 import { constructorParametersToExpressions } from './constructorParametersToExpressions.js';
+import { TransformOptions } from './TransformOptions.js';
 
 /**
  * @example
@@ -40,25 +41,41 @@ import { constructorParametersToExpressions } from './constructorParametersToExp
  * }
 */
 
-export function createDependencyNodes(className: string, parameters: ClassConstructorParameter[]) {
-  const cheapDiId = ts.factory.createIdentifier('cheapDi');
-  const classID = ts.factory.createIdentifier(className);
+export function createDependencyNodes(
+  className: string,
+  constructorParameters: ClassConstructorParameter[],
+  options: TransformOptions
+) {
+  const cheapDiID = ts.factory.createIdentifier('cheapDi');
+  const currentClassID = ts.factory.createIdentifier(className);
 
   return [
     tryCatchStatement([
       // const cheapDi = require('cheap-di');
-      constVariable(cheapDiId, callFunction('require', ts.factory.createStringLiteral('cheap-di'))),
+      constVariable(cheapDiID, callFunction('require', ts.factory.createStringLiteral('cheap-di'))),
 
-      ...addDependenciesOfImportedDependencies(cheapDiId, classID, parameters),
+      ...addDependenciesOfImportedDependencies(
+        {
+          cheapDiID,
+          currentClassID,
+          constructorParameters,
+        },
+        options
+      ),
     ]),
   ];
 }
 
 function addDependenciesOfImportedDependencies(
-  cheapDiID: ts.Identifier,
-  currentClassID: ts.Identifier,
-  constructorParameters: ClassConstructorParameter[] | undefined
+  codeInfo: {
+    cheapDiID: ts.Identifier;
+    currentClassID: ts.Identifier;
+    constructorParameters: ClassConstructorParameter[] | undefined;
+  },
+  options: TransformOptions
 ): ts.Statement[] {
+  const { cheapDiID, currentClassID, constructorParameters } = codeInfo;
+
   if (!constructorParameters) {
     return [];
   }
@@ -67,6 +84,20 @@ function addDependenciesOfImportedDependencies(
 
   return [
     tryCatchStatement([
+      ...(options.logClassNames
+        ? [
+            // console.debug('[cheap-di-transformer] register metadata for', <className>);
+            ts.factory.createExpressionStatement(
+              callFunction(
+                // console.debug
+                objectAccessor('console').property('debug'),
+                ts.factory.createStringLiteral('[cheap-di-transformer] register metadata for'),
+                currentClassID
+              )
+            ),
+          ]
+        : []),
+
       // const metadata = cheapDi.findOrCreateMetadata(<className>);
       constVariable(
         'metadata',
@@ -103,7 +134,14 @@ function addDependenciesOfImportedDependencies(
       ),
 
       ...parameterNodes.imports.flatMap(({ identifier, constructorParameters }) =>
-        addDependenciesOfImportedDependencies(cheapDiID, identifier, constructorParameters)
+        addDependenciesOfImportedDependencies(
+          {
+            cheapDiID,
+            currentClassID: identifier,
+            constructorParameters,
+          },
+          options
+        )
       ),
     ]),
   ];

@@ -24,7 +24,7 @@ export function constructorParametersToExpressions(parameters: ClassConstructorP
 
   return parameters.reduce((_parameters, parameter) => {
     const unknown = () => {
-      const parameterName = !isClassParameter(parameter) ? parameter.name || '<no_name>' : '<no_name>';
+      const parameterName = parameter.name || '<no_name>';
       const unknownString = `unknown /${parameterName}/`;
 
       const unknownStringLiteral = ts.factory.createStringLiteral(unknownString);

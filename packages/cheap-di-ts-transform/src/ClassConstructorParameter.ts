@@ -27,6 +27,7 @@ export interface PrimitiveParameter {
 
 export interface ClassParameter {
   type: 'class';
+  name?: string | undefined;
   classReference?: LocalClass | ImportedClass;
 }
 

@@ -107,6 +107,8 @@ export function findClassConstructorParameters(parameters: {
       }
       const nodeText4 = options?.debug ? typeReferencedNode.getFullText() : '';
 
+      classConstructorParameter.name = parameterNameIdentifier.getFullText().trim();
+
       if (ts.isTypeReferenceNode(typeReferencedNode)) {
         correctClassParameterIfItIsValid({
           typeChecker,
@@ -121,8 +123,6 @@ export function findClassConstructorParameters(parameters: {
             }),
         });
       } else if (options.addDetailsToUnknownParameters) {
-        classConstructorParameter.name = parameterNameIdentifier.getFullText().trim();
-
         const primitiveTypes = findPrimitiveTypes(parameterNode);
         if (primitiveTypes.length > 0) {
           const primitiveParameter = classConstructorParameter as unknown as PrimitiveParameter;
