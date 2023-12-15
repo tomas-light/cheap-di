@@ -5,15 +5,15 @@
     "test:3": "node compiled/case_03.js",
     "test:4": "node compiled/case_04.js",
     "test:5": "node compiled/case_05.js",
-    "test:webpack": "webpack --config webpack/config.dev.ts --stats-error-details",
+    "build": "webpack --config webpack/config.dev.ts --stats-error-details",
     "webpack:dev3": "cross-env NODE_OPTIONS=\"--loader ts-node/esm\" npx webpack --config webpack/config.dev.ts --stats-error-details",
     "webpack:prod": "webpack --config webpack/config.prod.ts"
   },
   "dependencies": {
     "axios": "1.6.2",
     "package1": "0.0.0",
-    "cheap-di": "4.0.0-rc-14",
-    "cheap-di-ts-transform": "1.0.0-rc-25",
+    "cheap-di": "4.0.0-rc-30",
+    "cheap-di-ts-transform": "1.0.0-rc-30",
     "react": "18.2.0",
     "react-dom": "18.2.0"
   },

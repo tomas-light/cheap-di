@@ -49,6 +49,7 @@ export function createDependencyNodes(
       shouldImportCheapDi: true,
       cheapDiID,
       currentClassID,
+      currentClassName: className,
       constructorParameters,
     },
     options
@@ -60,11 +61,12 @@ function addDependenciesOfImportedDependencies(
     shouldImportCheapDi?: boolean;
     cheapDiID: ts.Identifier;
     currentClassID: ts.Identifier;
+    currentClassName: string;
     constructorParameters: ClassConstructorParameter[] | undefined;
   },
   options: TransformOptions
 ): ts.Statement[] {
-  const { shouldImportCheapDi, cheapDiID, currentClassID, constructorParameters } = codeInfo;
+  const { shouldImportCheapDi, cheapDiID, currentClassID, currentClassName, constructorParameters } = codeInfo;
 
   if (!constructorParameters) {
     return [];
@@ -100,14 +102,13 @@ function addDependenciesOfImportedDependencies(
         }
       }),
 
-      ...(options.logClassNames
+      ...(options.logRegisteredMetadata
         ? [
-            // console.debug('[cheap-di-transformer] register metadata for', <className>);
+            // console.debug('[cheap-di-transformer] register metadata for', <className>, ...);
             callFunction(
-              // console.debug
               objectAccessor('console').property('debug'),
-              ts.factory.createStringLiteral('[cheap-di-transformer] register metadata for'),
-              currentClassID
+              ts.factory.createStringLiteral(`[cheap-di-transformer] register metadata for ${currentClassName}\n`),
+              ts.factory.createStringLiteral(parameterNodes.namesToDebug.join('\n'))
             ),
           ]
         : []),
@@ -119,11 +120,12 @@ function addDependenciesOfImportedDependencies(
         ...parameterNodes.expressions
       ),
 
-      ...parameterNodes.imports.flatMap(({ identifier, constructorParameters }) =>
+      ...parameterNodes.imports.flatMap(({ identifier, name, constructorParameters }) =>
         addDependenciesOfImportedDependencies(
           {
             cheapDiID,
             currentClassID: identifier,
+            currentClassName: name,
             constructorParameters,
           },
           options

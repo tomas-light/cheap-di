@@ -34,6 +34,7 @@ const config: Configuration = {
                 {
                   debug: true,
                   addDetailsToUnknownParameters: true,
+                  logRegisteredMetadata: true,
                 }
               ),
             ],

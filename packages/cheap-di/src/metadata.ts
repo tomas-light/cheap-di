@@ -5,7 +5,11 @@ export function saveConstructorMetadata<TClass>(
   constructor: ImplementationType<TClass>,
   ...dependencies: SomeDependency[]
 ) {
-  const metadata = findOrCreateMetadata(constructor);
+  if (!constructor) {
+    return {};
+  }
+
+  const metadata = createConstructorMetadata(constructor);
   metadata.dependencies = dependencies;
 
   return metadata;
@@ -25,9 +29,6 @@ export function findMetadata<TClass>(constructor: ImplementationType<TClass>) {
 }
 
 export function createConstructorMetadata<TClass>(constructor: ImplementationType<TClass>): DiMetadata {
-  if (!constructor) {
-    return {};
-  }
   return (constructor[cheapDiSymbol] = {
     modifiedClass: constructor,
   });
