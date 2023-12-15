@@ -4,6 +4,6 @@ export class Class1 {
   constructor(readonly service: Service1) {}
 
   logInfo() {
-    this.service.log('info');
+    this.service.log('succeed');
   }
 }

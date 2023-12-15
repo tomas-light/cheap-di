@@ -1,12 +1,22 @@
 import ts from 'typescript';
 import { makeIdentifier } from './makeIdentifier.js';
+import { objectAccessor } from './objectAccessor.js';
 
 /**
  * generates statement with function call
  * @example
  * yourFunctionName(parameter1, parameter2);
  * */
-export function callFunction(
+export function callFunction(...functionParameters: Parameters<typeof callFunctionExpression>) {
+  return ts.factory.createExpressionStatement(callFunctionExpression(...functionParameters));
+}
+
+/**
+ * generates function expression to using to using in another statements
+ * @example
+ * yourFunctionName(parameter1, parameter2)
+ * */
+export function callFunctionExpression(
   funcOrNameOrIdentifier: string | ts.Identifier | ts.PropertyAccessExpression,
   ...functionParameters: ts.Expression[]
 ) {

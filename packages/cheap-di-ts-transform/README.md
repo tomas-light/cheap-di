@@ -36,8 +36,7 @@ class Service {
  * @example
  * try {
  *   const cheapDi = require('cheap-di');
- *   const metadata = cheapDi.findOrCreateMetadata(Service);
- *   metadata.dependencies = [Logger];
+ *   cheapDi.saveConstructorMetadata(Service, Logger);
  * } catch (error: unknown) {
  *   console.warn(error);
  * }
@@ -67,8 +66,7 @@ class Example1 {
  * @example
  * try {
  *   const cheapDi = require('cheap-di');
- *   const metadata = cheapDi.findOrCreateMetadata(Example1);
- *   metadata.dependencies = ['unknown'];
+ *   cheapDi.saveConstructorMetadata(Example1, 'unknown');
  * } catch (error: unknown) {
  *   console.warn(error);
  * }
@@ -95,8 +93,7 @@ class Example2 {
  * @example
  * try {
  *   const cheapDi = require('cheap-di');
- *   const metadata = cheapDi.findOrCreateMetadata(Example2);
- *   metadata.dependencies = [Service, "unknown", Example1, "unknown", Logger, "unknown", unknown, "unknown"] 
+ *   cheapDi.saveConstructorMetadata(Example2, Service, "unknown", Example1, "unknown", Logger, "unknown", unknown, "unknown"); 
  * } catch (error: unknown) {
  *   console.warn(error);
  * }
@@ -114,10 +111,8 @@ class Example3 {
  * @example
  * try {
  *   const cheapDi = require('cheap-di');
- *   const metadata = cheapDi.findOrCreateMetadata(Example3);
- *
  *   const { SomeClass } = require('some-package');
- *   metadata.dependencies = [SomeClass];
+ *   const metadata = cheapDi.saveConstructorMetadata(Example3, SomeClass);
  * } catch (error: unknown) {
  *   console.warn(error);
  * }
@@ -157,14 +152,12 @@ class Example3 {
  * @example
  * try {
  *  const cheapDi = require('cheap-di');
- *  const metadata = cheapDi.findOrCreateMetadata(Example3);
  *  const { SomeClass } = require('some-package');
- *  metadata.dependencies = [SomeClass];
+ *  cheapDi.saveConstructorMetadata(Example3, SomeClass);
  *
  *  try {
- *    const metadata = cheapDi.findOrCreateMetadata(SomeClass);
  *    const { AnotherClass } = require('some-package');
- *    metadata.dependencies = [AnotherClass];
+ *    cheapDi.saveConstructorMetadata(SomeClass, AnotherClass);
  *  } catch (error: unknown) {
  *    console.warn(error);
  *  }

@@ -4,9 +4,6 @@
     "tests/*"
   ],
   "scripts": {
-    "build:cheap-di": "npm run build --workspace cheap-di",
-    "build:cheap-di-react": "npm run build --workspace cheap-di-react",
-    "build:cheap-di-ts-transform": "npm run build --workspace cheap-di-ts-transform",
     "build": "npm-run-all build:cheap-di build:cheap-di-react build:cheap-di-ts-transform",
     "test:webpack": "npm run webpack:dev --workspace @tests/webpack-project",
     "test:jest": "npm run test --workspace @tests/jest-tests"

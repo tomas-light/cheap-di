@@ -12,7 +12,7 @@ export default class B extends A {
   }
 
   log() {
-    console.log('key is', this.instance.key);
+    console.log('succeed: ', this.instance.key);
   }
 }
 

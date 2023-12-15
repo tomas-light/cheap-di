@@ -1,6 +1,5 @@
-import { findMetadata } from '../findMetadata.js';
-import { Dependency, SomeDependency } from '../types.js';
-import { workWithDiSettings } from '../workWithDiSettings.js';
+import { saveConstructorMetadata } from '../metadata.js';
+import { Dependency, ImplementationType, SomeDependency } from '../types.js';
 
 export interface InjectDecorator {
   <T, TClass extends Dependency<T>>(
@@ -10,12 +9,7 @@ export interface InjectDecorator {
 
 export const inject: InjectDecorator = ((...dependencies) => {
   return (constructor) => {
-    workWithDiSettings(constructor, (settings) => {
-      const metadata = findMetadata(settings)!;
-      metadata.modifiedClass = constructor;
-      metadata.injectDependencies = dependencies;
-    });
-
+    saveConstructorMetadata(constructor as ImplementationType<unknown>, ...dependencies);
     return constructor;
   };
 }) as InjectDecorator;
