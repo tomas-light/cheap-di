@@ -18,7 +18,7 @@
     "ts-node": "^10.9.1"
   },
   "peerDependencies": {
-    "cheap-di": ">= 4.0.0-rc-30",
+    "cheap-di": ">= 4.0.0-rc-31",
     "typescript": ">= 5.2.2"
   },
   "files": ["dist/**/*", "package.json", "README.md"],

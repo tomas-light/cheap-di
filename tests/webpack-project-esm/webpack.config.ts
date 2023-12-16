@@ -1,7 +1,9 @@
 import path from 'path';
-import { Configuration } from 'webpack';
+import webpack, { Configuration } from 'webpack';
 import { transformer } from 'cheap-di-ts-transform';
 import { fileURLToPath } from 'url';
+import { Configuration as DevServerConfiguration } from 'webpack-dev-server';
+import HtmlWebpackPlugin from 'html-webpack-plugin';
 
 //we need to change up how __dirname is used for ES6 purposes
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -9,27 +11,30 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const packageRoot = path.join(__dirname);
 const tsconfig = path.join(packageRoot, 'tsconfig.json');
 
-const config: Configuration = {
+const config: Configuration & { devServer?: DevServerConfiguration } = {
   mode: 'development',
-  devtool: false,
+  devtool: 'source-map',
   // target: 'web',
-  entry: {
-    case_01: path.join(packageRoot, 'src', 'case_01'),
-  },
+  entry: path.join(packageRoot, 'src', 'index.tsx'),
   output: {
     path: path.join(packageRoot, 'compiled'),
     publicPath: '/',
     // globalObject: 'this',
-    globalObject: "typeof self !== 'undefined' ? self : this",
+    // globalObject: "typeof self !== 'undefined' ? self : this",
   },
   resolve: {
-    extensions: ['.js', '.ts'],
+    extensions: ['.js', '.jsx', '.ts', '.tsx'],
+    extensionAlias: {
+      '.js': ['.ts', '.js'],
+      '.mjs': ['.mts', '.mjs'],
+    },
+    // enforceExtension: true,
   },
   module: {
     rules: [
       {
         loader: 'ts-loader',
-        test: /\.ts$/,
+        test: /\.tsx?$/,
         options: {
           getCustomTransformers: (program: any) => ({
             before: [
@@ -50,6 +55,17 @@ const config: Configuration = {
       },
     ],
   },
+  plugins: [
+    new webpack.ProgressPlugin(),
+    new HtmlWebpackPlugin({
+      template: path.join(packageRoot, 'index.html'),
+      inject: 'body',
+    }),
+  ],
+  // devServer: {
+  //   hot: true,
+  //   client: true,
+  // },
 };
 
 export default config;

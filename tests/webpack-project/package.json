@@ -1,5 +1,6 @@
 {
   "name": "@tests/webpack-project",
+  "private": true,
   "version": "0.0.0",
   "scripts": {
     "test:3": "node compiled/case_03.js",

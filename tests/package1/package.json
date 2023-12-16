@@ -1,5 +1,6 @@
 {
   "name": "package1",
+  "private": true,
   "version": "0.0.0",
   "scripts": {
     "compile": "tsc --build tsconfig.cjs.json ./tsconfig.esm.json ./tsconfig.types.json",
