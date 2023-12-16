@@ -1,15 +1,15 @@
 import { cheapDiSymbol } from './cheapDiSymbol.js';
-import { DiMetadata, ImplementationType, SomeDependency } from './types.js';
+import { AbstractConstructor, Constructor, DiMetadata, ImplementationType, SomeDependency } from './types.js';
 
-export function saveConstructorMetadata<TClass>(
-  constructor: ImplementationType<TClass>,
+export function saveConstructorMetadata<T>(
+  constructor: Constructor<T> | AbstractConstructor<T>,
   ...dependencies: SomeDependency[]
 ) {
   if (!constructor) {
     return {};
   }
 
-  const metadata = createConstructorMetadata(constructor);
+  const metadata = createConstructorMetadata(constructor as ImplementationType<T>);
   metadata.dependencies = dependencies;
 
   return metadata;

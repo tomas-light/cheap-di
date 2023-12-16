@@ -1,12 +1,10 @@
 {
-  "name": "@tests/webpack-project",
+  "name": "@tests/webpack-project-esm",
   "version": "0.0.0",
+  "type": "module",
   "scripts": {
-    "test:3": "node compiled/case_03.js",
-    "test:4": "node compiled/case_04.js",
-    "test:5": "node compiled/case_05.js",
-    "build": "webpack --config webpack.config.ts --stats-error-details",
-    "webpack:dev3": "cross-env NODE_OPTIONS=\\\\\\\"--loader ts-node/esm\\\\\\\" npx webpack --config webpack.config.ts --stats-error-details"
+    "test:1": "node compiled/case_01.js",
+    "build": "cross-env NODE_OPTIONS=\"--loader ts-node/esm\" npx webpack --config webpack.config.ts --stats-error-details"
   },
   "dependencies": {
     "axios": "1.6.2",

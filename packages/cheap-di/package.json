@@ -9,7 +9,7 @@
     "build": "npm-run-all build:clean compile prepare-package-json"
   },
   "dependencies": {
-    "typescript": "^5.2.2"
+    "typescript": "^5.3.3"
   },
   "devDependencies": {
     "@types/node": "^20.10.4",

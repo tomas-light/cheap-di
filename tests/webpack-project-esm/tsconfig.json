@@ -13,8 +13,8 @@
     ],
     "listEmittedFiles": false,
     "listFiles": false,
-    "module": "CommonJS",
-    "moduleResolution": "node",
+    "module": "esnext",
+    "moduleResolution": "bundler",
     "noErrorTruncation": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitAny": false,
@@ -23,7 +23,7 @@
     "skipLibCheck": true,
     "sourceMap": true,
     "strict": true,
-    "target": "ESNext",
+    "target": "esnext",
     "traceResolution": false
   },
   "include": ["src", "webpack.config.ts"]

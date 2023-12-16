@@ -1,2 +1,2 @@
-export * from './Service1';
-export * from './Class1';
+export * from './Zoo.js';
+export * from './Bar.js';

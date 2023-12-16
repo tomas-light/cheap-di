@@ -1,6 +1,5 @@
 import ts from 'typescript';
 import { makeIdentifier } from './makeIdentifier.js';
-import { objectAccessor } from './objectAccessor.js';
 
 /**
  * generates statement with function call

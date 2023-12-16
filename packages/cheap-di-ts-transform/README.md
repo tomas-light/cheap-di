@@ -5,6 +5,7 @@
   * [Webpack + ts-loader](#ts-loader)
   * [ts-node](#ts-node)
   * [ts-jest](#ts-jest)
+  * [Vite + @rollup/plugin-typescript](#vite) 
 
 ## <a name="what-is-it"></a> What is it
 
@@ -113,7 +114,7 @@ class Example3 {
  * try {
  *   const cheapDi = require('cheap-di');
  *   const { SomeClass } = require('some-package');
- *   const metadata = cheapDi.saveConstructorMetadata(Example3, SomeClass);
+ *   cheapDi.saveConstructorMetadata(Example3, SomeClass);
  * } catch (error: unknown) {
  *   console.warn(error);
  * }
@@ -244,8 +245,8 @@ tsconfig.json
     "compiler": "ts-patch/compiler"
   }
 }
-
 ```
+
 ### <a name="ts-jest"></a> ts-jest:
 ```json
 {
@@ -270,5 +271,45 @@ tsconfig.json
     ]
   }
 }
-
 ```
+
+### <a name="vite"></a> Vite + @rollup/plugin-typescript:
+```ts
+// vite.config.ts
+import { defineConfig } from 'vite';
+import typescript from '@rollup/plugin-typescript';
+import { transformer } from 'cheap-di-ts-transform';
+
+export default defineConfig({
+  plugins: [
+    // ...
+    typescript({
+      transformers: {
+        before: [
+          {
+            type: 'program',
+            factory: (program) =>
+              transformer(
+                { program },
+                {
+                  // (required) use esm imports to dependency registration
+                  esmImports: true,
+                  
+                  // (optional) debugging options
+                  debug: true,
+                  addDetailsToUnknownParameters: true,
+                  logRegisteredMetadata: true,
+                  errorsLogLevel: 'debug',
+                }
+              ),
+          },
+        ],
+      },
+    }),
+  ],
+});
+```
+
+### Helpful links
+
+* <a href="https://ts-ast-viewer.com/">TypeScript AST Viewer</a>
