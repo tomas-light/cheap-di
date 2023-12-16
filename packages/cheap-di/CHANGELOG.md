@@ -110,6 +110,7 @@ interface DiMetadata {
 
 * `@inject` decorator supports stage 2 and stage 3TypeScript decorator syntax;
 * get rid of reflect-metadata issues, when your class loses its dependencies in runtime in unpredictable cases;
+* provided separated bundles for CommonJs and EcmaScript modules;
 
 ## 3.5.0
 

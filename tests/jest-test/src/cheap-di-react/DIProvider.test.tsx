@@ -1,5 +1,5 @@
 import { DependencyRegistrator } from 'cheap-di';
-import { DIProvider, DIOneTimeProvider, use } from 'cheap-di-react';
+import { DIProvider, DIProviderMemo, use } from 'cheap-di-react';
 import { render, fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
@@ -236,13 +236,13 @@ describe('singleton and stateful', () => {
     };
 
     const Component = () => (
-      <DIOneTimeProvider selfSingletons={[Service1]}>
-        <DIOneTimeProvider selfSingletons={[Service2]}>
-          <DIOneTimeProvider selfSingletons={[Service3]}>
+      <DIProviderMemo selfSingletons={[Service1]}>
+        <DIProviderMemo selfSingletons={[Service2]}>
+          <DIProviderMemo selfSingletons={[Service3]}>
             <TestComponent />
-          </DIOneTimeProvider>
-        </DIOneTimeProvider>
-      </DIOneTimeProvider>
+          </DIProviderMemo>
+        </DIProviderMemo>
+      </DIProviderMemo>
     );
 
     const { rerender, getByTestId, queryByText } = render(<Component />);

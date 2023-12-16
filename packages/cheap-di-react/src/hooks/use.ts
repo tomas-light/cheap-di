@@ -2,7 +2,10 @@ import { useContext } from 'react';
 import { Constructor, AbstractConstructor } from 'cheap-di';
 import { DiContext } from '../DiContext.js';
 
-function use<TInstance>(type: Constructor<TInstance> | AbstractConstructor<TInstance>, ...args: any[]): TInstance {
+export function use<TInstance>(
+  type: Constructor<TInstance> | AbstractConstructor<TInstance>,
+  ...args: any[]
+): TInstance {
   const context = useContext(DiContext);
   if (!context || !context.container) {
     throw new Error('Container not found. You should use Provider as one of parent nodes of this component');
@@ -16,4 +19,4 @@ function use<TInstance>(type: Constructor<TInstance> | AbstractConstructor<TInst
   return implementation;
 }
 
-export { use };
+export { use as useDi };

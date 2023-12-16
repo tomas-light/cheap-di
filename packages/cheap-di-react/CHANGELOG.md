@@ -1,9 +1,39 @@
 # Changelog
 
-### 4.1.0-rc-1
+### 4.1.0
 
 * updated cheap-di dependency to v4.0.0
 * added prop `selfSingletons` as alias for `container.registerImplementation(...).asSingleton()`
+* 🚧 DiOneTimeProvider was renamed to DIProviderMemo
+```tsx
+// before
+<DIOneTimeProvider {/* ... */}>
+  {/* ... */}
+</DIOneTimeProvider>
+
+// after
+<DIProviderMemo {/* ... */}>
+  {/* ... */}
+</DIProviderMemo>
+```
+* 🚧 DiOneTimeProvider memoization logic was changed, now it compares passed `self` and `selfSingletons` items:
+```tsx
+const {
+  dependencies,
+  self,
+  selfSingletons,
+} = props;
+
+// before
+const memoizedDependencies = useMemo(() => dependencies, []);
+const memoizedSelfDependencies = useMemo(() => self, []);
+const memoizedSelfSingletons = useMemo(() => selfSingletons, []);
+
+// after
+const memoizedDependencies = useMemo(() => dependencies, []); // dependencies comparison not changed, because there are callbacks passed, that recreates on each render
+const memoizedSelfDependencies = useMemo(() => self, [...(self ?? [])]);
+const memoizedSelfSingletons = useMemo(() => selfSingletons, [...(selfSingletons ?? [])]);
+```
 
 ### 4.0.2
 

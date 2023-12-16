@@ -5,8 +5,8 @@
     "test": "jest"
   },
   "dependencies": {
-    "cheap-di": "4.0.0-rc-30",
-    "cheap-di-react": "4.1.0-rc-30",
+    "cheap-di": "4.0.0-rc-31",
+    "cheap-di-react": "4.1.0-rc-31",
     "react": "18.2.0",
     "react-dom": "18.2.0"
   },
