@@ -3,6 +3,7 @@
 * [What is it](#what-is-it)
 * [How to use:](#how-to-use)
   * [Webpack + ts-loader](#ts-loader)
+  * [ts-node](#ts-node)
   * [ts-jest](#ts-jest)
 
 ## <a name="what-is-it"></a> What is it
@@ -179,6 +180,11 @@ export * from './SomeClass';
 ## <a name="how-to-use"></a> How to use
 
 ### <a name="ts-loader"></a> Webpack + ts-loader:
+
+> [!WARNING]
+> The transformer does not work properly when used together with `fork-ts-checker-webpack-plugin`. 
+> If you have any thoughts on why is it and/or how we can fix it, please open the issue with details.
+
 ```ts
 // webpack.config.ts
 import path from 'path';
@@ -196,7 +202,16 @@ const config = {
         test: /\.ts$/,
         options: {
           getCustomTransformers: (program) => ({
-            before: [transformer({ program })],
+            before: [
+              transformer(
+                { program },
+                { /* options are optional */
+                  debug: true, // false by default
+                  addDetailsToUnknownParameters: true, // false by default
+                  logRegisteredMetadata: true, // false by default
+                }
+              ),
+            ],
           }),
           configFile: tsconfigFilePath,
         },
@@ -208,6 +223,29 @@ const config = {
 export default config;
 ```
 
+### <a name="ts-node"></a> ts-node
+You may use the transformer in nodejs, but in this case you need to use a compiler like `ts-patch`.
+
+tsconfig.json
+```json
+{
+  "compilerOptions": {
+    // [...]
+    "plugins": [
+      {
+        "transform": "cheap-di-ts-transform",
+        "debug": true, // false by default
+        "addDetailsToUnknownParameters": true, // false by default
+        "logRegisteredMetadata": true // false by default
+      }
+    ]
+  },
+  "ts-node": {
+    "compiler": "ts-patch/compiler"
+  }
+}
+
+```
 ### <a name="ts-jest"></a> ts-jest:
 ```json
 {
@@ -217,7 +255,16 @@ export default config;
       "ts-jest",
       {
         "astTransformers": {
-           "before": ["cheap-di-ts-transform"]
+          "before": [
+            {
+              "path": "cheap-di-ts-transform",
+              "options": {
+                "debug": true, // false by default
+                "addDetailsToUnknownParameters": true, // false by default
+                "logRegisteredMetadata": true // false by default
+              }
+            }
+          ]
         }
       }
     ]

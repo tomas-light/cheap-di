@@ -11,12 +11,18 @@ type ImplementationType<TClass> = Dependency<TClass> & {
 };
 
 interface DiMetadata {
+  /** if class was registered as singleton with container.registerImplementation(...).asSingleton)*/
   singleton?: boolean;
+
+  /** constructor dependencies */
   dependencies?: SomeDependency[];
-  /** parameters are specified with @inject decorator explicitly */
-  injectDependencies?: SomeDependency[];
+
   /** reference on a constructor that was patched (helps in inheritance cases) */
   modifiedClass?: unknown;
+
+  /** parameters are specified with @inject decorator explicitly */
+  injectDependencies?: SomeDependency[];
+
   /** parameters are passed to container.registerImplementation(...).inject(parameter1, parameter2) */
   injected?: unknown[];
 }
