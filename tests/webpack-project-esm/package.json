@@ -4,8 +4,6 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "test:1": "node compiled/case_01.js",
-    "build": "cross-env NODE_OPTIONS=\"--loader ts-node/esm\" npx webpack --config webpack.config.ts --stats-error-details",
     "serve": "cross-env NODE_OPTIONS=\"--loader ts-node/esm\" webpack serve --config webpack.config.ts"
   },
   "dependencies": {

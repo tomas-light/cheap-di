@@ -19,8 +19,6 @@ const config: Configuration & { devServer?: DevServerConfiguration } = {
   output: {
     path: path.join(packageRoot, 'compiled'),
     publicPath: '/',
-    // globalObject: 'this',
-    // globalObject: "typeof self !== 'undefined' ? self : this",
   },
   resolve: {
     extensions: ['.js', '.jsx', '.ts', '.tsx'],
@@ -28,7 +26,6 @@ const config: Configuration & { devServer?: DevServerConfiguration } = {
       '.js': ['.ts', '.js'],
       '.mjs': ['.mts', '.mjs'],
     },
-    // enforceExtension: true,
   },
   module: {
     rules: [
@@ -62,10 +59,6 @@ const config: Configuration & { devServer?: DevServerConfiguration } = {
       inject: 'body',
     }),
   ],
-  // devServer: {
-  //   hot: true,
-  //   client: true,
-  // },
 };
 
 export default config;
