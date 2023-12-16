@@ -1,0 +1,17 @@
+{
+  "preset": "ts-jest",
+  "moduleNameMapper": {
+    // replaces
+    // `import {} from './ContainerImpl.js'` with
+    // `import {} from './ContainerImpl'`
+    "^(\\.\\.?\\/.+)\\.js?$": "$1"
+  },
+  "transform": {
+    "^.+\\.ts?$": [
+      "ts-jest",
+      {
+        "tsconfig": "tsconfig.tests.json"
+      }
+    ]
+  }
+}

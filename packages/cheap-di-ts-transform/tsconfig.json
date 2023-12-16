@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "declaration": false,
+    "esModuleInterop": true /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables 'allowSyntheticDefaultImports' for type compatibility. */,
+    "inlineSources": true,
+    "isolatedModules": true,
+    "lib": [
+      "esnext",
+      "esnext.decorators",
+      "esnext.disposable",
+      "dom"
+    ],
+    "listEmittedFiles": false,
+    "listFiles": false,
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "noErrorTruncation": true,
+    "noFallthroughCasesInSwitch": true,
+    "outDir": "./dist",
+    "pretty": true,
+    "rootDir": "src",
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "strict": true,
+    "target": "ESNext",
+    "traceResolution": false
+  },
+  "exclude": ["node_modules", "dist"],
+  "include": [
+    "src"
+  ]
+}

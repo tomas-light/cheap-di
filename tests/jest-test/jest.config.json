@@ -1,0 +1,27 @@
+{
+  "testEnvironment": "jsdom",
+  "moduleNameMapper": {
+    // replaces
+    // `import {} from './ContainerImpl.js'` with
+    // `import {} from './ContainerImpl'`
+    "^(\\.\\.?\\/.+)\\.jsx?$": "$1"
+  },
+  "transform": {
+    "^.+\\.tsx?$": [
+      "ts-jest",
+      {
+        "astTransformers": {
+          "before": [
+            {
+              "path": "cheap-di-ts-transform",
+              "options": {
+                "debug": true,
+                "addDetailsToUnknownParameters": true
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
