@@ -1,12 +1,19 @@
 # cheap-di-ts-transform
 
+* [Installation](#installation)
 * [What is it](#what-is-it)
 * [How to use:](#how-to-use)
   * [Transform options](#options)
   * [Webpack + ts-loader](#ts-loader)
   * [ts-node](#ts-node)
   * [ts-jest](#ts-jest)
-  * [Vite + @rollup/plugin-typescript](#vite) 
+  * [Vite + @rollup/plugin-typescript](#vite)
+
+## <a name="isntallation"></a> Installation
+
+```shell
+npm i cheap-di-ts-transform --save-dev
+```
 
 ## <a name="what-is-it"></a> What is it
 

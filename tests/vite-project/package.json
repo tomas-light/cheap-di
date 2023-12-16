@@ -10,8 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "cheap-di": "4.0.0-rc-31",
-    "cheap-di-react": "4.1.0-rc-31",
+    "cheap-di": "4.0.0-rc-32",
+    "cheap-di-react": "4.1.0-rc-32",
     "package1": "0.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"

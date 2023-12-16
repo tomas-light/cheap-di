@@ -1,6 +1,6 @@
 {
   "name": "cheap-di-react",
-  "version": "4.1.0-rc-31",
+  "version": "4.1.0-rc-32",
   "description": "Dependency injection based on cheap-di for using in React components with React Context",
   "scripts": {
     "compile": "tsc --build tsconfig.cjs.json ./tsconfig.esm.json ./tsconfig.types.json",
@@ -13,17 +13,17 @@
     "@testing-library/react": "^14.1.2",
     "@types/jest": "^29.5.11",
     "@types/react": "^18.2.38",
-    "cheap-di": "^4.0.0-rc-31",
+    "cheap-di": "^4.0.0-rc-32",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "typescript": "^5.3.3"
   },
   "peerDependencies": {
-    "cheap-di": ">= 4.0.0-rc-31",
+    "cheap-di": ">= 4.0.0-rc-32",
     "react": ">= 18.2.0",
     "react-dom": ">= 18.2.0"
   },
-  "files": ["dist/**/*", "package.json", "README.md"],
+  "files": ["dist/**/*", "package.json", "README.md", "LICENSE"],
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
   "types": "./dist/types/index.d.ts",
@@ -33,13 +33,13 @@
   },
   "author": "TomasLight",
   "license": "MIT",
-  "homepage": "https://github.com/tomas-light/cheap-di/tree/release/4.0.0/packages/cheap-di-react#readme",
+  "homepage": "https://github.com/tomas-light/cheap-di/tree/master/packages/cheap-di-react#readme",
   "keywords": [
     "dependency",
     "injection",
     "dependency injection",
-    "di",
-    "cheap di",
-    "instance type"
+    "dependency injection react",
+    "react",
+    "cheap-di"
   ]
 }

@@ -1,7 +1,16 @@
 # cheap-di-react
 Integration of cheap-di into React via React.context
 
-## How to use
+* [Installation](#installation)
+* [How to use](#how-to-use)
+
+## <a name="isntallation"></a> Installation
+
+```shell
+npm i cheap-di-react
+```
+
+## <a name="how-to-use"></a> How to use
 
 There is simple logger.
 ```ts

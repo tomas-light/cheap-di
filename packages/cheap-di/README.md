@@ -2,10 +2,17 @@
 
 JavaScript's dependency injection like Autofac in .Net
 
+* [Installation](#installation)
 * [How to use](#how-to-use)
 * [Registration variants](#registration-variants)
   * [registerImplementation](#register-implementation)
   * [registerInstance](#register-instance)
+
+## <a name="isntallation"></a> Installation
+
+```shell
+npm i cheap-di
+```
 
 ## <a name="how-to-use"></a> How to use
 

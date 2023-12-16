@@ -1,6 +1,6 @@
 {
   "name": "cheap-di-ts-transform",
-  "version": "1.0.0-rc-31",
+  "version": "1.0.0-rc-32",
   "scripts": {
     "check-code-gen": "ts-node src/helpers/testCodeGeneration.ts",
     "compile": "tsc --build tsconfig.cjs.json ./tsconfig.esm.json ./tsconfig.types.json",
@@ -18,11 +18,27 @@
     "ts-node": "^10.9.1"
   },
   "peerDependencies": {
-    "cheap-di": ">= 4.0.0-rc-31",
+    "cheap-di": ">= 4.0.0-rc-32",
     "typescript": ">= 5.2.2"
   },
-  "files": ["dist/**/*", "package.json", "README.md"],
+  "files": ["dist/**/*", "package.json", "README.md", "LICENSE"],
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
-  "types": "./dist/types/index.d.ts"
+  "types": "./dist/types/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tomas-light/cheap-di.git"
+  },
+  "author": "TomasLight",
+  "license": "MIT",
+  "homepage": "https://github.com/tomas-light/cheap-di/tree/master/packages/cheap-di-ts-transform#readme",
+  "keywords": [
+    "dependency",
+    "injection",
+    "dependency injection",
+    "cheap-di",
+    "transformation",
+    "ts plugin",
+    "ts-transform"
+  ]
 }
