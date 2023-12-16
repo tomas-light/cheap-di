@@ -1,6 +1,6 @@
 # cheap-di
 
-JavaScript's dependency injection like Autofac in .Net
+JavaScript's dependency injection is like Autofac in .Net
 
 * [Installation](#installation)
 * [How to use](#how-to-use)
@@ -8,7 +8,7 @@ JavaScript's dependency injection like Autofac in .Net
   * [registerImplementation](#register-implementation)
   * [registerInstance](#register-instance)
 
-## <a name="isntallation"></a> Installation
+## <a name="installation"></a> Installation
 
 ```shell
 npm i cheap-di
@@ -16,7 +16,7 @@ npm i cheap-di
 
 ## <a name="how-to-use"></a> How to use
 
-The recommended way of using this package is using it with code transformers like `cheap-di-ts-transform`. Because in this way you will get the true dependency injection:
+The recommended way of using this package is to use it with code transformers like `cheap-di-ts-transform`. Because in this way, you will get true dependency injection:
 
 > Note:
 > You may wonder, why we use abstract classes?
@@ -65,7 +65,7 @@ const service = container.resolve(Service);
 service.doSome();
 ```
 
-But if you can't use transformers you still may use cheap-di with `@inject` decorator (it supports stage 2 and stage 3 TypeScript syntax):
+But if you can't use transformers, you still may use cheap-di with `@inject` decorator (it supports stage 2 and stage 3 TypeScript syntax):
 
 ```ts
 import { inject } from 'cheap-di';
@@ -117,7 +117,7 @@ const service = container.resolve(Service);
 service.doSome();
 ```
 
-To use stage 2 decorators you need to adjust your tsconfig.json like:
+To use stage 2 decorators, you need to adjust your tsconfig.json like this:
 ```json
 {
   "compilerOptions": {
@@ -127,7 +127,7 @@ To use stage 2 decorators you need to adjust your tsconfig.json like:
 }
 ```
 
-To use stage 3 decorators you don't need extra setup.
+To use stage 3 decorators, you don't need extra setup.
 
 ## <a name="registration-variants"></a> Registration variants
 
@@ -169,7 +169,7 @@ container
   .asSingleton();
 ```
 
-And singleton also may be used with interface specification:
+And singletons may also be used with interface specifications:
 ```ts
 import { container } from 'cheap-di';
 
@@ -201,7 +201,7 @@ container
 
 #### <a name="register-instance"></a> registerInstance
 
-If you want to register some instance as interface. Result is similar to singleton registration except the fact you have to instantiate class by your self
+If you want to register some instance as an interface, the result is similar to singleton registration, except that you have to instantiate the class yourself.
 
 ```ts
 import { container } from 'cheap-di';

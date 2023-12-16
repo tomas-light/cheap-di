@@ -1,10 +1,10 @@
 # cheap-di-react
-Integration of cheap-di into React via React.context
+Integration of cheap-di into React via React.Context
 
 * [Installation](#installation)
 * [How to use](#how-to-use)
 
-## <a name="isntallation"></a> Installation
+## <a name="installation"></a> Installation
 
 ```shell
 npm i cheap-di-react
@@ -12,7 +12,7 @@ npm i cheap-di-react
 
 ## <a name="how-to-use"></a> How to use
 
-There is simple logger.
+There is a simple logger.
 ```ts
 // logger.ts
 export abstract class Logger {
@@ -36,7 +36,7 @@ export class ConsoleLoggerWithPrefixes extends Logger {
 }
 ```
 
-Use it in react component
+Use it in the React component
 
 ```tsx
 // App.tsx

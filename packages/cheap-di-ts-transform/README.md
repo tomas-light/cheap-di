@@ -9,7 +9,7 @@
   * [ts-jest](#ts-jest)
   * [Vite + @rollup/plugin-typescript](#vite)
 
-## <a name="isntallation"></a> Installation
+## <a name="installation"></a> Installation
 
 ```shell
 npm i cheap-di-ts-transform --save-dev
@@ -69,8 +69,8 @@ class JustSomeClass {}
 
 
 class Example1 {
-  // string (as well as any non-class parameters) will interpreted as 'unknown' depdency
-  constructor(name: string) {} 
+  // string (as well as any non-class parameters) will interpreted as 'unknown' dependency
+  constructor(name: string) {}
 }
 /** cheap-di-ts-transform will add folowwing code:
  * @example
@@ -103,7 +103,7 @@ class Example2 {
  * @example
  * try {
  *   const cheapDi = require('cheap-di');
- *   cheapDi.saveConstructorMetadata(Example2, Service, "unknown", Example1, "unknown", Logger, "unknown", unknown, "unknown"); 
+ *   cheapDi.saveConstructorMetadata(Example2, Service, "unknown", Example1, "unknown", Logger, "unknown", unknown, "unknown");
  * } catch (error: unknown) {
  *   console.warn(error);
  * }
@@ -129,7 +129,7 @@ class Example3 {
  * */
 ```
 
-if imported class also used class in its constructor:
+If the imported class also used a class in its constructor:
 ```ts
 // "some-package"
 // there are 3 files:
@@ -189,18 +189,18 @@ export * from './SomeClass';
 ## <a name="how-to-use"></a> How to use
 
 ### <a name="options"></a> Transform options
-| name                           | value by default | description                                                                                                                                                                                   |
-|--------------------------------|------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| debug                          | `false`          | gets node names if you want to debug transformation                                                                                                                                           |
-| addDetailsToUnknownParameters  | `false`          | adds primitive types information of class parameters, to debug if there is something went wrong, instead of just `unknown` you will get something like `primitive /<parameter-name>/ :string` |
-| logRegisteredMetadata          | `false`          | adds console.debug call before saveConstructorMetadata function call. Useful to get debug information trace. You will see this information at runtime in console                              |
-| errorsLogLevel                 | `"warn"`         | used in try-catch statements to log registration errors                                                                                                                                       |
-| esmImports                     | `false`          | use `await import('package')` instead of `require('package')`. It works with top level await in esm                                                                                           |
+| name                           | value by default | description                                                                                                                                                                           |
+|--------------------------------|------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| debug                          | `false`          | gets node names if you want to debug transformation                                                                                                                                   |
+| addDetailsToUnknownParameters  | `false`          | adds primitive types information of class parameters, to debug if something went wrong, instead of just `unknown` you will get something like `primitive /<parameter-name>/ :string`  |
+| logRegisteredMetadata          | `false`          | adds console.debug call before saveConstructorMetadata function call. Useful to get debug information traced. You will see this information at runtime in console                     |
+| errorsLogLevel                 | `"warn"`         | used in try-catch statements to log registration errors                                                                                                                               |
+| esmImports                     | `false`          | use `await import('package')` instead of `require('package')`. It works with top level await in esm                                                                                   |
 
 ### <a name="ts-loader"></a> Webpack + ts-loader
 
 > [!WARNING]
-> The transformer does not work properly when used together with `fork-ts-checker-webpack-plugin`. 
+> The transformer does not work properly when used together with `fork-ts-checker-webpack-plugin`.
 > If you have any thoughts on why is it and/or how we can fix it, please open the issue with details.
 
 ```ts
@@ -223,10 +223,13 @@ const config = {
             before: [
               transformer(
                 { program },
-                { /* options are optional */
-                  debug: true, // false by default
-                  addDetailsToUnknownParameters: true, // false by default
-                  logRegisteredMetadata: true, // false by default
+                {
+                  // options are optional
+                  debug: false,
+                  addDetailsToUnknownParameters: false,
+                  logRegisteredMetadata: false,
+                  errorsLogLevel: "warn",
+                  esmImports: false
                 }
               ),
             ],
