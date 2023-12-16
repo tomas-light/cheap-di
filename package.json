@@ -4,15 +4,12 @@
     "tests/*"
   ],
   "scripts": {
-    "build:cheap-di": "npm run build --workspace cheap-di",
-    "build:cheap-di-react": "npm run build --workspace cheap-di-react",
-    "build:cheap-di-ts-transform": "npm run build --workspace cheap-di-ts-transform",
     "build": "npm-run-all build:cheap-di build:cheap-di-react build:cheap-di-ts-transform",
     "test:webpack": "npm run webpack:dev --workspace @tests/webpack-project",
     "test:jest": "npm run test --workspace @tests/jest-tests"
   },
   "dependencies": {
-    "typescript": "5.2.2"
+    "typescript": "5.3.3"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "6.9.1",

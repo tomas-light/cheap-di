@@ -2,7 +2,7 @@ import path from 'path';
 import { Configuration } from 'webpack';
 import { transformer } from 'cheap-di-ts-transform';
 
-const packageRoot = path.join(__dirname, '..');
+const packageRoot = path.join(__dirname);
 const tsconfig = path.join(packageRoot, 'tsconfig.json');
 
 const config: Configuration = {
@@ -10,6 +10,10 @@ const config: Configuration = {
   devtool: false,
   entry: {
     case_01: path.join(packageRoot, 'src', 'case_01'),
+    case_02: path.join(packageRoot, 'src', 'case_02'),
+    case_03: path.join(packageRoot, 'src', 'case_03'),
+    case_04: path.join(packageRoot, 'src', 'case_04'),
+    case_05: path.join(packageRoot, 'src', 'case_05', 'index'),
   },
   output: {
     path: path.join(packageRoot, 'compiled'),
@@ -24,7 +28,16 @@ const config: Configuration = {
         test: /\.ts$/,
         options: {
           getCustomTransformers: (program) => ({
-            before: [transformer({ program })],
+            before: [
+              transformer(
+                { program },
+                {
+                  debug: true,
+                  addDetailsToUnknownParameters: true,
+                  logRegisteredMetadata: true,
+                }
+              ),
+            ],
           }),
           configFile: tsconfig,
         },
@@ -33,4 +46,4 @@ const config: Configuration = {
   },
 };
 
-module.exports = config;
+export default config;

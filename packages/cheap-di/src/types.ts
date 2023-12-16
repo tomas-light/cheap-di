@@ -7,15 +7,22 @@ type Dependency<T = any> = Constructor<T> | AbstractConstructor<T>;
 type SomeDependency = Dependency | string;
 
 type ImplementationType<TClass> = Dependency<TClass> & {
-  [cheapDiSymbol]: DiMetadata<TClass>;
+  [cheapDiSymbol]: DiMetadata;
 };
 
-interface DiMetadata<TClass> {
+interface DiMetadata {
+  /** if class was registered as singleton with container.registerImplementation(...).asSingleton)*/
   singleton?: boolean;
+
+  /** constructor dependencies */
   dependencies?: SomeDependency[];
+
+  /** reference on a constructor that was patched (helps in inheritance cases) */
+  modifiedClass?: unknown;
+
   /** parameters are specified with @inject decorator explicitly */
   injectDependencies?: SomeDependency[];
-  modifiedClass?: TClass;
+
   /** parameters are passed to container.registerImplementation(...).inject(parameter1, parameter2) */
   injected?: unknown[];
 }

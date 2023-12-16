@@ -1,5 +1,6 @@
 import ts from 'typescript';
 import { objectAccessor } from './objectAccessor.js';
+import { TransformOptions } from '../TransformOptions.js';
 
 /**
  * generates try-catch statement with passed body
@@ -10,7 +11,7 @@ import { objectAccessor } from './objectAccessor.js';
  *   console.warn(error);
  * }
  * */
-export function tryCatchStatement(tryStatements: ts.Statement[]) {
+export function tryCatchStatement(tryStatements: ts.Statement[], transformOptions: TransformOptions) {
   const errorId = ts.factory.createIdentifier('error');
 
   return ts.factory.createTryStatement(
@@ -33,7 +34,7 @@ export function tryCatchStatement(tryStatements: ts.Statement[]) {
           ts.factory.createExpressionStatement(
             ts.factory.createCallExpression(
               // console.warn
-              objectAccessor('console').property('warn'),
+              objectAccessor('console').property(transformOptions.errorsLogLevel),
               undefined,
 
               // error

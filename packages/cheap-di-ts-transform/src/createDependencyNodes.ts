@@ -1,45 +1,67 @@
 import ts from 'typescript';
 import { ClassConstructorParameter } from './ClassConstructorParameter.js';
-import { arrayExpression } from './generation/arrayExpression.js';
-import { assignValue } from './generation/assignValue.js';
-import { callFunction } from './generation/callFunction.js';
+import { callFunction, callFunctionExpression } from './generation/callFunction.js';
 import { constVariable } from './generation/constVariable.js';
 import { constVariableWithDestructor } from './generation/constVariableWithDestructor.js';
 import { objectAccessor } from './generation/objectAccessor.js';
 import { tryCatchStatement } from './generation/tryCatchStatement.js';
 import { constructorParametersToExpressions } from './constructorParametersToExpressions.js';
 import { TransformOptions } from './TransformOptions.js';
+import { immediateAsyncArrowFunction } from './generation/immediateAsyncArrowFunction.js';
+import { requireImport } from './generation/requireImport.js';
+import { awaitImport } from './generation/awaitImport.js';
 
 /**
+ * your code example
+ * @example
+ * // package-1/index.ts
+ * import { Zoo } from 'package-2';
+ *
+ * class Bar {
+ *   constructor(zoo: Zoo) {}
+ * }
+ *
+ * // <your src>/index.ts
+ * import { Bar } from 'package-1';
+ *
+ * class Foo {
+ *   constructor(bar: Bar) {}
+ * }
+ *
+ * CommonJs version
  * @example
  * try {
  *  const cheapDi = require('cheap-di');
- *  const metadata = cheapDi.findOrCreateMetadata(<className>);
- *  const { SomeClass } = require('some-package');
- *  const { SomeAnotherClass } = require('another-package');
- *  metadata.dependencies = [SomeClass, SomeAnotherClass, <...parameters>];
+ *  const { Bar } = require('package-1');
+ *  cheapDi.saveConstructorMetadata(Foo, Bar);
  *
  *  try {
- *    const metadata = cheapDi.findOrCreateMetadata(SomeClass);
- *    const { SomeService } = require('some-package');
- *    metadata.dependencies = [SomeService];
- *    // ...
- *  } catch (error: unknown) {
- *    console.warn(error);
- *  }
-
- *  try {
- *    const metadata = cheapDi.findOrCreateMetadata(SomeAnotherClass);
- *    const { SomeService } = require('some-package');
- *    metadata.dependencies = [SomeService];
- *    // ...
+ *    const { Zoo } = require('package-2');
+ *    cheapDi.saveConstructorMetadata(Bar, Zoo);
  *  } catch (error: unknown) {
  *    console.warn(error);
  *  }
  * } catch (error: unknown) {
  *  console.warn(error);
  * }
-*/
+ *
+ * EcmaScript modules version
+ * @example
+ * try {
+ *  const cheapDi = await import('cheap-di');
+ *  const { Bar } = await import('package-1');
+ *  cheapDi.saveConstructorMetadata(Foo, Bar);
+ *
+ *  try {
+ *    const { Zoo } = await import('package-2');
+ *    cheapDi.saveConstructorMetadata(Bar, Zoo);
+ *  } catch (error: unknown) {
+ *    console.warn(error);
+ *  }
+ * } catch (error: unknown) {
+ *  console.warn(error);
+ * }
+ */
 
 export function createDependencyNodes(
   className: string,
@@ -49,32 +71,29 @@ export function createDependencyNodes(
   const cheapDiID = ts.factory.createIdentifier('cheapDi');
   const currentClassID = ts.factory.createIdentifier(className);
 
-  return [
-    tryCatchStatement([
-      // const cheapDi = require('cheap-di');
-      constVariable(cheapDiID, callFunction('require', ts.factory.createStringLiteral('cheap-di'))),
-
-      ...addDependenciesOfImportedDependencies(
-        {
-          cheapDiID,
-          currentClassID,
-          constructorParameters,
-        },
-        options
-      ),
-    ]),
-  ];
+  return addDependenciesOfImportedDependencies(
+    {
+      shouldImportCheapDi: true,
+      cheapDiID,
+      currentClassID,
+      currentClassName: className,
+      constructorParameters,
+    },
+    options
+  );
 }
 
 function addDependenciesOfImportedDependencies(
   codeInfo: {
+    shouldImportCheapDi?: boolean;
     cheapDiID: ts.Identifier;
     currentClassID: ts.Identifier;
+    currentClassName: string;
     constructorParameters: ClassConstructorParameter[] | undefined;
   },
   options: TransformOptions
 ): ts.Statement[] {
-  const { cheapDiID, currentClassID, constructorParameters } = codeInfo;
+  const { shouldImportCheapDi, cheapDiID, currentClassID, currentClassName, constructorParameters } = codeInfo;
 
   if (!constructorParameters) {
     return [];
@@ -82,67 +101,67 @@ function addDependenciesOfImportedDependencies(
 
   const parameterNodes = constructorParametersToExpressions(constructorParameters ?? []);
 
+  let createImportExpression: (importedFrom: string) => ts.Expression;
+  if (options.esmImports) {
+    createImportExpression = awaitImport;
+  } else {
+    createImportExpression = requireImport;
+  }
+
   return [
-    tryCatchStatement([
-      ...(options.logClassNames
-        ? [
-            // console.debug('[cheap-di-transformer] register metadata for', <className>);
-            ts.factory.createExpressionStatement(
+    tryCatchStatement(
+      [
+        ...(shouldImportCheapDi
+          ? [
+              // const cheapDi = require('cheap-di');
+              constVariable(cheapDiID, createImportExpression('cheap-di')),
+            ]
+          : []),
+
+        // const { SomeClass } = require('some-package');
+        // const { SomeAnotherClass } = require('another-package');
+        ...parameterNodes.imports.map(({ identifier, importedFrom, importType }) => {
+          switch (importType) {
+            case 'named':
+              return constVariableWithDestructor(identifier, createImportExpression(importedFrom));
+
+            case 'default':
+            case 'namespace':
+              return constVariable(identifier, createImportExpression(importedFrom));
+          }
+        }),
+
+        ...(options.logRegisteredMetadata
+          ? [
+              // console.debug('[cheap-di-transformer] register metadata for', <className>, ...);
               callFunction(
-                // console.debug
                 objectAccessor('console').property('debug'),
-                ts.factory.createStringLiteral('[cheap-di-transformer] register metadata for'),
-                currentClassID
-              )
-            ),
-          ]
-        : []),
+                ts.factory.createStringLiteral(`[cheap-di-transformer] register metadata for ${currentClassName}\n`),
+                ts.factory.createStringLiteral(parameterNodes.namesToDebug.join('\n'))
+              ),
+            ]
+          : []),
 
-      // const metadata = cheapDi.findOrCreateMetadata(<className>);
-      constVariable(
-        'metadata',
+        // cheapDi.saveConstructorMetadata(<className>, <parameter1>, <parameter2>, ...)
         callFunction(
-          // cheapDi.findOrCreateMetadata
-          objectAccessor(cheapDiID).property('findOrCreateMetadata'),
-          currentClassID
-        )
-      ),
+          objectAccessor(cheapDiID).property('saveConstructorMetadata'),
+          currentClassID,
+          ...parameterNodes.expressions
+        ),
 
-      // const { SomeClass } = require('some-package');
-      // const { SomeAnotherClass } = require('another-package');
-      ...parameterNodes.imports.map(({ identifier, importedFrom, importType }) => {
-        switch (importType) {
-          case 'named':
-            return constVariableWithDestructor(
-              identifier,
-              callFunction('require', ts.factory.createStringLiteral(importedFrom))
-            );
-
-          case 'default':
-          case 'namespace':
-            return constVariable(identifier, callFunction('require', ts.factory.createStringLiteral(importedFrom)));
-        }
-      }),
-
-      // metadata.dependencies = [<parameters>];
-      assignValue(
-        // metadata.dependencies
-        objectAccessor('metadata').property('dependencies')
-      ).value(
-        // [<parameters>]
-        arrayExpression(...parameterNodes.expressions)
-      ),
-
-      ...parameterNodes.imports.flatMap(({ identifier, constructorParameters }) =>
-        addDependenciesOfImportedDependencies(
-          {
-            cheapDiID,
-            currentClassID: identifier,
-            constructorParameters,
-          },
-          options
-        )
-      ),
-    ]),
+        ...parameterNodes.imports.flatMap(({ identifier, name, constructorParameters }) =>
+          addDependenciesOfImportedDependencies(
+            {
+              cheapDiID,
+              currentClassID: identifier,
+              currentClassName: name,
+              constructorParameters,
+            },
+            options
+          )
+        ),
+      ],
+      options
+    ),
   ];
 }

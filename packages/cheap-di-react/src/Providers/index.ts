@@ -1,2 +1,2 @@
-export * from './DIOneTimeProvider.js';
+export * from './DIProviderMemo.js';
 export * from './DIProvider.js';

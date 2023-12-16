@@ -8,13 +8,19 @@ type FactoryParameters = {
 
 type TransformerFactory = (
   parameters: FactoryParameters,
-  options?: TransformOptions
+  partialOptions?: Partial<TransformOptions>
 ) => ts.TransformerFactory<ts.SourceFile>;
 
-export const transformer: TransformerFactory = (
-  parameters,
-  options: TransformOptions = { debug: false, addDetailsToUnknownParameters: false }
-) => {
+export const transformer: TransformerFactory = (parameters, partialOptions: Partial<TransformOptions> = {}) => {
+  const transformOptions: TransformOptions = {
+    debug: false,
+    addDetailsToUnknownParameters: false,
+    logRegisteredMetadata: false,
+    errorsLogLevel: 'warn',
+    esmImports: false,
+    ...partialOptions,
+  };
+
   let program: ts.Program;
   if ('getTypeChecker' in parameters && typeof parameters.getTypeChecker === 'function') {
     // when executing from ts-patch, it passes program directly
@@ -27,10 +33,10 @@ export const transformer: TransformerFactory = (
 
   return (context) => {
     return (sourceFile) => {
-      const { classFinder, ref } = makeClassFinder(context, typeChecker, options);
+      const { classFinder, ref } = makeClassFinder(context, typeChecker, transformOptions);
 
       const transformedSourceFile = ts.visitNode(sourceFile, (tsNode) => {
-        const nodeText = options?.debug ? tsNode.getFullText() : '';
+        const nodeText = transformOptions?.debug ? tsNode.getFullText() : '';
         return ts.visitEachChild(tsNode, classFinder, context);
       }) as ts.SourceFile;
 

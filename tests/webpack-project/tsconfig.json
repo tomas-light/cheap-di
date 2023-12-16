@@ -5,8 +5,6 @@
     "esModuleInterop": true /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables 'allowSyntheticDefaultImports' for type compatibility. */,
     "inlineSources": true,
     "isolatedModules": true,
-    "module": "CommonJS",
-    "moduleResolution": "node",
     "lib": [
       "esnext",
       "esnext.decorators",
@@ -15,10 +13,12 @@
     ],
     "listEmittedFiles": false,
     "listFiles": false,
+    "module": "CommonJS",
+    "moduleResolution": "node",
     "noErrorTruncation": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitAny": false,
-    "outDir": "./dist",
+    "outDir": "./compiled",
     "pretty": true,
     "skipLibCheck": true,
     "sourceMap": true,
@@ -26,5 +26,5 @@
     "target": "ESNext",
     "traceResolution": false
   },
-  "include": ["src", "webpack"]
+  "include": ["src", "webpack.config.ts"]
 }

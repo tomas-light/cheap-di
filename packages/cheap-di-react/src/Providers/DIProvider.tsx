@@ -1,5 +1,5 @@
 import { Constructor, Container, DependencyRegistrator, isSingleton } from 'cheap-di';
-import { FC, Fragment, memo, ReactNode, useEffect, useRef, useState } from 'react';
+import { FC, ReactNode, useEffect, useRef, useState } from 'react';
 import { DiContext } from '../DiContext.js';
 import { useDiContext } from '../hooks/index.js';
 import { InternalLogger } from '../InternalLogger.js';
@@ -8,12 +8,62 @@ type Dependency = (dependencyRegistrator: DependencyRegistrator) => void;
 type SelfDependency = Constructor;
 
 interface Props {
+  /**
+   * using of cheap-di API to register dependencies as you wish
+   * @example
+   * <DIProvider dependencies={[
+   *   (dr) => dr.registerImplementation(Foo).as(Bar),
+   *   (dr) => dr.registerImplementation(Foo2).as(Bar2),
+   *   // ...
+   * ]}>
+   *   <MyComponent />
+   * </DIProvider>
+   * */
   dependencies?: Dependency[];
+
+  /**
+   * shortcut for container.registerImplementation(<you-class>), when you want to keep code simple, without using interfaces (abstract classes)
+   * @example
+   * <DIProvider self={[Foo, Bar]}>
+   *   <MyComponent />
+   * </DIProvider>
+   * */
   self?: SelfDependency[];
+
+  /**
+   * shortcut for container.registerImplementation(<you-class>).asSingleton()
+   * @example
+   * <DIProvider selfSingletons={[Foo, Bar]}>
+   *   <MyComponent />
+   * </DIProvider>
+   * */
   selfSingletons?: SelfDependency[];
+
+  /**
+   * adds your configured container as root container to your React tree
+   * @example
+   * import { container } from 'cheap-di';
+   *
+   * class Foo {}
+   *
+   * const App = () => {
+   *   const [configuredContainer] = useState(() => {
+   *     container.registerImplementation(Foo);
+   *     // ...
+   *   });
+   *
+   *   return (
+   *     <DIProvider parentContainer={configuredContainer}>
+   *       <MyComponent />
+   *     </DIProvider>
+   *   );
+   * }
+   * */
   parentContainer?: Container;
-  /** if it is provided, logging will be enabled */
+
+  /** enables logging of dependencies registrations */
   debugName?: string;
+
   children: ReactNode;
 }
 
@@ -24,26 +74,26 @@ const DIProvider: FC<Props> = (props) => {
   const [initialized, setInitialized] = useState(false);
   const timerRef = useRef<any>(null);
   const diContext = useDiContext({ logger, parentContainer });
-  const { container } = diContext;
+  const { container: reactContainer } = diContext;
 
   useEffect(() => {
     const isAnyConfigurationPassed = dependencies || self || selfSingletons || parentContainer;
-    if (!container || !isAnyConfigurationPassed) {
+    if (!reactContainer || !isAnyConfigurationPassed) {
       return;
     }
 
-    container.clear();
+    reactContainer.clear();
     logger.log('dependency registrations');
 
-    const singletonsSizeBeforeDependenciesUpdate = container?.getSingletons().size ?? 0;
-    dependencies?.forEach((dependency) => dependency(container));
-    self?.forEach((selfDependency) => container.registerImplementation(selfDependency));
-    selfSingletons?.forEach((selfDependency) => container.registerImplementation(selfDependency).asSingleton());
+    const singletonsSizeBeforeDependenciesUpdate = reactContainer?.getSingletons().size ?? 0;
+    dependencies?.forEach((dependency) => dependency(reactContainer));
+    self?.forEach((selfDependency) => reactContainer.registerImplementation(selfDependency));
+    selfSingletons?.forEach((selfDependency) => reactContainer.registerImplementation(selfDependency).asSingleton());
 
     logger.log('singleton and stateful configurations');
 
-    for (const [type] of container.getDependencies()) {
-      const constructor = container.localScope((_container) => _container.getImplementation(type));
+    for (const [type] of reactContainer.getDependencies()) {
+      const constructor = reactContainer.localScope((container) => container.getImplementation(type));
       if (!constructor) {
         return;
       }
@@ -51,19 +101,22 @@ const DIProvider: FC<Props> = (props) => {
       if (isSingleton(constructor as Constructor)) {
         logger.log('singleton', constructor, 'founded');
         // resolve type to get and register its instance
-        container.resolve(type);
+        reactContainer.resolve(type);
       }
     }
 
-    if (container.parentContainer && singletonsSizeBeforeDependenciesUpdate !== container.getSingletons().size) {
+    if (
+      reactContainer.parentContainer &&
+      singletonsSizeBeforeDependenciesUpdate !== reactContainer.getSingletons().size
+    ) {
       logger.log('singletons size changed, trigger root rerender');
       timerRef.current = setTimeout(() => {
-        container.rootContainer.rerender();
+        reactContainer.rootContainer.rerender();
       });
     }
 
     setInitialized(true);
-  }, [container, dependencies, self]);
+  }, [reactContainer, dependencies, self, selfSingletons]);
 
   useEffect(() => {
     return () => {
@@ -71,7 +124,7 @@ const DIProvider: FC<Props> = (props) => {
         clearTimeout(timerRef.current);
       }
 
-      container?.clear();
+      reactContainer?.clear();
     };
   }, []);
 
@@ -79,15 +132,8 @@ const DIProvider: FC<Props> = (props) => {
     return null;
   }
 
-  return (
-    <DiContext.Provider value={diContext}>
-      <MemoizedChildren>{children}</MemoizedChildren>
-    </DiContext.Provider>
-  );
+  return <DiContext.Provider value={diContext}>{children}</DiContext.Provider>;
 };
 
-const MemoizedChildren: FC<{ children: ReactNode }> = memo(({ children }) => <Fragment>{children}</Fragment>);
-
-const memoizedComponent = memo(DIProvider) as FC<Props>;
-export { memoizedComponent as DIProvider };
+export { DIProvider };
 export type { Props as DIProviderProps };

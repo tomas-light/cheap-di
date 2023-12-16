@@ -1,16 +1,16 @@
-import { Class1 } from 'package1';
+import { Bar } from 'package1';
 import cheapDi from 'cheap-di';
 
-class MyClass {
-  constructor(readonly _class1: Class1) {}
+class Foo {
+  constructor(readonly bar: Bar) {}
 
   do() {
     console.log('my class does ...');
-    this._class1.logInfo();
+    this.bar.logInfo();
   }
 }
 
-const myClass = cheapDi.container.resolve(MyClass);
+const myClass = cheapDi.container.resolve(Foo);
 if (!myClass) {
   console.log('no my class');
 } else {

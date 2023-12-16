@@ -1,7 +1,6 @@
 import { CircularDependencyError } from './CircularDependencyError.js';
-import { findMetadata, findOrCreateMetadata } from './findMetadata.js';
+import { findMetadata, findOrCreateMetadata } from './metadata.js';
 import { isSingleton } from './isSingleton.js';
-import { modifyConstructor } from './modifyConstructor.js';
 import { Trace } from './Trace.js';
 import {
   AbstractConstructor,
@@ -14,7 +13,6 @@ import {
   ImplementationType,
   RegistrationType,
 } from './types.js';
-import { workWithDiSettings } from './workWithDiSettings.js';
 
 class ContainerImpl implements Container, IHaveSingletons, IHaveInstances, IHaveDependencies, Disposable {
   singletons: Map<ImplementationType<any>, object>;
@@ -30,10 +28,8 @@ class ContainerImpl implements Container, IHaveSingletons, IHaveInstances, IHave
   /** register implementation class */
   registerImplementation<TInstance>(implementationType: Constructor<TInstance>) {
     const inject = (...injectionParams: any[]) => {
-      modifyConstructor(implementationType, (settings) => {
-        const metadata = findOrCreateMetadata(settings);
-        metadata.injected = injectionParams;
-      });
+      const metadata = findOrCreateMetadata(implementationType as ImplementationType<unknown>);
+      metadata.injected = injectionParams;
     };
 
     this.dependencies.set(implementationType, implementationType);
@@ -56,11 +52,9 @@ class ContainerImpl implements Container, IHaveSingletons, IHaveInstances, IHave
         }
 
         if (!isSingleton(implementationType)) {
-          workWithDiSettings(implementationType, (settings) => {
-            const metadata = findMetadata(settings)!;
-            metadata.modifiedClass = implementationType;
-            metadata.singleton = true;
-          });
+          const metadata = findOrCreateMetadata(implementationType as ImplementationType<unknown>);
+          metadata.modifiedClass = implementationType;
+          metadata.singleton = true;
         }
 
         return {

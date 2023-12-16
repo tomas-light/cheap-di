@@ -10,11 +10,13 @@ import ts from 'typescript';
 
 type Import = Omit<ImportedClass, 'classNameInImport'> & {
   identifier: ts.Identifier;
+  name: string;
 };
 
 export function constructorParametersToExpressions(parameters: ClassConstructorParameter[] | undefined) {
   const initial = {
     expressions: [] as ts.Expression[],
+    namesToDebug: [] as string[],
     imports: [] as Import[],
   };
 
@@ -29,6 +31,8 @@ export function constructorParametersToExpressions(parameters: ClassConstructorP
 
       const unknownStringLiteral = ts.factory.createStringLiteral(unknownString);
       _parameters.expressions.push(unknownStringLiteral);
+      _parameters.namesToDebug.push(unknownString);
+
       return _parameters;
     };
 
@@ -40,14 +44,17 @@ export function constructorParametersToExpressions(parameters: ClassConstructorP
       if (isLocalClass(parameter.classReference)) {
         const id = ts.factory.createIdentifier(parameter.classReference.localName);
         _parameters.expressions.push(id);
+        _parameters.namesToDebug.push(parameter.classReference.localName);
         return _parameters;
       }
 
       if (isImportedClass(parameter.classReference)) {
         const id = ts.factory.createIdentifier(parameter.classReference.classNameInImport);
         _parameters.expressions.push(id);
+        _parameters.namesToDebug.push(parameter.classReference.classNameInImport);
         _parameters.imports.push({
           identifier: id,
+          name: parameter.classReference.classNameInImport,
           ...parameter.classReference,
         });
         return _parameters;
@@ -66,6 +73,7 @@ export function constructorParametersToExpressions(parameters: ClassConstructorP
 
       const primitiveStringLiteral = ts.factory.createStringLiteral(primitiveString);
       _parameters.expressions.push(primitiveStringLiteral);
+      _parameters.namesToDebug.push(primitiveString);
       return _parameters;
     }
 
