@@ -29,6 +29,7 @@ class MyLogger {
 
 class MyService {
   constructor(private logger: MyLogger) {}
+
   someStaff() {
     this.logger.log('I do something');
   }
@@ -58,6 +59,7 @@ class MyLogger {
 @inject(MyLogger)
 class MyService {
   constructor(private logger: MyLogger) {}
+
   someStaff() {
     this.logger.log('I do something');
   }
