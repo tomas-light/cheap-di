@@ -1,15 +1,14 @@
 import ts from 'typescript';
 import { ClassConstructorParameter } from './ClassConstructorParameter.js';
-import { callFunction, callFunctionExpression } from './generation/callFunction.js';
+import { callFunction } from './generation/callFunction.js';
 import { constVariable } from './generation/constVariable.js';
 import { constVariableWithDestructor } from './generation/constVariableWithDestructor.js';
 import { objectAccessor } from './generation/objectAccessor.js';
 import { tryCatchStatement } from './generation/tryCatchStatement.js';
 import { constructorParametersToExpressions } from './constructorParametersToExpressions.js';
-import { TransformOptions } from './TransformOptions.js';
-import { immediateAsyncArrowFunction } from './generation/immediateAsyncArrowFunction.js';
 import { requireImport } from './generation/requireImport.js';
 import { awaitImport } from './generation/awaitImport.js';
+import { InternalTransformOptions } from './InternalTransformOptions.js';
 
 /**
  * your code example
@@ -66,7 +65,7 @@ import { awaitImport } from './generation/awaitImport.js';
 export function createDependencyNodes(
   className: string,
   constructorParameters: ClassConstructorParameter[],
-  options: TransformOptions
+  options: InternalTransformOptions
 ) {
   const cheapDiID = ts.factory.createIdentifier('cheapDi');
   const currentClassID = ts.factory.createIdentifier(className);
@@ -91,7 +90,7 @@ function addDependenciesOfImportedDependencies(
     currentClassName: string;
     constructorParameters: ClassConstructorParameter[] | undefined;
   },
-  options: TransformOptions
+  options: InternalTransformOptions
 ): ts.Statement[] {
   const { shouldImportCheapDi, cheapDiID, currentClassID, currentClassName, constructorParameters } = codeInfo;
 

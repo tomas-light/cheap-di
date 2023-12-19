@@ -1,15 +1,16 @@
 import ts from 'typescript';
 import { ClassConstructorParameter, PrimitiveParameter } from './ClassConstructorParameter.js';
 import { correctClassParameterIfItIsValid } from './correctClassParameterIfItIsValid.js';
-import { TransformOptions } from './TransformOptions.js';
 import { findPrimitiveTypes } from './findPrimitiveTypes.js';
+import { InternalTransformOptions } from './InternalTransformOptions.js';
+import { findConstructorDeclaration } from './findConstructorDeclaration.js';
 
 export function findClassConstructorParameters(parameters: {
   currentImportFrom?: string;
   typeChecker: ts.TypeChecker;
   classNode: ts.Node;
   constructorParameters?: ClassConstructorParameter[];
-  options: TransformOptions;
+  options: InternalTransformOptions;
 }): ClassConstructorParameter[] | undefined {
   const {
     //
@@ -20,45 +21,12 @@ export function findClassConstructorParameters(parameters: {
     options,
   } = parameters;
 
-  let constructorDeclaration: ts.ConstructorDeclaration | undefined;
-
-  const classNodeText = options?.debug ? classNode.getFullText() : '';
-  if (ts.isConstructorDeclaration(classNode)) {
-    constructorDeclaration = classNode;
-  } else {
-    for (const childNode of classNode.getChildren()) {
-      const childNodeText = options?.debug ? childNode.getFullText() : '';
-      if (childNode.kind !== ts.SyntaxKind.SyntaxList) {
-        continue;
-      }
-
-      for (const tsNode of childNode.getChildren()) {
-        const nodeText = options?.debug ? tsNode.getFullText() : '';
-        if (ts.isConstructorDeclaration(tsNode)) {
-          constructorDeclaration = tsNode;
-          break;
-        }
-      }
-
-      if (constructorDeclaration) {
-        // no need to iterate over other nodes
-        break;
-      }
-    }
-  }
-
+  const constructorDeclaration = findConstructorDeclaration(classNode, options);
   if (!constructorDeclaration) {
     return;
   }
 
-  const parameterDeclarations: ts.ParameterDeclaration[] = [];
-  constructorDeclaration.forEachChild((node) => {
-    const nodeText2 = options?.debug ? node.getFullText() : '';
-    if (ts.isParameter(node)) {
-      parameterDeclarations.push(node);
-    }
-  });
-
+  const parameterDeclarations = findConstructorParameterDeclarations(constructorDeclaration, options);
   for (const parameterDeclaration of parameterDeclarations) {
     const classConstructorParameter: ClassConstructorParameter = {
       type: 'unknown',
@@ -94,33 +62,28 @@ export function findClassConstructorParameters(parameters: {
         return;
       }
 
-      let typeReferencedNode = parameterNode;
-
-      if (ts.isUnionTypeNode(parameterNode)) {
-        let founded = false; // take only first type reference
-        parameterNode.forEachChild((unionNode) => {
-          if (!founded && ts.isTypeReferenceNode(unionNode)) {
-            typeReferencedNode = unionNode;
-            founded = true;
-          }
-        });
-      }
-      const nodeText4 = options?.debug ? typeReferencedNode.getFullText() : '';
+      const typeReferencedNode = findTypeReference(parameterNode);
+      const nodeText4 = options?.debug ? typeReferencedNode?.getFullText() : '';
 
       classConstructorParameter.name = parameterNameIdentifier.getFullText().trim();
 
-      if (ts.isTypeReferenceNode(typeReferencedNode)) {
+      if (typeReferencedNode) {
         correctClassParameterIfItIsValid({
           typeChecker,
           tsNode: typeReferencedNode,
           outClassConstructorParameter: classConstructorParameter,
           currentImportFrom,
-          findClassConstructorParameters: (_parameters) =>
-            findClassConstructorParameters({
+          findClassConstructorParameters: (_parameters) => {
+            if (!options.deepRegistration) {
+              return undefined;
+            }
+
+            return findClassConstructorParameters({
               typeChecker,
               ..._parameters,
               options,
-            }),
+            });
+          },
         });
       } else if (options.addDetailsToUnknownParameters) {
         const primitiveTypes = findPrimitiveTypes(parameterNode);
@@ -134,4 +97,40 @@ export function findClassConstructorParameters(parameters: {
   }
 
   return constructorParameters;
+}
+
+function findConstructorParameterDeclarations(
+  constructorDeclaration: ts.ConstructorDeclaration,
+  options: InternalTransformOptions
+) {
+  const parameterDeclarations: ts.ParameterDeclaration[] = [];
+
+  constructorDeclaration.forEachChild((node) => {
+    const nodeText2 = options?.debug ? node.getFullText() : '';
+    if (ts.isParameter(node)) {
+      parameterDeclarations.push(node);
+    }
+  });
+
+  return parameterDeclarations;
+}
+
+function findTypeReference(parameterNode: ts.Node) {
+  let typeReferencedNode = parameterNode;
+
+  if (ts.isUnionTypeNode(parameterNode)) {
+    let founded = false; // take only first type reference
+    parameterNode.forEachChild((unionNode) => {
+      if (!founded && ts.isTypeReferenceNode(unionNode)) {
+        typeReferencedNode = unionNode;
+        founded = true;
+      }
+    });
+  }
+
+  if (ts.isTypeReferenceNode(typeReferencedNode)) {
+    return typeReferencedNode;
+  }
+
+  return undefined;
 }

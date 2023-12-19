@@ -130,6 +130,7 @@ class Example3 {
 ```
 
 If the imported class also used a class in its constructor:
+> Note: works with `deepRegistration: true`
 ```ts
 // "some-package"
 // there are 3 files:
@@ -189,13 +190,53 @@ export * from './SomeClass';
 ## <a name="how-to-use"></a> How to use
 
 ### <a name="options"></a> Transform options
-| name                           | value by default | description                                                                                                                                                                           |
-|--------------------------------|------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| debug                          | `false`          | gets node names if you want to debug transformation                                                                                                                                   |
-| addDetailsToUnknownParameters  | `false`          | adds primitive types information of class parameters, to debug if something went wrong, instead of just `unknown` you will get something like `primitive /<parameter-name>/ :string`  |
-| logRegisteredMetadata          | `false`          | adds console.debug call before saveConstructorMetadata function call. Useful to get debug information traced. You will see this information at runtime in console                     |
-| errorsLogLevel                 | `"warn"`         | used in try-catch statements to log registration errors                                                                                                                               |
-| esmImports                     | `false`          | use `await import('package')` instead of `require('package')`. It works with top level await in esm                                                                                   |
+| name                           | value by default | description                                                                                                                                                                          |
+|--------------------------------|------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| debug                          | `false`          | gets node names if you want to debug transformation                                                                                                                                  |
+| addDetailsToUnknownParameters  | `false`          | adds primitive types information of class parameters, to debug if something went wrong, instead of just `unknown` you will get something like `primitive /<parameter-name>/ :string` |
+| logRegisteredMetadata          | `false`          | adds console.debug call before saveConstructorMetadata function call. Useful to get debug information traced. You will see this information at runtime in console                    |
+| errorsLogLevel                 | `"warn"`         | used in try-catch statements to log registration errors                                                                                                                              |
+| esmImports                     | `false`          | use `await import('package')` instead of `require('package')`. It works with top level await in esm                                                                                  |
+| deepRegistration               | `false`          | add dependencies of dependencies right in place or not                                                                                                                               |
+
+`deepRegistration` example:
+```ts
+import { Repository } from './Repository';
+
+export class Service1 {
+  constructor(private repository: Repository) {}
+
+  data() {
+    return this.repository.users();
+  }
+}
+
+// region: deepRegistration: false
+try {
+  const cheapDi = await import('cheap-di');
+  const { Repository } = await import('./Repository.ts');
+  cheapDi.saveConstructorMetadata(Service1, Repository);
+} catch (error) {
+  console.warn(error);
+}
+// endregion
+
+// region: deepRegistration: true
+try {
+  const cheapDi = await import('cheap-di');
+  const { Repository } = await import('./Repository.ts');
+  cheapDi.saveConstructorMetadata(Service1, Repository);
+  try {
+    const { Logger } = await import('./Repository.ts');
+    cheapDi.saveConstructorMetadata(Repository, Logger);
+  } catch (error) {
+    console.warn(error);
+  }
+} catch (error) {
+  console.warn(error);
+}
+// endregion
+```
 
 ### <a name="ts-loader"></a> Webpack + ts-loader
 

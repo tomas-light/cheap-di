@@ -1,15 +1,20 @@
 import ts from 'typescript';
 import { createDependencyNodes } from './createDependencyNodes.js';
 import { makeConstructorFinder } from './makeConstructorFinder.js';
-import { TransformOptions } from './TransformOptions.js';
+import { InternalTransformOptions } from './InternalTransformOptions.js';
 
 export function makeClassFinder(
   context: ts.TransformationContext,
   typeChecker: ts.TypeChecker,
-  options: TransformOptions
+  options: InternalTransformOptions
 ) {
   const fileRef = {
     hasDependencies: false,
+  };
+
+  return {
+    ref: fileRef,
+    classFinder,
   };
 
   function classFinder(tsNode: ts.Node): ts.Node | ts.Node[] {
@@ -21,7 +26,6 @@ export function makeClassFinder(
     const classDeclaration = tsNode;
 
     const { ref, constructorFinder } = makeConstructorFinder(context, typeChecker, options);
-
     ts.visitEachChild(classDeclaration, constructorFinder, context);
 
     const { classLocalName, parameters } = ref;
@@ -35,9 +39,4 @@ export function makeClassFinder(
     const dependencyRegistrationNodes = createDependencyNodes(classLocalName, parameters, options);
     return [classDeclaration, ...dependencyRegistrationNodes];
   }
-
-  return {
-    ref: fileRef,
-    classFinder,
-  };
 }

@@ -28,4 +28,55 @@ export type TransformOptions = {
    * @default false
    * */
   esmImports: boolean;
+
+  /**
+   * add dependencies of dependencies right in place
+   * @default false
+   * @example
+   * import { Repository } from './Repository';
+   *
+   * export class Service1 {
+   *   constructor(private repository: Repository) {}
+   *
+   *   data() {
+   *     return this.repository.users();
+   *   }
+   * }
+   *
+   * // deepRegistration: false
+   * try {
+   *   const cheapDi = await import('cheap-di');
+   *   const { Repository } = await import('./Repository.ts');
+   *   cheapDi.saveConstructorMetadata(Service1, Repository);
+   * } catch (error) {
+   *   console.warn(error);
+   * }
+   *
+   * @example
+   * import { Repository } from './Repository';
+   *
+   * export class Service1 {
+   *   constructor(private repository: Repository) {}
+   *
+   *   data() {
+   *     return this.repository.users();
+   *   }
+   * }
+   *
+   * // deepRegistration: true
+   * try {
+   *   const cheapDi = await import('cheap-di');
+   *   const { Repository } = await import('./Repository.ts');
+   *   cheapDi.saveConstructorMetadata(Service1, Repository);
+   *   try {
+   *     const { Logger } = await import('./Repository.ts');
+   *     cheapDi.saveConstructorMetadata(Repository, Logger);
+   *   } catch (error) {
+   *     console.warn(error);
+   *   }
+   * } catch (error) {
+   *   console.warn(error);
+   * }
+   * */
+  deepRegistration: boolean;
 };

@@ -1,16 +1,21 @@
 import ts from 'typescript';
 import { ClassConstructorParameter } from './ClassConstructorParameter.js';
 import { findClassConstructorParameters } from './findClassConstructorParameters.js';
-import { TransformOptions } from './TransformOptions.js';
+import { InternalTransformOptions } from './InternalTransformOptions.js';
 
 export function makeConstructorFinder(
   context: ts.TransformationContext,
   typeChecker: ts.TypeChecker,
-  options: TransformOptions
+  options: InternalTransformOptions
 ) {
   const ref = {
     classLocalName: undefined as string | undefined,
     parameters: [] as ClassConstructorParameter[],
+  };
+
+  return {
+    ref,
+    constructorFinder,
   };
 
   function constructorFinder(nodeInsideClass: ts.Node): ts.Node {
@@ -47,9 +52,4 @@ export function makeConstructorFinder(
 
     return nodeInsideClass;
   }
-
-  return {
-    ref,
-    constructorFinder,
-  };
 }

@@ -1,6 +1,6 @@
 import ts from 'typescript';
 import { objectAccessor } from './objectAccessor.js';
-import { TransformOptions } from '../TransformOptions.js';
+import { InternalTransformOptions } from '../InternalTransformOptions.js';
 
 /**
  * generates try-catch statement with passed body
@@ -11,7 +11,7 @@ import { TransformOptions } from '../TransformOptions.js';
  *   console.warn(error);
  * }
  * */
-export function tryCatchStatement(tryStatements: ts.Statement[], transformOptions: TransformOptions) {
+export function tryCatchStatement(tryStatements: ts.Statement[], transformOptions: InternalTransformOptions) {
   const errorId = ts.factory.createIdentifier('error');
 
   return ts.factory.createTryStatement(

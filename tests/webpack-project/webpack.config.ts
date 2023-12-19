@@ -14,6 +14,7 @@ const config: Configuration = {
     case_03: path.join(packageRoot, 'src', 'case_03'),
     case_04: path.join(packageRoot, 'src', 'case_04'),
     case_05: path.join(packageRoot, 'src', 'case_05', 'index'),
+    case_06: path.join(packageRoot, 'src', 'case_06', 'index'),
   },
   output: {
     path: path.join(packageRoot, 'compiled'),

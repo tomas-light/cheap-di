@@ -1,6 +1,7 @@
 import ts from 'typescript';
 import { makeClassFinder } from './makeClassFinder.js';
 import { TransformOptions } from './TransformOptions.js';
+import { InternalTransformOptions } from './InternalTransformOptions.js';
 
 type FactoryParameters = {
   program: ts.Program;
@@ -12,12 +13,14 @@ type TransformerFactory = (
 ) => ts.TransformerFactory<ts.SourceFile>;
 
 export const transformer: TransformerFactory = (parameters, partialOptions: Partial<TransformOptions> = {}) => {
-  const transformOptions: TransformOptions = {
+  const transformOptions: InternalTransformOptions = {
     debug: false,
     addDetailsToUnknownParameters: false,
     logRegisteredMetadata: false,
     errorsLogLevel: 'warn',
     esmImports: false,
+    deepRegistration: false,
+    // registeredClasses: new Set(),
     ...partialOptions,
   };
 
