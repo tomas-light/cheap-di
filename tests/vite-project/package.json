@@ -7,8 +7,8 @@
     "dev": "vite"
   },
   "dependencies": {
-    "cheap-di": "4.0.0-rc-32",
-    "cheap-di-react": "4.1.0-rc-32",
+    "cheap-di": "4.0.1",
+    "cheap-di-react": "4.1.0",
     "package1": "0.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
@@ -18,7 +18,7 @@
     "@types/react": "^18.2.43",
     "@types/react-dom": "^18.2.17",
     "@vitejs/plugin-react": "^4.2.1",
-    "cheap-di-ts-transform": "1.0.0-rc-31",
+    "cheap-di-ts-transform": "1.0.0",
     "tslib": "2.6.2",
     "vite": "^5.0.8"
   }

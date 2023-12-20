@@ -1,28 +1,23 @@
 {
-  "name": "cheap-di-ts-transform",
-  "version": "1.0.0-rc-33",
+  "name": "@cheap-di-ts-transform/src",
+  "version": "1.0.0",
   "scripts": {
     "compile": "tsc --build tsconfig.cjs.json ./tsconfig.esm.json ./tsconfig.types.json",
     "prepare-package-json": "ts-node scripts/prepare-package-json.ts",
     "build:clean": "rimraf -rf ./dist",
     "build": "npm-run-all build:clean compile prepare-package-json"
   },
-  "dependencies": {
+  "devDependencies": {
+    "@types/node": "^20.10.5",
+    "cheap-di": "^4.0.1",
+    "rimraf": "^5.0.5",
+    "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
   },
-  "devDependencies": {
-    "@types/node": "^20.10.4",
-    "rimraf": "^5.0.5",
-    "ts-node": "^10.9.1"
-  },
   "peerDependencies": {
-    "cheap-di": ">= 4.0.0-rc-32",
-    "typescript": ">= 5.2.2"
+    "cheap-di": ">= 4.0.1",
+    "typescript": ">= 5.3.3"
   },
-  "files": ["dist/**/*", "package.json", "README.md", "LICENSE"],
-  "main": "./dist/cjs/index.js",
-  "module": "./dist/esm/index.js",
-  "types": "./dist/types/index.d.ts",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/tomas-light/cheap-di.git"
@@ -38,5 +33,20 @@
     "transformation",
     "ts plugin",
     "ts-transform"
-  ]
+  ],
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "build-instructions": {
+    "files": [
+      "cjs/**/*",
+      "esm/**/*",
+      "types/**/*",
+      "package.json",
+      "README.md",
+      "LICENSE"
+    ],
+    "main": "./cjs/index.js",
+    "module": "./esm/index.js",
+    "types": "./types/index.d.ts"
+  }
 }

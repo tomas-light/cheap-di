@@ -1,6 +1,8 @@
 {
   "workspaces": [
-    "packages/*",
+    "packages/cheap-di",
+    "packages/cheap-di-react",
+    "packages/cheap-di-ts-transform",
     "tests/*"
   ],
   "scripts": {

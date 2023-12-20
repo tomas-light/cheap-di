@@ -7,13 +7,10 @@
     "build:clean": "rimraf -rf ./dist",
     "build": "npm-run-all build:clean compile"
   },
-  "dependencies": {
-    "typescript": "5.3.3"
-  },
   "devDependencies": {
     "@types/node": "20.8.10",
     "rimraf": "5.0.5",
-    "ts-node": "10.9.1"
+    "ts-node": "10.9.2"
   },
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
