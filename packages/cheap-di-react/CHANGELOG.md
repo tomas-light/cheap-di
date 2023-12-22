@@ -1,5 +1,11 @@
 # Changelog
 
+### 4.1.1
+
+🐛 Fixed singleton instantiating issue, when it was firstly instantiated in root container, and then instantiated again in one of child containers
+🐛 Fixed possible issue with scoped singletons
+🚧 Changed type of `DiContext`, not there is nullish type `DiContextType | null` to check if it has DiProvider or not
+
 ### 4.1.0
 
 * updated cheap-di dependency to v4.0.0

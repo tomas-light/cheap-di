@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { Constructor, AbstractConstructor } from 'cheap-di';
+import { AbstractConstructor, Constructor } from 'cheap-di';
 import { DiContext } from '../DiContext.js';
 
 export function use<TInstance>(

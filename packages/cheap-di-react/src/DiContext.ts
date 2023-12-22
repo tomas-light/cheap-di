@@ -5,4 +5,4 @@ export type DiContextType = {
   container: ReactContainer | undefined;
 };
 
-export const DiContext = createContext<DiContextType>({ container: undefined });
+export const DiContext = createContext<DiContextType | null>(null);

@@ -15,6 +15,9 @@ export class ReactContainer extends ContainerImpl {
   get rootContainer() {
     return this.findRootContainer();
   }
+  get rootReactContainer() {
+    return this.findReactContainerContainer();
+  }
 
   sameParent(parentContainer?: ContainerImpl) {
     return this.parentContainer === parentContainer;
@@ -76,11 +79,20 @@ export class ReactContainer extends ContainerImpl {
     return rootContainer.singletons;
   }
 
-  private findRootContainer(): ReactContainer {
+  private findRootContainer(): ContainerImpl {
     if (this.parentContainer) {
       if (this.parentContainer instanceof ReactContainer) {
         return this.parentContainer.findRootContainer();
       }
+      return this.parentContainer;
+    }
+
+    return this;
+  }
+
+  private findReactContainerContainer(): ReactContainer {
+    if (this.parentContainer instanceof ReactContainer) {
+      return this.parentContainer.findReactContainerContainer();
     }
 
     return this;

@@ -10,10 +10,10 @@ type HookParams = {
   parentContainer?: Container;
 };
 
-function useDiContext(params: HookParams = {}) {
+export function useDiContext(params: HookParams = {}) {
   const { logger = console } = params;
 
-  const parentContainer = useContext(DiContext).container as ReactContainer;
+  const parentContainer = useContext(DiContext)?.container as ReactContainer;
 
   const [contextValue, setContextValue] = useState<DiContextType>({ container: undefined });
 
@@ -46,5 +46,3 @@ function useDiContext(params: HookParams = {}) {
 
   return contextValue;
 }
-
-export { useDiContext };

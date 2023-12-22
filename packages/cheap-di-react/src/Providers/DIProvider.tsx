@@ -93,14 +93,14 @@ const DIProvider: FC<Props> = (props) => {
     logger.log('singleton and stateful configurations');
 
     for (const [type] of reactContainer.getDependencies()) {
-      const constructor = reactContainer.localScope((container) => container.getImplementation(type));
-      if (!constructor) {
-        return;
+      const implementation = reactContainer.localScope((container) => container.getImplementation(type));
+      if (!implementation) {
+        continue;
       }
 
-      if (isSingleton(constructor as Constructor)) {
-        logger.log('singleton', constructor, 'founded');
-        // resolve type to get and register its instance
+      if (isSingleton(implementation as Constructor)) {
+        logger.log('singleton', implementation, 'founded');
+        // instantiate singleton in local scope (it may use local scope dependencies)
         reactContainer.resolve(type);
       }
     }
@@ -111,7 +111,7 @@ const DIProvider: FC<Props> = (props) => {
     ) {
       logger.log('singletons size changed, trigger root rerender');
       timerRef.current = setTimeout(() => {
-        reactContainer.rootContainer.rerender();
+        reactContainer.rootReactContainer.rerender();
       });
     }
 
