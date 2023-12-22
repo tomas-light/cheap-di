@@ -7,11 +7,14 @@
     "dev": "vite"
   },
   "dependencies": {
+    "@reduxjs/toolkit": "^2.0.1",
     "cheap-di": "4.0.1",
-    "cheap-di-react": "4.1.0",
+    "cheap-di-react": "4.1.1",
     "package1": "0.0.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "redux": "5.0.0",
+    "redux-controller-middleware": "3.0.0"
   },
   "devDependencies": {
     "@rollup/plugin-typescript": "11.1.5",

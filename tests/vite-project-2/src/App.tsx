@@ -1,25 +1,18 @@
-import { DIProviderMemo } from 'cheap-di-react';
+import { Provider } from 'react-redux';
+import { DIProviderMemo } from '@cheap-di-react/src';
 import { Component1 } from './Component1.tsx';
 import { SingletonService } from './SingletonService.ts';
 import { useEffect, useState } from 'react';
 import { container, Container } from 'cheap-di';
 import { Component2 } from './Component2.tsx';
+import { store } from './store.ts';
 
-function App() {
+export default function App() {
   const [configuredContainer, setConfiguredContainer] = useState<Container | null>(null);
 
   useEffect(() => {
-    (async () => {
-      // imitate async configuration
-      const _container = await new Promise<Container>((resolve) => {
-        setTimeout(() => {
-          container.registerImplementation(SingletonService).asSingleton();
-          resolve(container);
-        });
-      });
-
-      setConfiguredContainer(_container);
-    })();
+    container.registerImplementation(SingletonService).asSingleton();
+    setConfiguredContainer(container);
   }, []);
 
   if (!configuredContainer) {
@@ -27,11 +20,19 @@ function App() {
   }
 
   return (
-    <DIProviderMemo parentContainer={configuredContainer}>
-      <Component1 />
-      <Component2 />
-    </DIProviderMemo>
+    <Provider store={store}>
+      <DIProviderMemo parentContainer={configuredContainer}>
+        <Page />
+      </DIProviderMemo>
+    </Provider>
   );
 }
 
-export default App;
+const Page = () => {
+  return (
+    <>
+      <Component1 />
+      <Component2 />
+    </>
+  );
+};

@@ -33,6 +33,7 @@
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "build-instructions": {
+    "name": "cheap-di",
     "files": [
       "cjs/**/*",
       "esm/**/*",

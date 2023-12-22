@@ -38,7 +38,6 @@ async function copyLicense() {
 async function copyAndFixPackageJson(sourcePackageJson: Record<string, any>) {
   const modifiedPackageJson = {
     ...sourcePackageJson,
-    name: 'cheap-di',
     ...sourcePackageJson['build-instructions'],
   };
   delete modifiedPackageJson['build-instructions'];
