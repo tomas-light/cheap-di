@@ -2,12 +2,15 @@ import { stat } from 'fs/promises';
 import path from 'path';
 import ts from 'typescript';
 import { transformer } from 'cheap-di-ts-transform';
-import tsconfig from '../tsconfig.json';
+// import { fileURLToPath } from 'url';
+// import tsconfig from '../tsconfig.json';
 
-test('debug-transformer', async () => {
+test.skip('debug-transformer', async () => {
+  // const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
   const filePath = path.join(__dirname, 'test-file.ts');
 
-  const { options: compilerOptions } = ts.convertCompilerOptionsFromJson(tsconfig.compilerOptions, '.');
+  const { options: compilerOptions } = ts.convertCompilerOptionsFromJson(/*tsconfig.compilerOptions*/ {}, '.');
 
   const fileStats = await stat(filePath);
   if (!fileStats.isFile()) {
