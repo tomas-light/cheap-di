@@ -7,6 +7,6 @@
 ### Examples and tests
 
 * <a href="https://github.com/tomas-light/cheap-di/blob/master/tests/jest-test">ts-jest</a>
-* <a href="https://github.com/tomas-light/cheap-di/blob/master/tests/vite">vite</a>
+* <a href="https://github.com/tomas-light/cheap-di/blob/master/tests/vite-project">vite</a>
 * <a href="https://github.com/tomas-light/cheap-di/blob/master/tests/webpack-project">webpack commonjs</a>
 * <a href="https://github.com/tomas-light/cheap-di/blob/master/tests/webpack-project-esm">webpack esm</a>
