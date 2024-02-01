@@ -1,24 +1,27 @@
 import ts from 'typescript';
-import { ClassConstructorParameter, PrimitiveParameter } from './ClassConstructorParameter.js';
-import { correctClassParameterIfItIsValid } from './correctClassParameterIfItIsValid.js';
+import { ClassConstructorParameter, ClassParameter, PrimitiveParameter } from './ClassConstructorParameter.js';
 import { findPrimitiveTypes } from './findPrimitiveTypes.js';
 import { InternalTransformOptions } from './InternalTransformOptions.js';
 import { findConstructorDeclaration } from './findConstructorDeclaration.js';
+import { findImportedClass } from './findImportedClass.js';
+import { findNodeIdentifier } from './findNodeIdentifier.js';
+
+export type ConstructorParametersInfo = {
+  constructorParameter: ClassConstructorParameter;
+};
 
 export function findClassConstructorParameters(parameters: {
-  currentImportFrom?: string;
   typeChecker: ts.TypeChecker;
   classNode: ts.Node;
-  constructorParameters?: ClassConstructorParameter[];
   options: InternalTransformOptions;
+  addConstructorParametersInfo: (info: ConstructorParametersInfo) => void;
 }): ClassConstructorParameter[] | undefined {
   const {
     //
-    currentImportFrom,
     typeChecker,
     classNode,
-    constructorParameters = [],
     options,
+    addConstructorParametersInfo,
   } = parameters;
 
   const constructorDeclaration = findConstructorDeclaration(classNode, options);
@@ -31,7 +34,6 @@ export function findClassConstructorParameters(parameters: {
     const classConstructorParameter: ClassConstructorParameter = {
       type: 'unknown',
     };
-    constructorParameters.push(classConstructorParameter);
 
     /** handle case when some of the dependencies can be missed because of your container setup
      * class Service {
@@ -52,6 +54,11 @@ export function findClassConstructorParameters(parameters: {
         return;
       }
       if (ts.isIdentifier(parameterNode)) {
+        /** variable name
+         * @example
+         * constructor(parameter?: SomeClass)
+         * // parameterNode is 'parameter'
+         * */
         parameterNameIdentifier = parameterNode;
         return;
       }
@@ -62,29 +69,34 @@ export function findClassConstructorParameters(parameters: {
         return;
       }
 
-      const typeReferencedNode = findTypeReference(parameterNode);
-      const nodeText4 = options?.debug ? typeReferencedNode?.getFullText() : '';
-
       classConstructorParameter.name = parameterNameIdentifier.getFullText().trim();
 
-      if (typeReferencedNode) {
-        correctClassParameterIfItIsValid({
-          typeChecker,
-          tsNode: typeReferencedNode,
-          outClassConstructorParameter: classConstructorParameter,
-          currentImportFrom,
-          findClassConstructorParameters: (_parameters) => {
-            if (!options.deepRegistration) {
-              return undefined;
-            }
+      const tsReferenceNode = findTypeReference(parameterNode);
+      const nodeText4 = options?.debug ? tsReferenceNode?.getFullText() : '';
 
-            return findClassConstructorParameters({
-              typeChecker,
-              ..._parameters,
-              options,
-            });
-          },
+      if (tsReferenceNode) {
+        const { identifier, identifierSymbol, namespaceIdentifier, namespaceIdentifierSymbol } = findNodeIdentifier(
+          typeChecker,
+          tsReferenceNode
+        );
+        if (!identifier || !identifierSymbol) {
+          return;
+        }
+
+        const importedClass = findImportedClass({
+          typeChecker,
+          tsReferenceNode: tsReferenceNode,
+          identifier,
+          identifierSymbol,
+          namespaceIdentifier,
+          namespaceIdentifierSymbol,
         });
+
+        if (importedClass) {
+          const classParameter = classConstructorParameter as unknown as ClassParameter;
+          classParameter.type = 'class';
+          classParameter.importedClass = importedClass;
+        }
       } else if (options.addDetailsToUnknownParameters) {
         const primitiveTypes = findPrimitiveTypes(parameterNode);
         if (primitiveTypes.length > 0) {
@@ -94,9 +106,11 @@ export function findClassConstructorParameters(parameters: {
         }
       }
     });
-  }
 
-  return constructorParameters;
+    addConstructorParametersInfo({
+      constructorParameter: classConstructorParameter,
+    });
+  }
 }
 
 function findConstructorParameterDeclarations(

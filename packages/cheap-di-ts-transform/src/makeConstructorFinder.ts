@@ -3,22 +3,22 @@ import { ClassConstructorParameter } from './ClassConstructorParameter.js';
 import { findClassConstructorParameters } from './findClassConstructorParameters.js';
 import { InternalTransformOptions } from './InternalTransformOptions.js';
 
-export function makeConstructorFinder(
-  context: ts.TransformationContext,
-  typeChecker: ts.TypeChecker,
-  options: InternalTransformOptions
-) {
-  const ref = {
-    classLocalName: undefined as string | undefined,
-    parameters: [] as ClassConstructorParameter[],
-  };
+export type ConstructorDependenciesInformationChunk = Partial<{
+  targetClassLocalName: string | undefined;
+  constructorParameter: ClassConstructorParameter;
+}>;
 
-  return {
-    ref,
-    constructorFinder,
-  };
+export function makeConstructorFinder(params: {
+  context: ts.TransformationContext;
+  typeChecker: ts.TypeChecker;
+  options: InternalTransformOptions;
+  addConstructorDependenciesInformation: (infoChunk: ConstructorDependenciesInformationChunk) => void;
+}) {
+  const { context, typeChecker, options, addConstructorDependenciesInformation } = params;
 
-  function constructorFinder(nodeInsideClass: ts.Node): ts.Node {
+  let identifier: ts.Identifier | undefined;
+
+  return function constructorFinder(nodeInsideClass: ts.Node): ts.Node {
     const nodeText = options?.debug ? nodeInsideClass.getFullText() : '';
 
     /**
@@ -33,8 +33,11 @@ export function makeConstructorFinder(
 
     if (ts.isIdentifier(nodeInsideClass)) {
       // first identifier in class is a class identifier (class reference)
-      if (!ref.classLocalName) {
-        ref.classLocalName = nodeInsideClass.getFullText().trim();
+      if (!identifier) {
+        identifier = nodeInsideClass;
+        addConstructorDependenciesInformation({
+          targetClassLocalName: nodeInsideClass.getFullText().trim(),
+        });
       }
       return nodeInsideClass;
     }
@@ -43,13 +46,15 @@ export function makeConstructorFinder(
       return ts.visitEachChild(nodeInsideClass, constructorFinder, context);
     }
 
+    const constructorDeclaration = nodeInsideClass;
+
     findClassConstructorParameters({
       typeChecker,
-      classNode: nodeInsideClass,
-      constructorParameters: ref.parameters,
+      classNode: constructorDeclaration,
+      addConstructorParametersInfo: addConstructorDependenciesInformation,
       options,
     });
 
-    return nodeInsideClass;
-  }
+    return constructorDeclaration;
+  };
 }

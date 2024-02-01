@@ -1,6 +1,3 @@
-import { TransformOptions } from './TransformOptions.js';
-import ts from 'typescript';
+import { TransformOptions } from './TransformOptions';
 
-export type InternalTransformOptions = TransformOptions & {
-  // registeredClasses: Set<ts.Identifier>;
-};
+export type InternalTransformOptions = TransformOptions;

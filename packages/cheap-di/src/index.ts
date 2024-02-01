@@ -1,19 +1,19 @@
-export * from './cheapDiSymbol.js';
-export * from './CircularDependencyError.js';
-export * from './ContainerImpl.js';
-export * from './decorators/inject.js';
-export * from './metadata.js';
-export * from './isSingleton.js';
-export * from './Trace.js';
-export * from './types.js';
+export * from './cheapDiSymbol';
+export * from './CircularDependencyError';
+export * from './ContainerImpl';
+export * from './decorators/inject';
+export * from './metadata';
+export * from './isSingleton';
+export * from './Trace';
+export * from './types';
 
-import { cheapDiSymbol } from './cheapDiSymbol.js';
-import { CircularDependencyError } from './CircularDependencyError.js';
-import { container, ContainerImpl } from './ContainerImpl.js';
-import { inject } from './decorators/inject.js';
-import { findMetadata, findOrCreateMetadata, saveConstructorMetadata, createConstructorMetadata } from './metadata.js';
-import { isSingleton } from './isSingleton.js';
-import { Trace } from './Trace.js';
+import { cheapDiSymbol } from './cheapDiSymbol';
+import { CircularDependencyError } from './CircularDependencyError';
+import { container, ContainerImpl } from './ContainerImpl';
+import { inject } from './decorators/inject';
+import { findMetadata, findOrCreateMetadata, saveConstructorMetadata, createConstructorMetadata } from './metadata';
+import { isSingleton } from './isSingleton';
+import { Trace } from './Trace';
 
 export default {
   cheapDiSymbol,

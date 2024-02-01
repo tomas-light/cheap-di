@@ -1,4 +1,5 @@
 import { ImportType } from './findImports.js';
+import ts from 'typescript';
 
 export type ClassConstructorParameter = UnknownParameter | PrimitiveParameter | ClassParameter;
 
@@ -28,7 +29,7 @@ export interface PrimitiveParameter {
 export interface ClassParameter {
   type: 'class';
   name?: string | undefined;
-  classReference?: LocalClass | ImportedClass;
+  importedClass?: ImportedClass | ExistedImport;
 }
 
 export function isClassParameter(parameter: ClassConstructorParameter): parameter is ClassParameter {
@@ -39,24 +40,30 @@ export function isPrimitiveParameter(parameter: ClassConstructorParameter): para
   return parameter.type === 'primitive';
 }
 
-export interface LocalClass {
-  /**
-   * @example
-   * import { MyClass as Some } from "./myClass"; // => "Some"
-   * */
-  localName: string;
+export interface ExistedImport {
+  existedId: ts.Identifier;
 }
 
-export function isLocalClass(classReference: LocalClass | ImportedClass): classReference is LocalClass {
-  return ('localName' satisfies keyof LocalClass) in classReference;
+export function isExistedImport(importedClass: ImportedClass | ExistedImport): importedClass is ExistedImport {
+  return (importedClass as ExistedImport).existedId != null;
 }
 
 export interface ImportedClass {
   /**
    * @example
-   * import { MyClass } from "./myClass"; // => "MyClass"
+   * import { MyClass as Some } from "./myClass"; // => id of "Some"
+   * import { MyClass } from "./myClass"; // => undefined
+   * import Some from "./myClass"; // => undefined
    * */
-  classNameInImport: string;
+  namedAsClassId: ts.Identifier | undefined;
+
+  /**
+   * @example
+   * import { MyClass as Some } from "./myClass"; // => id of "MyClass"
+   * import Some from "./myClass"; // => id of "MyClass"
+   * */
+  classId: ts.Identifier;
+
   /**
    * @example
    * import { ... } from "react"; // => "react"
@@ -70,14 +77,4 @@ export interface ImportedClass {
    * import react from "react"; // => "default"
    * */
   importType: ImportType;
-
-  /** if imported dependency has its own dependencies in its package we have to get them all as well */
-  constructorParameters?: ClassConstructorParameter[];
-}
-
-export function isImportedClass(classReference: LocalClass | ImportedClass): classReference is ImportedClass {
-  return (
-    ('classNameInImport' satisfies keyof ImportedClass) in classReference ||
-    ('importedFrom' satisfies keyof ImportedClass) in classReference
-  );
 }

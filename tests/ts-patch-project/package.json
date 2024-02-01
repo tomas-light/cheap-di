@@ -1,0 +1,42 @@
+{
+  "name": "@tests/ts-patch-project",
+  "version": "0.0.0",
+  "scripts": {
+    "// live": "",
+    "ts-test:1": "ts-node src/case-01-single-file.ts",
+    "ts-test:2": "ts-node src/case-02-single-file-dependencies-of-extended-class.ts",
+    "ts-test:3": "ts-node src/case-03-external-named-import.ts",
+    "ts-test:4": "ts-node src/case-04-external-default-import.ts",
+    "ts-test:5": "ts-node src/case-05-external-combined-import.ts",
+    "ts-test:6": "ts-node src/case-06-local-imports/index.ts",
+    "ts-test:7": "ts-node src/case-07-multiple-extends-of-local-import/index.ts",
+    "ts-test:8": "ts-node src/case-08-multiple-usings-of-the-same-imports-in-single-file.ts",
+    "ts-test:9": "ts-node src/case-09-namespace-import.ts",
+    "// compiled": "",
+    "test:1": "node compiled/case-01-single-file.js",
+    "test:2": "node compiled/case-02-single-file-dependencies-of-extended-class.js",
+    "test:3": "node compiled/case-03-external-named-import.js",
+    "test:4": "node compiled/case-04-external-default-import.js",
+    "test:5": "node compiled/case-05-external-combined-import.js",
+    "test:6": "node compiled/case-06-local-imports/index.js",
+    "test:7": "node compiled/case-07-multiple-extends-of-local-import/index.js",
+    "test:8": "node compiled/case-08-multiple-usings-of-the-same-imports-in-single-file.js",
+    "test:9": "node compiled/case-09-namespace-import.js",
+    "//": "",
+    "build": "rimraf ./compiled && tspc --build"
+  },
+  "dependencies": {
+    "axios": "1.6.2",
+    "cheap-di": "workspace:^",
+    "cheap-di-ts-transform": "workspace:^",
+    "package1": "0.0.0",
+    "typescript": "^5"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "cheap-di-ts-transform": "workspace:^",
+    "rimraf": "^5.0.5",
+    "ts-node": "^10",
+    "ts-patch": "3.1.1"
+  }
+}

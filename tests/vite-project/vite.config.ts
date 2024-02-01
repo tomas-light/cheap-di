@@ -20,8 +20,6 @@ const viteConfig = defineConfig({
                   addDetailsToUnknownParameters: true,
                   logRegisteredMetadata: true,
                   errorsLogLevel: 'debug',
-                  esmImports: true,
-                  deepRegistration: true,
                 }
               ),
           },
