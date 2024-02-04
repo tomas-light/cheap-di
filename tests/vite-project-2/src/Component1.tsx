@@ -1,6 +1,6 @@
 import { FC, useMemo } from 'react';
 import { SingletonService } from './SingletonService.ts';
-import { use } from '@cheap-di-react/src';
+import { use } from 'cheap-di-react';
 import { useDispatch } from 'react-redux';
 import { updateToken } from './updateToken.ts';
 

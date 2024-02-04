@@ -1,5 +1,5 @@
 import { Provider } from 'react-redux';
-import { DIProviderMemo } from '@cheap-di-react/src';
+import { DIProviderMemo } from 'cheap-di-react';
 import { Component1 } from './Component1.tsx';
 import { SingletonService } from './SingletonService.ts';
 import { useEffect, useState } from 'react';

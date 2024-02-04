@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { SingletonService } from './SingletonService.ts';
-import { use } from '@cheap-di-react/src';
+import { use } from 'cheap-di-react';
 
 export const Component2: FC = () => {
   const singletonService = use(SingletonService);

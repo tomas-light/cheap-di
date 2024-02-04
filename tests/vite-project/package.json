@@ -4,22 +4,25 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
     "cheap-di": "4.0.1",
-    "cheap-di-react": "4.1.0",
+    "cheap-di-react": "4.1.1",
     "package1": "0.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "@rollup/plugin-typescript": "11.1.5",
-    "@types/react": "^18.2.43",
-    "@types/react-dom": "^18.2.17",
+    "@rollup/plugin-typescript": "11.1.6",
+    "@types/react": "^18.2.51",
+    "@types/react-dom": "^18.2.18",
     "@vitejs/plugin-react": "^4.2.1",
-    "cheap-di-ts-transform": "1.0.0",
+    "cheap-di-ts-transform": "workspace:^",
+    "cross-env": "^7.0.3",
     "tslib": "2.6.2",
-    "vite": "^5.0.8"
+    "vite": "^5.0.12"
   }
 }

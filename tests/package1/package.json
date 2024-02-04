@@ -8,9 +8,9 @@
     "build": "npm-run-all build:clean compile"
   },
   "devDependencies": {
-    "@types/node": "20.8.10",
-    "rimraf": "5.0.5",
-    "ts-node": "10.9.2"
+    "@types/node": "^20",
+    "rimraf": "^5",
+    "ts-node": "^10"
   },
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",

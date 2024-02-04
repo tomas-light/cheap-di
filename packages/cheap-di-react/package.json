@@ -1,5 +1,5 @@
 {
-  "name": "@cheap-di-react/src",
+  "name": "cheap-di-react",
   "version": "4.1.1",
   "description": "Dependency injection based on cheap-di for using in React components with React Context",
   "scripts": {
@@ -12,10 +12,14 @@
     "@testing-library/jest-dom": "^6.1.5",
     "@testing-library/react": "^14.1.2",
     "@types/jest": "^29.5.11",
+    "@types/node": "^20",
     "@types/react": "^18.2.38",
     "cheap-di": "^4.0.1",
+    "npm-run-all": "^4",
     "react": "^18.2.0",
-    "typescript": "^5.3.3"
+    "rimraf": "^5",
+    "ts-node": "^10",
+    "typescript": "^5"
   },
   "peerDependencies": {
     "cheap-di": ">= 4.0.1",
