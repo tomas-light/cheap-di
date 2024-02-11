@@ -33,7 +33,9 @@ const viteConfig = defineConfig({
 
 const vitestConfig = defineVitestConfig({
   test: {
+    globals: true,
     environment: 'jsdom',
+    setupFiles: './src/tests/setup-react.ts',
     include: ['**.test.{tsx,ts}'],
   },
 });

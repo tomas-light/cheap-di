@@ -11,7 +11,9 @@ test('singleton', async () => {
   expect(entity1).toBe(entity2);
 });
 
-describe('nested containers', () => {
+// because cheap-di-ts-transformer adds `await import(...)` after class declaration with injected dependencies,
+// and `await` keyword may be used only inside `async` function
+describe('nested containers', async () => {
   abstract class Service {
     abstract some(): string;
   }

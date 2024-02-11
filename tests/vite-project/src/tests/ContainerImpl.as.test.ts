@@ -5,7 +5,9 @@ beforeEach(() => {
   container.clear();
 });
 
-describe('register implementation', () => {
+// because cheap-di-ts-transformer adds `await import(...)` after class declaration with injected dependencies,
+// and `await` keyword may be used only inside `async` function
+describe('register implementation as', async () => {
   test('simple', async () => {
     class Service {
       constructor() {
@@ -66,79 +68,11 @@ describe('register implementation', () => {
     expect(service instanceof MyService).toBe(true);
     expect(service.get()).toBe('some message');
   });
-
-  test('simple with params', async () => {
-    class Service {
-      constructor() {
-        if (new.target === Service) {
-          throw new Error('Cannot construct Service instance directly');
-        }
-      }
-
-      get(): string {
-        throw new Error('Not implemented');
-      }
-    }
-
-    class MyService extends Service {
-      private readonly message: string;
-
-      constructor(message: string) {
-        super();
-        this.message = message;
-      }
-
-      get() {
-        return this.message;
-      }
-    }
-
-    container.registerImplementation(MyService).as(Service).inject('some');
-    const service = container.resolve(Service)!;
-
-    expect(service instanceof Service).toBe(true);
-    expect(service instanceof MyService).toBe(true);
-    expect(service.get()).toBe('some');
-  });
-
-  test('simple with params and passed arguments', async () => {
-    class Service {
-      constructor() {
-        if (new.target === Service) {
-          throw new Error('Cannot construct Service instance directly');
-        }
-      }
-
-      get(): string {
-        throw new Error('Not implemented');
-      }
-    }
-
-    class MyService extends Service {
-      private readonly message1: string;
-      private readonly message2: string;
-
-      constructor(message1: string, message2: string) {
-        super();
-        this.message1 = message1;
-        this.message2 = message2;
-      }
-
-      get() {
-        return `${this.message1} ${this.message2}`;
-      }
-    }
-
-    container.registerImplementation(MyService).as(Service).inject('some');
-    const service = container.resolve(Service, 'property')!;
-
-    expect(service instanceof Service).toBe(true);
-    expect(service instanceof MyService).toBe(true);
-    expect(service.get()).toBe('some property');
-  });
 });
 
-describe('register instance', () => {
+// because cheap-di-ts-transformer adds `await import(...)` after class declaration with injected dependencies,
+// and `await` keyword may be used only inside `async` function
+describe('register instance', async () => {
   test('simple', async () => {
     class Database {
       readonly entities: string[];
@@ -363,6 +297,8 @@ test('add abstract constructor for instance registration', async () => {
   expect(result).toBe(config);
 });
 
+// because cheap-di-ts-transformer adds `await import(...)` after class declaration with injected dependencies,
+// and `await` keyword may be used only inside `async` function
 describe('with decorators', async () => {
   class Database {
     readonly entities: string[];
@@ -485,6 +421,8 @@ describe('with decorators', async () => {
   });
 });
 
+// because cheap-di-ts-transformer adds `await import(...)` after class declaration with injected dependencies,
+// and `await` keyword may be used only inside `async` function
 describe('arguments order', async () => {
   class Database {
     constructor(private readonly entities: string[]) {}

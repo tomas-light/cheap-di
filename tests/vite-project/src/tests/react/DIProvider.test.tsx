@@ -1,14 +1,20 @@
 import { DependencyRegistrator } from 'cheap-di';
 import { DIProvider, DIProviderMemo, use } from 'cheap-di-react';
-import { act, fireEvent, render } from '@testing-library/react';
-import { describe, expect, test } from 'vitest';
+import { act, fireEvent, render, cleanup, screen } from '@testing-library/react';
+import { describe, expect, test, afterEach } from 'vitest';
+
+afterEach(() => {
+  cleanup();
+});
 
 test('use jsdom in this test file', async () => {
   const element = document.createElement('div');
   expect(element).not.toBeNull();
 });
 
-describe('base cases', () => {
+// because cheap-di-ts-transformer adds `await import(...)` after class declaration with injected dependencies,
+// and `await` keyword may be used only inside `async` function
+describe('base cases', async () => {
   abstract class Logger {
     abstract debug(message: string): string;
   }
