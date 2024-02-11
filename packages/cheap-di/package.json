@@ -5,12 +5,13 @@
   "type": "module",
   "scripts": {
     "compile": "tsc --build tsconfig.cjs.json ./tsconfig.esm.json ./tsconfig.types.json",
-    "prepare-package-json": "ts-node scripts/prepare-package-json.ts",
+    "prepare-package-json": "cross-env NODE_OPTIONS=\"--loader ts-node/esm --disable-warning ExperimentalWarning\" ts-node scripts/prepare-package-json.ts",
     "build:clean": "rimraf -rf ./dist",
     "build": "npm-run-all build:clean compile prepare-package-json"
   },
   "devDependencies": {
     "@types/node": "^20",
+    "cross-env": "^7.0.3",
     "npm-run-all": "^4",
     "rimraf": "^5",
     "ts-node": "^10",
@@ -29,8 +30,11 @@
     "dependency injection",
     "cheap di"
   ],
-  "main": "./src/index.ts",
-  "types": "./src/index.ts",
+  "_main": "./src/index.ts",
+  "_types": "./src/index.ts",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
   "build-instructions": {
     "name": "cheap-di",
     "files": [

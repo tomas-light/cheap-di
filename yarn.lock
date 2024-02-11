@@ -835,7 +835,7 @@ __metadata:
     "@types/react": "npm:18.2.35"
     "@types/react-dom": "npm:18.2.14"
     axios: "npm:1.6.2"
-    cheap-di: "npm:4.0.1"
+    cheap-di: "npm:4.1.0"
     cheap-di-ts-transform: "npm:1.0.0"
     cross-env: "npm:7.0.3"
     html-webpack-plugin: "npm:^5.5.4"
@@ -858,7 +858,7 @@ __metadata:
     "@types/react": "npm:18.2.35"
     "@types/react-dom": "npm:18.2.14"
     axios: "npm:1.6.2"
-    cheap-di: "npm:4.0.1"
+    cheap-di: "npm:4.1.0"
     cheap-di-ts-transform: "workspace:^"
     cross-env: "npm:7.0.3"
     package1: "npm:0.0.0"
@@ -2053,18 +2053,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"cheap-di@npm:4.0.1":
-  version: 4.0.1
-  resolution: "cheap-di@npm:4.0.1"
-  checksum: 10c0/9dcd71dd3396359cdbc0c00771ad3035fb4d8de6d50a8d8dd1f5ebd7fe09b75733ea5a2dda86f498698648768acc871bd2ea2222e9ce0d537e8eec77516a2eaf
-  languageName: node
-  linkType: hard
-
 "cheap-di@npm:4.1.0, cheap-di@npm:^4.0.1, cheap-di@workspace:packages/cheap-di":
   version: 0.0.0-use.local
   resolution: "cheap-di@workspace:packages/cheap-di"
   dependencies:
     "@types/node": "npm:^20"
+    cross-env: "npm:^7.0.3"
     npm-run-all: "npm:^4"
     rimraf: "npm:^5"
     ts-node: "npm:^10"
@@ -4974,6 +4968,7 @@ __metadata:
   resolution: "package1@workspace:tests/package1"
   dependencies:
     "@types/node": "npm:^20"
+    cheap-di: "npm:4.1.0"
     npm-run-all: "npm:^4"
     rimraf: "npm:^5"
     ts-node: "npm:^10"

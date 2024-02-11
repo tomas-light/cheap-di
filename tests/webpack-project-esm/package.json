@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "axios": "1.6.2",
-    "cheap-di": "4.0.1",
+    "cheap-di": "4.1.0",
     "cheap-di-ts-transform": "1.0.0",
     "package1": "0.0.0",
     "react": "18.2.0",

@@ -1,5 +1,8 @@
-import { readdir, readFile, writeFile } from 'fs/promises';
+import { readdir, readFile, writeFile, copyFile } from 'fs/promises';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const paths = {
   project: path.join(__dirname, '..'),
@@ -25,15 +28,6 @@ const paths = {
     return path.join(this.dist, 'package.json');
   },
 };
-
-async function copyReadme() {
-  const readmeContent = await readFile(paths.readme, 'utf-8');
-  await writeFile(paths.distReadme, readmeContent);
-}
-async function copyLicense() {
-  const licenseContent = await readFile(paths.license, 'utf-8');
-  await writeFile(paths.distLicense, licenseContent);
-}
 
 async function copyAndFixPackageJson(sourcePackageJson: Record<string, any>) {
   const modifiedPackageJson = {
@@ -77,9 +71,8 @@ async function createEsmModulePackageJson(sourcePackageJson: Record<string, any>
 (async () => {
   const sourcePackageJsonString = await readFile(paths.packageJson, 'utf-8');
   const sourcePackageJson = JSON.parse(sourcePackageJsonString);
-
-  await copyReadme();
-  await copyLicense();
+  await copyFile(paths.readme, paths.distReadme);
+  await copyFile(paths.license, paths.distLicense);
   await copyAndFixPackageJson(sourcePackageJson);
   await createEsmModulePackageJson(sourcePackageJson);
 })();

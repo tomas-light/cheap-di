@@ -13,8 +13,8 @@
     ],
     "listEmittedFiles": false,
     "listFiles": false,
-    "module": "CommonJS",
-    "moduleResolution": "node",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
     "noErrorTruncation": true,
     "noFallthroughCasesInSwitch": true,
     "outDir": "./dist",
@@ -29,5 +29,6 @@
   "exclude": ["node_modules", "dist"],
   "include": [
     "src"
-  ]
+  ],
+  "references": [{ "path": "./tsconfig.node.json" }]
 }
