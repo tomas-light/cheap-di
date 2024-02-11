@@ -3,7 +3,7 @@ import { DIProvider, DIProviderMemo, use } from 'cheap-di-react';
 import { act, fireEvent, render } from '@testing-library/react';
 import { describe, expect, test } from 'vitest';
 
-test('use jsdom in this test file', () => {
+test('use jsdom in this test file', async () => {
   const element = document.createElement('div');
   expect(element).not.toBeNull();
 });
@@ -33,7 +33,7 @@ describe('base cases', () => {
     }
   }
 
-  test('register type', () => {
+  test('register type', async () => {
     const Component = () => {
       const logger = use(SomeConsoleLogger);
       return <p>{logger.debug('another layout')}</p>;
@@ -49,7 +49,7 @@ describe('base cases', () => {
     expect(queryByText('another layout')).toBeInTheDocument();
   });
 
-  test('register type as base type', () => {
+  test('register type as base type', async () => {
     const Component = () => {
       const logger = use(Logger);
       return <p>{logger.debug('my layout')}</p>;
@@ -65,7 +65,7 @@ describe('base cases', () => {
     expect(queryByText('my layout')).toBeInTheDocument();
   });
 
-  test('register type as base type with injection params', () => {
+  test('register type as base type with injection params', async () => {
     const Component = () => {
       const logger = use(Logger);
       return <p>{logger.debug('my layout')}</p>;
@@ -81,7 +81,7 @@ describe('base cases', () => {
     expect(queryByText('my message: my layout')).toBeInTheDocument();
   });
 
-  test('register instance', () => {
+  test('register instance', async () => {
     class Database {
       readonly entities: string[];
 
@@ -114,7 +114,7 @@ describe('base cases', () => {
     expect(queryByText(entities[1])).toBeInTheDocument();
   });
 
-  test('nested providers', () => {
+  test('nested providers', async () => {
     const Component = () => {
       const logger = use(Logger);
       return <p>{logger.debug('my layout')}</p>;

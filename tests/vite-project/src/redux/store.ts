@@ -1,9 +1,13 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import { container } from 'cheap-di';
-import { controllerMiddleware } from 'redux-controller-middleware';
+import { controllerMiddleware, getReducersFromStoreSlices, storeSlice } from 'redux-controller-middleware';
+
+// just to turn off redux warning about empty reducers list
+@storeSlice
+class EmptySlice {}
 
 export const store = configureStore({
-  reducer: combineReducers({}),
+  reducer: combineReducers(getReducersFromStoreSlices({ empty: EmptySlice })),
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: false,

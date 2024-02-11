@@ -9,8 +9,10 @@
   },
   "devDependencies": {
     "@types/node": "^20",
+    "npm-run-all": "^4",
     "rimraf": "^5",
-    "ts-node": "^10"
+    "ts-node": "^10",
+    "typescript": "^5"
   },
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",

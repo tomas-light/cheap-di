@@ -1,5 +1,5 @@
 import { createReducer } from 'redux-controller-middleware';
-import { SingletonService } from './SingletonService.ts';
+import { SingletonService } from '../models/SingletonService.ts';
 
 export const updateToken = createReducer('update token', ({ container }) => {
   const singletonService = container?.resolve(SingletonService);

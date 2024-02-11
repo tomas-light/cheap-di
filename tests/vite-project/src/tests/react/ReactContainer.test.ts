@@ -1,7 +1,7 @@
 import { ReactContainer } from 'cheap-di-react';
 import { describe, expect, test } from 'vitest';
 
-test('singleton', () => {
+test('singleton', async () => {
   class Service {}
 
   const container = new ReactContainer();
@@ -42,20 +42,20 @@ describe('nested containers', () => {
 
   container1.registerImplementation(Service1).as(Service);
 
-  test('container 1 -> 3', () => {
+  test('container 1 -> 3', async () => {
     const consumer = container3.resolve(Consumer);
     expect(consumer instanceof Consumer).toBe(true);
     expect(consumer!.do()).toBe('service 1');
   });
 
-  test('container 2 overrides container 1', () => {
+  test('container 2 overrides container 1', async () => {
     container2.registerImplementation(Service2).as(Service);
     const consumer = container3.resolve(Consumer);
     expect(consumer instanceof Consumer).toBe(true);
     expect(consumer!.do()).toBe('service 2');
   });
 
-  test('singleton resolving', () => {
+  test('singleton resolving', async () => {
     class Database {
       readonly entities: string[];
 

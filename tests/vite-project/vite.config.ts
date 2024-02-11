@@ -1,9 +1,10 @@
-import { defineConfig } from 'vite';
+import { defineConfig, mergeConfig } from 'vite';
+import { defineConfig as defineVitestConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import typescript from '@rollup/plugin-typescript';
 import { transformer } from 'cheap-di-ts-transform';
 
-export default defineConfig({
+const viteConfig = defineConfig({
   plugins: [
     react(),
     typescript({
@@ -29,3 +30,12 @@ export default defineConfig({
     }),
   ],
 });
+
+const vitestConfig = defineVitestConfig({
+  test: {
+    environment: 'jsdom',
+    include: ['**.test.{tsx,ts}'],
+  },
+});
+
+export default mergeConfig(viteConfig, vitestConfig);

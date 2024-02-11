@@ -6,7 +6,7 @@ beforeEach(() => {
 });
 
 describe('register type', () => {
-  test('simple', () => {
+  test('simple', async () => {
     class Service {
       constructor() {
         if (new.target === Service) {
@@ -33,7 +33,7 @@ describe('register type', () => {
     expect(service.get()).toBe('some');
   });
 
-  test('simple with passed arguments', () => {
+  test('simple with passed arguments', async () => {
     class Service {
       constructor() {
         if (new.target === Service) {
@@ -67,7 +67,7 @@ describe('register type', () => {
     expect(service.get()).toBe('some message');
   });
 
-  test('simple with params', () => {
+  test('simple with params', async () => {
     class Service {
       constructor() {
         if (new.target === Service) {
@@ -101,7 +101,7 @@ describe('register type', () => {
     expect(service.get()).toBe('some');
   });
 
-  test('simple with params and passed arguments', () => {
+  test('simple with params and passed arguments', async () => {
     class Service {
       constructor() {
         if (new.target === Service) {
@@ -139,7 +139,7 @@ describe('register type', () => {
 });
 
 describe('register instance', () => {
-  test('simple', () => {
+  test('simple', async () => {
     class Database {
       readonly entities: string[];
 
@@ -160,7 +160,7 @@ describe('register instance', () => {
     expect(database.list()).toBe(entities);
   });
 
-  test('as other', () => {
+  test('as other', async () => {
     class Service {
       readonly entities: string[];
 
@@ -240,20 +240,20 @@ describe('resolving several dependencies', () => {
   container.registerImplementation(MyApi);
 
   const myApi = container.resolve(MyApi);
-  test('api resolved', () => {
+  test('api resolved', async () => {
     expect(myApi).not.toBe(null);
   });
-  test('api has passed parameter', () => {
+  test('api has passed parameter', async () => {
     expect(myApi!.interceptor).not.toBe(null);
     expect(myApi!.interceptor!.dispatch).not.toBe(null);
   });
-  test('api method works', () => {
+  test('api method works', async () => {
     expect(myApi!.getData()).toBe('123-456');
     expect(dispatch).toBeCalledTimes(1);
   });
 });
 
-test('asSingleton', () => {
+test('asSingleton', async () => {
   class Service {}
 
   container.registerImplementation(Service).asSingleton();
@@ -263,7 +263,7 @@ test('asSingleton', () => {
 });
 
 describe('nested resolve', () => {
-  test('resolve service', () => {
+  test('resolve service', async () => {
     class Database {
       readonly entities: string[];
 
@@ -307,7 +307,7 @@ describe('nested resolve', () => {
     expect(list).toEqual(['entity 1', 'entity 2', 'service entity']);
   });
 
-  test('auto resolve service', () => {
+  test('auto resolve service', async () => {
     class Database {
       readonly entities: string[];
 
@@ -347,7 +347,7 @@ describe('nested resolve', () => {
   });
 });
 
-test('add abstract constructor for instance registration', () => {
+test('add abstract constructor for instance registration', async () => {
   abstract class Config {
     abstract message: string;
   }
@@ -408,7 +408,7 @@ describe('with decorators', () => {
     container.clear();
   });
 
-  test('with inject decorator', () => {
+  test('with inject decorator', async () => {
     class _Repository extends Repository {
       constructor(db: Database) {
         super(db);
@@ -424,7 +424,7 @@ describe('with decorators', () => {
     check(_Service);
   });
 
-  test('with di decorator', () => {
+  test('with di decorator', async () => {
     class _Repository extends Repository {
       constructor(db: Database) {
         super(db);
@@ -440,7 +440,7 @@ describe('with decorators', () => {
     check(_Service);
   });
 
-  test('resolve service', () => {
+  test('resolve service', async () => {
     class Database {
       readonly entities: string[];
 
@@ -555,7 +555,7 @@ describe('arguments order', () => {
     container.clear();
   });
 
-  test('case 1', () => {
+  test('case 1', async () => {
     class Service1 extends Service {
       constructor(
         public repository: Repository,
@@ -577,7 +577,7 @@ describe('arguments order', () => {
     check(Service1);
   });
 
-  test('case 2', () => {
+  test('case 2', async () => {
     class Service2 extends Service {
       constructor(
         public repository: Repository,
@@ -599,7 +599,7 @@ describe('arguments order', () => {
     check(Service2 as any);
   });
 
-  test('case 3', () => {
+  test('case 3', async () => {
     class Service3 extends Service {
       constructor(
         message: string,
@@ -621,7 +621,7 @@ describe('arguments order', () => {
     check(Service3 as any);
   });
 
-  test('case 4', () => {
+  test('case 4', async () => {
     class Service4 extends Service {
       constructor(
         message: string,
@@ -643,7 +643,7 @@ describe('arguments order', () => {
     check(Service4 as any);
   });
 
-  test('case 5', () => {
+  test('case 5', async () => {
     class Service5 extends Service {
       constructor(
         message: string,
@@ -665,7 +665,7 @@ describe('arguments order', () => {
     check(Service5 as any);
   });
 
-  test('case 6', () => {
+  test('case 6', async () => {
     class AnotherService {
       constructor(private num: number) {}
 

@@ -21,7 +21,7 @@ describe('[function] use', () => {
     }
   }
 
-  test('it should get singleton from parent container', () => {
+  test('it should get singleton from parent container', async () => {
     const Component = ({ name }: { name: string }) => {
       const logger = use(Logger);
       return <p>{logger.debug(name)} </p>;
