@@ -1,4 +1,5 @@
 import { container } from 'cheap-di';
+import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 beforeEach(() => {
   container.clear();
@@ -234,7 +235,7 @@ describe('resolving several dependencies', () => {
     }
   }
 
-  const dispatch = jest.fn();
+  const dispatch = vi.fn();
   container.registerImplementation(ApiInterceptor).inject(dispatch);
   container.registerImplementation(MyApi);
 

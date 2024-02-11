@@ -1,4 +1,5 @@
 import { ReactContainer } from 'cheap-di-react';
+import { describe, expect, test } from 'vitest';
 
 test('singleton', () => {
   class Service {}

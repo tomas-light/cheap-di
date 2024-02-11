@@ -1,4 +1,5 @@
 import { container } from 'cheap-di';
+import { beforeEach, expect, test } from 'vitest';
 
 beforeEach(() => {
   container.clear();

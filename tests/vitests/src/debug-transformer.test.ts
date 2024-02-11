@@ -2,6 +2,7 @@ import { stat } from 'fs/promises';
 import path from 'path';
 import ts from 'typescript';
 import { transformer } from 'cheap-di-ts-transform';
+import { test } from 'vitest';
 // import { fileURLToPath } from 'url';
 // import tsconfig from '../tsconfig.json';
 

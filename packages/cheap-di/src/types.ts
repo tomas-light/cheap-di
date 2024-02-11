@@ -29,29 +29,44 @@ interface DiMetadata {
 
 type RegistrationType<TInstance> = Constructor<TInstance> | AbstractConstructor<TInstance>;
 
-interface WithInjectionParams {
+type AsBase<TClass, ReturnType> = <TBase extends Partial<TClass>>(type: RegistrationType<TBase>) => ReturnType;
+
+type AsSingleton<TClass, ReturnType> = <TBase extends Partial<TClass>>(type?: RegistrationType<TBase>) => ReturnType;
+
+type Enrich<TInstance, ReturnType> = <EnrichedInstance extends TInstance>(
+  enrichCallback: (instance: TInstance) => EnrichedInstance
+) => ReturnType;
+
+type Inject<ReturnType> = (...injectionParams: any[]) => ReturnType;
+
+interface RegisteredImplementation<TClass> {
+  /** as super class */
+  as: AsBase<TClass, this>;
+  /** as singleton (optionally super class) */
+  asSingleton: AsSingleton<TClass, this>;
+  /** enrich instance when it will be resolved, example, if you want to wrap instance with Proxy */
+  enrich: Enrich<TClass, this>;
   /** add parameters that will be passed to the class constructor */
-  inject: (...injectionParams: any[]) => void;
+  inject: Inject<this>;
+}
+
+interface RegisteredInstance<TInstance> {
+  /** or register the object as any class */
+  as: AsBase<TInstance, this>;
+  /** enrich instance when it will be resolved, example, if you want to wrap instance with Proxy */
+  enrich: Enrich<TInstance, this>;
 }
 
 interface DependencyRegistrator<RegisterTypeExtension = object, RegisterInstanceExtension = object> {
   /** register implementation class */
-  registerImplementation: <TClass>(implementationType: Constructor<TClass>) => {
-    /** as super class */
-    as: <TBase extends Partial<TClass>>(type: RegistrationType<TBase>) => WithInjectionParams;
-
-    /** as singleton (optionally super class) */
-    asSingleton: <TBase extends Partial<TClass>>(type?: RegistrationType<TBase>) => WithInjectionParams;
-  } & WithInjectionParams &
-    RegisterTypeExtension;
+  registerImplementation: <TClass>(
+    implementationType: Constructor<TClass>
+  ) => RegisteredImplementation<TClass> & RegisterTypeExtension;
 
   /** register any object as it constructor */
   registerInstance: <TInstance extends object>(
     instance: TInstance
-  ) => {
-    /** or register the object as any class */
-    as: <TBase extends Partial<TInstance>>(type: RegistrationType<TBase>) => void;
-  } & RegisterInstanceExtension;
+  ) => RegisteredInstance<TInstance> & RegisterInstanceExtension;
 }
 
 type Resolver = <TInstance>(
@@ -95,5 +110,10 @@ export type {
   ImplementationType,
   RegistrationType,
   SomeDependency,
-  WithInjectionParams,
+  RegisteredImplementation,
+  RegisteredInstance,
+  AsBase,
+  AsSingleton,
+  Enrich,
+  Inject,
 };

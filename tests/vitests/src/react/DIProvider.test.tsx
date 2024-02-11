@@ -1,7 +1,7 @@
 import { DependencyRegistrator } from 'cheap-di';
 import { DIProvider, DIProviderMemo, use } from 'cheap-di-react';
-import { render, fireEvent, act } from '@testing-library/react';
-import '@testing-library/jest-dom';
+import { act, fireEvent, render } from '@testing-library/react';
+import { describe, expect, test } from 'vitest';
 
 test('use jsdom in this test file', () => {
   const element = document.createElement('div');

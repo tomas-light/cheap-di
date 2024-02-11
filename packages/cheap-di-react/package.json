@@ -2,6 +2,7 @@
   "name": "cheap-di-react",
   "version": "4.1.1",
   "description": "Dependency injection based on cheap-di for using in React components with React Context",
+  "type": "module",
   "scripts": {
     "compile": "tsc --build tsconfig.cjs.json ./tsconfig.esm.json ./tsconfig.types.json",
     "prepare-package-json": "ts-node scripts/prepare-package-json.ts",
@@ -9,9 +10,6 @@
     "build": "npm-run-all build:clean compile prepare-package-json"
   },
   "devDependencies": {
-    "@testing-library/jest-dom": "^6.1.5",
-    "@testing-library/react": "^14.1.2",
-    "@types/jest": "^29.5.11",
     "@types/node": "^20",
     "@types/react": "^18.2.38",
     "cheap-di": "^4.0.1",

@@ -2,6 +2,7 @@ import { container } from 'cheap-di';
 import { DIProviderMemo, use } from 'cheap-di-react';
 import { render } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { beforeEach, describe, expect, test } from 'vitest';
 
 beforeEach(() => {
   container.clear();
