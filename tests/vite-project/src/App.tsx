@@ -1,24 +1,37 @@
-import reactLogo from './assets/react.svg';
-import viteLogo from '/vite.svg';
+import { container, Container } from 'cheap-di';
 import { DIProviderMemo } from 'cheap-di-react';
-import './App.css';
-import { Component } from './Component.tsx';
-import { Foo } from './Foo.ts';
+import { useEffect, useState } from 'react';
+import { Provider } from 'react-redux';
+import { CheapDiReactComponentExample } from './CheapDiReactComponentExample.tsx';
+import { Foo } from './models/Foo.ts';
+import { SingletonService } from './models/SingletonService.ts';
+import { store } from './redux/store.ts';
+import { CheapDiAndReduxMiddlewareComponent1 } from './CheapDiAndReduxMiddlewareComponent1.tsx';
+import { CheapDiAndReduxMiddlewareComponent2 } from './CheapDiAndReduxMiddlewareComponent2.tsx';
 
 function App() {
+  const [configuredContainer, setConfiguredContainer] = useState<Container | null>(null);
+
+  useEffect(() => {
+    container.registerImplementation(SingletonService).asSingleton();
+    setConfiguredContainer(container);
+  }, []);
+
+  if (!configuredContainer) {
+    return null;
+  }
+
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
+      <Provider store={store}>
+        <DIProviderMemo parentContainer={configuredContainer}>
+          <CheapDiAndReduxMiddlewareComponent1 />
+          <CheapDiAndReduxMiddlewareComponent2 />
+        </DIProviderMemo>
+      </Provider>
 
       <DIProviderMemo self={[Foo]}>
-        <Component />
+        <CheapDiReactComponentExample />
       </DIProviderMemo>
     </>
   );

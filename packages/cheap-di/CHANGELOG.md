@@ -1,5 +1,13 @@
 # Changelog
 
+## 4.1.0
+
+🚀 added `enrich` method to container to be able to wrap resolved instance with Proxy or something else that you need;
+
+## 4.0.1
+
+🐛 fixed InjectDecorator type;
+
 ## 4.0.0
 
 The release main goal is stop using reflect-metadata as obsoleted (and unstable) approach and become compatible with TypeScript 5.2.0 decorators (stage 3 proposal).

@@ -11,6 +11,8 @@ import {
   IHaveInstances,
   IHaveSingletons,
   ImplementationType,
+  RegisteredImplementation,
+  RegisteredInstance,
   RegistrationType,
 } from './types.js';
 
@@ -18,37 +20,33 @@ class ContainerImpl implements Container, IHaveSingletons, IHaveInstances, IHave
   singletons: Map<ImplementationType<any>, object>;
   instances: Map<RegistrationType<any>, object>;
   dependencies: Map<RegistrationType<any>, ImplementationType<any> | object>;
+  enrichCallbacks: Map<RegistrationType<any> | object, (instance: any) => any>;
 
   constructor() {
     this.singletons = new Map();
     this.instances = new Map();
     this.dependencies = new Map();
+    this.enrichCallbacks = new Map();
   }
 
   /** register implementation class */
-  registerImplementation<TInstance>(implementationType: Constructor<TInstance>) {
-    const inject = (...injectionParams: any[]) => {
-      const metadata = findOrCreateMetadata(implementationType as ImplementationType<unknown>);
-      metadata.injected = injectionParams;
-    };
-
+  registerImplementation: Container['registerImplementation'] = <TClass>(implementationType: Constructor<TClass>) => {
     this.dependencies.set(implementationType, implementationType);
 
-    return {
-      /** as super class */
-      as: <TBase extends Partial<TInstance>>(type: RegistrationType<TBase>) => {
+    let asType: RegistrationType<any> | undefined = undefined;
+
+    const registeredImplementation: RegisteredImplementation<TClass> = {
+      as: (type) => {
         this.dependencies.delete(implementationType);
         this.dependencies.set(type, implementationType);
-        return {
-          /** add parameters that will be passed to the class constructor */
-          inject,
-        };
+        asType = type;
+        return registeredImplementation;
       },
-      /** as singleton (optionally super class) */
-      asSingleton: <TBase extends Partial<TInstance>>(type?: RegistrationType<TBase>) => {
+      asSingleton: (type) => {
         if (type) {
           this.dependencies.delete(implementationType);
           this.dependencies.set(type, implementationType);
+          asType = type;
         }
 
         if (!isSingleton(implementationType)) {
@@ -57,33 +55,63 @@ class ContainerImpl implements Container, IHaveSingletons, IHaveInstances, IHave
           metadata.singleton = true;
         }
 
-        return {
-          /** add parameters that will be passed to the class constructor */
-          inject,
-        };
+        return registeredImplementation;
       },
-      /** add parameters that will be passed to the class constructor */
-      inject,
+      inject: (...injectionParams) => {
+        const metadata = findOrCreateMetadata(implementationType as ImplementationType<unknown>);
+        metadata.injected = injectionParams;
+
+        return registeredImplementation;
+      },
+      enrich: (enrichCallback) => {
+        if (asType) {
+          this.enrichCallbacks.delete(implementationType);
+          this.enrichCallbacks.set(asType, enrichCallback);
+        } else {
+          this.enrichCallbacks.set(implementationType, enrichCallback);
+        }
+
+        return registeredImplementation;
+      },
     };
-  }
+
+    return registeredImplementation;
+  };
 
   /** register any object as its constructor */
-  registerInstance<TInstance extends object>(instance: TInstance) {
+  registerInstance: Container['registerInstance'] = <TInstance extends object>(instance: TInstance) => {
     const constructor = instance.constructor as Constructor<TInstance>;
     if (constructor) {
       this.instances.set(constructor, instance);
     }
 
-    return {
-      /** or register the object as any class */
-      as: <TBase extends Partial<TInstance>>(type: RegistrationType<TBase>) => {
+    let asType: RegistrationType<any> | undefined = undefined;
+
+    const registeredInstance: RegisteredInstance<TInstance> = {
+      as: (type) => {
         if (constructor) {
           this.instances.delete(constructor);
         }
         this.instances.set(type, instance);
+
+        asType = type;
+
+        return registeredInstance;
+      },
+      enrich: (enrichCallback) => {
+        if (asType) {
+          this.enrichCallbacks.delete(instance);
+          this.enrichCallbacks.set(asType, enrichCallback);
+        } else {
+          this.enrichCallbacks.set(instance, enrichCallback);
+        }
+
+        return registeredInstance;
       },
     };
-  }
+
+    return registeredInstance;
+  };
 
   /** instantiate (or get instance for singleton) by class */
   resolve<TInstance>(
@@ -92,7 +120,14 @@ class ContainerImpl implements Container, IHaveSingletons, IHaveInstances, IHave
   ): TInstance | undefined {
     const trace = new Trace(type.name);
     try {
-      return this.internalResolve(type, trace, ...args);
+      const resolvedInstance = this.internalResolve(type, trace, ...args);
+
+      const enrichCallback = this.enrichCallbacks.get(type);
+      if (typeof enrichCallback === 'function') {
+        return enrichCallback(resolvedInstance);
+      }
+
+      return resolvedInstance;
     } catch (error) {
       if (error instanceof RangeError) {
         const tree = trace.build();

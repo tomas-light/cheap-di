@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="true" type="JavaScriptTestRunnerVitest">
+    <node-interpreter value="project" />
+    <node-options value="--loader ts-node/esm --disable-warning ExperimentalWarning" />
+    <envs />
+    <scope-kind value="ALL" />
+    <method v="2" />
+  </configuration>
+</component>

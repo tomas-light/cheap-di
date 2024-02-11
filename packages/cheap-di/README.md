@@ -266,6 +266,29 @@ container
   .inject('some name');
 ```
 
+You may wrap resolved instance with Proxy or do something else. 
+For example if you want to log called methods of Api.
+```ts
+import { container } from 'cheap-di';
+
+class Api {
+  async load() {
+    // ...
+  }
+}
+
+container
+  .registerImplementation(Api)
+  .enrich((api) => {
+    return new Proxy(api, {
+      get(instance, propertyName) {
+        console.log('Request to', propertyName.toString());
+        return instance[propertyName as keyof typeof instance];
+      },
+    });
+  });
+```
+
 #### <a name="register-instance"></a> registerInstance
 
 If you want to register some instance as an interface, the result is similar to singleton registration, except that you have to instantiate the class yourself.
