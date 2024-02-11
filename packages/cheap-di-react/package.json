@@ -1,18 +1,19 @@
 {
   "name": "cheap-di-react",
-  "version": "4.1.1",
+  "version": "4.1.2",
   "description": "Dependency injection based on cheap-di for using in React components with React Context",
   "type": "module",
   "scripts": {
     "compile": "tsc --build tsconfig.cjs.json ./tsconfig.esm.json ./tsconfig.types.json",
-    "prepare-package-json": "ts-node scripts/prepare-package-json.ts",
+    "prepare-package-json": "cross-env NODE_OPTIONS=\"--loader ts-node/esm --disable-warning ExperimentalWarning\" ts-node scripts/prepare-package-json.ts",
     "build:clean": "rimraf -rf ./dist",
     "build": "npm-run-all build:clean compile prepare-package-json"
   },
   "devDependencies": {
     "@types/node": "^20",
     "@types/react": "^18.2.38",
-    "cheap-di": "^4.0.1",
+    "cheap-di": "^4.1.0",
+    "cross-env": "^7.0.3",
     "npm-run-all": "^4",
     "react": "^18.2.0",
     "rimraf": "^5",
@@ -20,7 +21,7 @@
     "typescript": "^5"
   },
   "peerDependencies": {
-    "cheap-di": ">= 4.0.1",
+    "cheap-di": ">= 4.1.0",
     "react": ">= 18.2.0"
   },
   "repository": {

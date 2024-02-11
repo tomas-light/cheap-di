@@ -810,8 +810,8 @@ __metadata:
     "@types/react": "npm:^18.2.51"
     "@types/react-dom": "npm:^18.2.18"
     "@vitejs/plugin-react": "npm:^4.2.1"
-    cheap-di: "npm:4.1.0"
-    cheap-di-react: "npm:4.1.1"
+    cheap-di: "workspace:^"
+    cheap-di-react: "workspace:^"
     cheap-di-ts-transform: "workspace:^"
     cross-env: "npm:^7.0.3"
     jsdom: "npm:^24.0.0"
@@ -835,8 +835,8 @@ __metadata:
     "@types/react": "npm:18.2.35"
     "@types/react-dom": "npm:18.2.14"
     axios: "npm:1.6.2"
-    cheap-di: "npm:4.1.0"
-    cheap-di-ts-transform: "npm:1.0.0"
+    cheap-di: "workspace:^"
+    cheap-di-ts-transform: "workspace:^"
     cross-env: "npm:7.0.3"
     html-webpack-plugin: "npm:^5.5.4"
     package1: "npm:0.0.0"
@@ -858,7 +858,7 @@ __metadata:
     "@types/react": "npm:18.2.35"
     "@types/react-dom": "npm:18.2.14"
     axios: "npm:1.6.2"
-    cheap-di: "npm:4.1.0"
+    cheap-di: "workspace:^"
     cheap-di-ts-transform: "workspace:^"
     cross-env: "npm:7.0.3"
     package1: "npm:0.0.0"
@@ -2008,52 +2008,43 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cheap-di-react@npm:4.1.1, cheap-di-react@npm:^4.1.0, cheap-di-react@workspace:packages/cheap-di-react":
+"cheap-di-react@npm:^4.1.0, cheap-di-react@workspace:^, cheap-di-react@workspace:packages/cheap-di-react":
   version: 0.0.0-use.local
   resolution: "cheap-di-react@workspace:packages/cheap-di-react"
   dependencies:
     "@types/node": "npm:^20"
     "@types/react": "npm:^18.2.38"
-    cheap-di: "npm:^4.0.1"
+    cheap-di: "npm:^4.1.0"
+    cross-env: "npm:^7.0.3"
     npm-run-all: "npm:^4"
     react: "npm:^18.2.0"
     rimraf: "npm:^5"
     ts-node: "npm:^10"
     typescript: "npm:^5"
   peerDependencies:
-    cheap-di: ">= 4.0.1"
+    cheap-di: ">= 4.1.0"
     react: ">= 18.2.0"
   languageName: unknown
   linkType: soft
-
-"cheap-di-ts-transform@npm:1.0.0":
-  version: 1.0.0
-  resolution: "cheap-di-ts-transform@npm:1.0.0"
-  peerDependencies:
-    cheap-di: ">= 4.0.1"
-    typescript: ">= 5.3.3"
-  checksum: 10c0/70c77598e1d7c410115a190eddd87b7ab3e56e7153dae06efcca58a9673f1d7a113665dd9e92fcd4a3533f564ce723591c41ed11a599a45653f899050161f41a
-  languageName: node
-  linkType: hard
 
 "cheap-di-ts-transform@workspace:^, cheap-di-ts-transform@workspace:packages/cheap-di-ts-transform":
   version: 0.0.0-use.local
   resolution: "cheap-di-ts-transform@workspace:packages/cheap-di-ts-transform"
   dependencies:
     "@types/node": "npm:^20"
-    cheap-di: "npm:^4.0.1"
+    cheap-di: "npm:^4.1.0"
     cross-env: "npm:^7.0.3"
     npm-run-all: "npm:^4"
     rimraf: "npm:^5"
     ts-node: "npm:^10"
     typescript: "npm:^5"
   peerDependencies:
-    cheap-di: ">= 4.0.1"
+    cheap-di: ">= 4.1.0"
     typescript: ">= 5.3.3"
   languageName: unknown
   linkType: soft
 
-"cheap-di@npm:4.1.0, cheap-di@npm:^4.0.1, cheap-di@workspace:packages/cheap-di":
+"cheap-di@npm:^4.0.1, cheap-di@npm:^4.1.0, cheap-di@workspace:^, cheap-di@workspace:packages/cheap-di":
   version: 0.0.0-use.local
   resolution: "cheap-di@workspace:packages/cheap-di"
   dependencies:
@@ -4968,7 +4959,7 @@ __metadata:
   resolution: "package1@workspace:tests/package1"
   dependencies:
     "@types/node": "npm:^20"
-    cheap-di: "npm:4.1.0"
+    cheap-di: "workspace:^"
     npm-run-all: "npm:^4"
     rimraf: "npm:^5"
     ts-node: "npm:^10"

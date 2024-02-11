@@ -8,7 +8,7 @@
     "build": "npm-run-all build:clean compile"
   },
   "dependencies": {
-    "cheap-di": "4.1.0"
+    "cheap-di": "workspace:^"
   },
   "devDependencies": {
     "@types/node": "^20",

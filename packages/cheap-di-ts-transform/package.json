@@ -1,6 +1,6 @@
 {
   "name": "cheap-di-ts-transform",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Typescript code transformer. It produces constructor dependencies information to be able to use Dependency Injection approach with `cheap-di` package",
   "type": "module",
   "scripts": {
@@ -11,7 +11,7 @@
   },
   "devDependencies": {
     "@types/node": "^20",
-    "cheap-di": "^4.0.1",
+    "cheap-di": "^4.1.0",
     "cross-env": "^7.0.3",
     "npm-run-all": "^4",
     "rimraf": "^5",
@@ -19,7 +19,7 @@
     "typescript": "^5"
   },
   "peerDependencies": {
-    "cheap-di": ">= 4.0.1",
+    "cheap-di": ">= 4.1.0",
     "typescript": ">= 5.3.3"
   },
   "repository": {

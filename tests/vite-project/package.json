@@ -11,8 +11,8 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.1.0",
-    "cheap-di": "4.1.0",
-    "cheap-di-react": "4.1.1",
+    "cheap-di": "workspace:^",
+    "cheap-di-react": "workspace:^",
     "package1": "0.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

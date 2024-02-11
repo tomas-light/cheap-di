@@ -1,5 +1,9 @@
 # Changelog
 
+### 4.1.2
+
+🔨 updated `cheap-di` to from `4.0.1` to `4.1.0`
+
 ### 4.1.1
 
 🐛 Fixed singleton instantiating issue, when it was firstly instantiated in root container, and then instantiated again in one of child containers

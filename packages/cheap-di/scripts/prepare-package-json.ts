@@ -71,6 +71,7 @@ async function createEsmModulePackageJson(sourcePackageJson: Record<string, any>
 (async () => {
   const sourcePackageJsonString = await readFile(paths.packageJson, 'utf-8');
   const sourcePackageJson = JSON.parse(sourcePackageJsonString);
+
   await copyFile(paths.readme, paths.distReadme);
   await copyFile(paths.license, paths.distLicense);
   await copyAndFixPackageJson(sourcePackageJson);

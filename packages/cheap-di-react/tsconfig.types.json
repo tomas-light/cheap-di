@@ -4,6 +4,7 @@
     "declaration": true,
     "emitDeclarationOnly": true,
     "module": "esnext",
+    "moduleResolution": "node",
     "outDir": "dist/types",
     "target": "esnext"
   }
