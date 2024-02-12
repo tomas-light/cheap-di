@@ -35,18 +35,26 @@ class ContainerImpl implements Container, IHaveSingletons, IHaveInstances, IHave
 
     let asType: RegistrationType<any> | undefined = undefined;
 
+    const asAnotherType = <TBase>(type: RegistrationType<TBase>) => {
+      this.dependencies.delete(implementationType);
+      this.dependencies.set(type, implementationType);
+      asType = type;
+
+      const enrichCallback = this.enrichCallbacks.get(implementationType);
+      if (enrichCallback) {
+        this.enrichCallbacks.delete(implementationType);
+        this.enrichCallbacks.set(type, enrichCallback);
+      }
+    };
+
     const registeredImplementation: RegisteredImplementation<TClass> = {
       as: (type) => {
-        this.dependencies.delete(implementationType);
-        this.dependencies.set(type, implementationType);
-        asType = type;
+        asAnotherType(type);
         return registeredImplementation;
       },
       asSingleton: (type) => {
         if (type) {
-          this.dependencies.delete(implementationType);
-          this.dependencies.set(type, implementationType);
-          asType = type;
+          asAnotherType(type);
         }
 
         if (!isSingleton(implementationType)) {
@@ -120,6 +128,7 @@ class ContainerImpl implements Container, IHaveSingletons, IHaveInstances, IHave
   ): TInstance | undefined {
     const trace = new Trace(type.name);
     try {
+      // return this.internalResolve(type, trace, ...args);
       const resolvedInstance = this.internalResolve(type, trace, ...args);
 
       const enrichCallback = this.enrichCallbacks.get(type);
@@ -164,6 +173,7 @@ class ContainerImpl implements Container, IHaveSingletons, IHaveInstances, IHave
     }
 
     const implementation = this.getImplementation(type) || type;
+    // if it is not a class (function)
     if (!isImplementationType(implementation)) {
       return implementation as object as TInstance;
     }
@@ -205,6 +215,7 @@ class ContainerImpl implements Container, IHaveSingletons, IHaveInstances, IHave
           trace.addTrace(dependencyType.name);
 
           const instance = this.internalResolve(dependencyType, trace.trace!);
+
           const isNewInstance =
             !this.isRegisteredInstance(dependencyType, instance) && !this.isRegisteredType(dependencyType, instance);
           if (
@@ -216,7 +227,14 @@ class ContainerImpl implements Container, IHaveSingletons, IHaveInstances, IHave
             resolvedDependencies[index] = injectionParams[injectionParamsIndex];
             injectionParamsIndex++;
           } else {
-            resolvedDependencies[index] = instance;
+            let enrichedInstance = instance;
+
+            const enrichCallback = this.enrichCallbacks.get(dependencyType);
+            if (typeof enrichCallback === 'function') {
+              enrichedInstance = enrichCallback(instance);
+            }
+
+            resolvedDependencies[index] = enrichedInstance;
           }
         } else if (injectionParams[injectionParamsIndex]) {
           resolvedDependencies[index] = injectionParams[injectionParamsIndex];

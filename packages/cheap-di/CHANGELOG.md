@@ -1,5 +1,31 @@
 # Changelog
 
+## 4.1.1
+
+🐛 fix `enrich` method call order dependency. Now you should be able to call in any order of dependency setup:
+```ts
+container
+  .registerImplementation(ApiImpl)
+  .as(Api)
+  .enrich(...);
+//
+container
+  .registerImplementation(ApiImpl)
+  .asSingleton(Api)
+  .enrich(...);
+//
+container
+  .registerImplementation(ApiImpl)
+  .enrich(...)
+  .as(Api);
+//
+container
+  .registerImplementation(ApiImpl)
+  .enrich(...)
+  .asSingleton(Api);
+```
+
+
 ## 4.1.0
 
 🚀 added `enrich` method to container to be able to wrap resolved instance with Proxy or something else that you need;

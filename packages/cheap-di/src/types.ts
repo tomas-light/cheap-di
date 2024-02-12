@@ -44,7 +44,7 @@ interface RegisteredImplementation<TClass> {
   as: AsBase<TClass, this>;
   /** as singleton (optionally super class) */
   asSingleton: AsSingleton<TClass, this>;
-  /** enrich instance when it will be resolved, example, if you want to wrap instance with Proxy */
+  /** enrich instance when it will be resolved, for example, if you want to wrap instance with Proxy */
   enrich: Enrich<TClass, this>;
   /** add parameters that will be passed to the class constructor */
   inject: Inject<this>;
@@ -53,7 +53,7 @@ interface RegisteredImplementation<TClass> {
 interface RegisteredInstance<TInstance> {
   /** or register the object as any class */
   as: AsBase<TInstance, this>;
-  /** enrich instance when it will be resolved, example, if you want to wrap instance with Proxy */
+  /** enrich instance when it will be resolved, for example, if you want to extend it but not right now, and only when it will be resolved */
   enrich: Enrich<TInstance, this>;
 }
 

@@ -1,6 +1,6 @@
 {
   "name": "cheap-di",
-  "version": "4.1.0",
+  "version": "4.1.1",
   "description": "TypeScript dependency injection like Autofac in .Net",
   "type": "module",
   "scripts": {
@@ -30,11 +30,11 @@
     "dependency injection",
     "cheap di"
   ],
-  "_main": "./src/index.ts",
-  "_types": "./src/index.ts",
-  "main": "./dist/cjs/index.js",
-  "module": "./dist/esm/index.js",
-  "types": "./dist/types/index.d.ts",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "_main": "./dist/cjs/index.js",
+  "_module": "./dist/esm/index.js",
+  "_types": "./dist/types/index.d.ts",
   "build-instructions": {
     "name": "cheap-di",
     "files": [
