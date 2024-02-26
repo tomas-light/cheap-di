@@ -3,7 +3,7 @@ import { ClassConstructorParameter, ClassParameter, PrimitiveParameter } from '.
 import { findPrimitiveTypes } from './findPrimitiveTypes.js';
 import { InternalTransformOptions } from './InternalTransformOptions.js';
 import { findConstructorDeclaration } from './findConstructorDeclaration.js';
-import { findImportedClass } from './findImportedClass.js';
+import { findImportedEntity } from './findImportedEntity.js';
 import { findNodeIdentifier } from './findNodeIdentifier.js';
 
 export type ConstructorParametersInfo = {
@@ -83,7 +83,7 @@ export function findClassConstructorParameters(parameters: {
           return;
         }
 
-        const importedClass = findImportedClass({
+        const importedEntity = findImportedEntity({
           typeChecker,
           tsReferenceNode: tsReferenceNode,
           identifier,
@@ -92,10 +92,14 @@ export function findClassConstructorParameters(parameters: {
           namespaceIdentifierSymbol,
         });
 
-        if (importedClass) {
+        if (importedEntity) {
           const classParameter = classConstructorParameter as unknown as ClassParameter;
-          classParameter.type = 'class';
-          classParameter.importedClass = importedClass;
+          if (importedEntity.isClass) {
+            classParameter.type = 'class';
+            classParameter.importedClass = importedEntity;
+          } else {
+            classConstructorParameter.importedId = importedEntity.namedAsId ?? importedEntity.id;
+          }
         }
       } else if (options.addDetailsToUnknownParameters) {
         const primitiveTypes = findPrimitiveTypes(parameterNode);

@@ -12,6 +12,7 @@
     "ts-test:7": "ts-node src/case-07-multiple-extends-of-local-import/index.ts",
     "ts-test:8": "ts-node src/case-08-multiple-usings-of-the-same-imports-in-single-file.ts",
     "ts-test:9": "ts-node src/case-09-namespace-import.ts",
+    "ts-test:10": "ts-node src/case-10-interface-dependency.ts",
     "// compiled": "",
     "test:1": "node compiled/case-01-single-file.js",
     "test:2": "node compiled/case-02-single-file-dependencies-of-extended-class.js",

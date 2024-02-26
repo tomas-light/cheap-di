@@ -6,6 +6,7 @@ export type ClassConstructorParameter = UnknownParameter | PrimitiveParameter | 
 export interface UnknownParameter {
   type: 'unknown';
   name?: string | undefined;
+  importedId?: ts.Identifier;
 }
 
 export type PrimitiveType =
@@ -29,7 +30,7 @@ export interface PrimitiveParameter {
 export interface ClassParameter {
   type: 'class';
   name?: string | undefined;
-  importedClass?: ImportedClass | ExistedImport;
+  importedClass?: ImportedEntity | ExistedImport;
 }
 
 export function isClassParameter(parameter: ClassConstructorParameter): parameter is ClassParameter {
@@ -44,25 +45,25 @@ export interface ExistedImport {
   existedId: ts.Identifier;
 }
 
-export function isExistedImport(importedClass: ImportedClass | ExistedImport): importedClass is ExistedImport {
+export function isExistedImport(importedClass: ImportedEntity | ExistedImport): importedClass is ExistedImport {
   return (importedClass as ExistedImport).existedId != null;
 }
 
-export interface ImportedClass {
+export interface ImportedEntity {
   /**
    * @example
    * import { MyClass as Some } from "./myClass"; // => id of "Some"
    * import { MyClass } from "./myClass"; // => undefined
    * import Some from "./myClass"; // => undefined
    * */
-  namedAsClassId: ts.Identifier | undefined;
+  namedAsId: ts.Identifier | undefined;
 
   /**
    * @example
    * import { MyClass as Some } from "./myClass"; // => id of "MyClass"
    * import Some from "./myClass"; // => id of "MyClass"
    * */
-  classId: ts.Identifier;
+  id: ts.Identifier;
 
   /**
    * @example

@@ -24,11 +24,18 @@ export function createMetadataNode(params: {
 }): (GeneratedNode | GeneratedImport) | undefined {
   const { typeChecker, parameter, localHash } = params;
 
+  const parameterName = parameter.name || '<no_name>';
+
   switch (true) {
     case parameter.type === 'unknown':
     case parameter.type === 'class' && parameter.importedClass == null: {
-      const parameterName = parameter.name || '<no_name>';
-      const unknownString = `unknown /${parameterName}/`;
+      let id = '';
+      if (parameter.type === 'unknown' && parameter.importedId) {
+        // here may be an interface/type name
+        id = ` :${parameter.importedId.getFullText().trim()}`;
+      }
+
+      const unknownString = `unknown /${parameterName}/${id}`;
       const unknownStringLiteral = ts.factory.createStringLiteral(unknownString);
 
       return {
@@ -38,13 +45,7 @@ export function createMetadataNode(params: {
     }
 
     case parameter.type === 'primitive': {
-      let primitiveString = 'primitive';
-      if (parameter.name) {
-        primitiveString += ` /${parameter.name}/ `;
-      } else {
-        primitiveString += ' /<no_name>/ ';
-      }
-
+      let primitiveString = `primitive /${parameterName}/ `;
       parameter.primitiveTypes.forEach((type) => {
         primitiveString += `:${type}`;
       });
@@ -63,24 +64,25 @@ export function createMetadataNode(params: {
       if (isExistedImport(importedClass)) {
         const newId = createIdentifierOfIdentifier(typeChecker, importedClass.existedId);
         return {
-          nameToDebug: name ?? '<no_name>',
+          nameToDebug: `class /${parameterName}/ :${name}`,
           node: newId,
         };
       }
 
       let classId: ts.Identifier;
-      if (importedClass.namedAsClassId && importedClass.importType === 'named') {
-        classId = importedClass.namedAsClassId;
+      if (importedClass.namedAsId && importedClass.importType === 'named') {
+        classId = importedClass.namedAsId;
       } else {
-        classId = importedClass.classId;
+        classId = importedClass.id;
       }
 
       const className = classId.getFullText().trim();
+      const nameToDebug = `class /${parameterName}/ :${className}`;
 
       switch (importedClass.importType) {
         case 'local defined': {
           return {
-            nameToDebug: className,
+            nameToDebug,
             node: ts.factory.createIdentifier(className),
           };
         }
@@ -99,7 +101,7 @@ export function createMetadataNode(params: {
           const [nodeIdentifier] = identifiers;
 
           return {
-            nameToDebug: className,
+            nameToDebug,
             node: nodeIdentifier,
             importDeclarations: nodes,
             from: importedClass.importedFrom,
@@ -120,7 +122,7 @@ export function createMetadataNode(params: {
           const [nodeIdentifier] = identifiers;
 
           return {
-            nameToDebug: className,
+            nameToDebug,
             node: nodeIdentifier,
             importDeclarations: nodes,
             from: importedClass.importedFrom,

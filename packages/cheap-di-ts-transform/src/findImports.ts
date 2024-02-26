@@ -5,7 +5,7 @@ import ts, {
   // type NamespaceImport,
   type SyntaxList,
 } from 'typescript';
-import { ImportedClass } from './ClassConstructorParameter.js';
+import { ImportedEntity } from './ClassConstructorParameter.js';
 
 /**
  * @example
@@ -27,7 +27,7 @@ export type ImportType = 'default' | 'namespace' | 'named' | 'local defined';
 // export type ImportValueType = 'type' | 'value';
 
 export function findImports(sourceFile: ts.SourceFile) {
-  const imports: ImportedClass[] = [];
+  const imports: ImportedEntity[] = [];
 
   ts.forEachChild(sourceFile, (tsNode) => {
     const nodeText = tsNode.getFullText();
@@ -66,8 +66,8 @@ export function findImports(sourceFile: ts.SourceFile) {
     // import type A from 'a';
     if (defaultImportIdentifier) {
       imports.push({
-        classId: defaultImportIdentifier,
-        namedAsClassId: undefined,
+        id: defaultImportIdentifier,
+        namedAsId: undefined,
         importedFrom: nameFromWhereImportIs,
         importType: 'default',
         // importedAs: defaultImportValueType,
@@ -81,8 +81,8 @@ export function findImports(sourceFile: ts.SourceFile) {
       const id = namespaceImport.getChildren().find((node) => ts.isIdentifier(node)) as ts.Identifier | undefined;
       if (id) {
         imports.push({
-          classId: id,
-          namedAsClassId: undefined,
+          id: id,
+          namedAsId: undefined,
           importedFrom: nameFromWhereImportIs,
           importType: 'namespace',
           // importedAs: defaultImportValueType,
@@ -134,8 +134,8 @@ export function findImports(sourceFile: ts.SourceFile) {
 
       if (classId) {
         imports.push({
-          classId,
-          namedAsClassId,
+          id: classId,
+          namedAsId: namedAsClassId,
           // importedAs: hasTypeKeyword ? 'type' : 'value',
           importedFrom: nameFromWhereImportIs,
           importType: 'named',
