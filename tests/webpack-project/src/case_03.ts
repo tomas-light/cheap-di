@@ -6,7 +6,7 @@ class Foo {
 
   do() {
     console.log('my class does ...');
-    this.bar.logInfo();
+    this.bar.log('succeed');
   }
 }
 

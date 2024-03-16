@@ -1,7 +1,7 @@
-import { CircularDependencyError } from './CircularDependencyError.js';
-import { findMetadata, findOrCreateMetadata } from './metadata.js';
-import { isSingleton } from './isSingleton.js';
-import { Trace } from './Trace.js';
+import { CircularDependencyError } from './CircularDependencyError';
+import { findMetadata, findOrCreateMetadata } from './metadata';
+import { isSingleton } from './isSingleton';
+import { Trace } from './Trace';
 import {
   AbstractConstructor,
   Constructor,
@@ -14,7 +14,7 @@ import {
   RegisteredImplementation,
   RegisteredInstance,
   RegistrationType,
-} from './types.js';
+} from './types';
 
 class ContainerImpl implements Container, IHaveSingletons, IHaveInstances, IHaveDependencies, Disposable {
   singletons: Map<ImplementationType<any>, object>;

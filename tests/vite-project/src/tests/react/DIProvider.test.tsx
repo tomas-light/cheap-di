@@ -12,9 +12,7 @@ test('use jsdom in this test file', async () => {
   expect(element).not.toBeNull();
 });
 
-// because cheap-di-ts-transformer adds `await import(...)` after class declaration with injected dependencies,
-// and `await` keyword may be used only inside `async` function
-describe('base cases', async () => {
+describe('base cases', () => {
   abstract class Logger {
     abstract debug(message: string): string;
   }
@@ -39,7 +37,7 @@ describe('base cases', async () => {
     }
   }
 
-  test('register type', async () => {
+  test('register type', () => {
     const Component = () => {
       const logger = use(SomeConsoleLogger);
       return <p>{logger.debug('another layout')}</p>;
@@ -55,7 +53,7 @@ describe('base cases', async () => {
     expect(queryByText('another layout')).toBeInTheDocument();
   });
 
-  test('register type as base type', async () => {
+  test('register type as base type', () => {
     const Component = () => {
       const logger = use(Logger);
       return <p>{logger.debug('my layout')}</p>;
@@ -71,7 +69,7 @@ describe('base cases', async () => {
     expect(queryByText('my layout')).toBeInTheDocument();
   });
 
-  test('register type as base type with injection params', async () => {
+  test('register type as base type with injection params', () => {
     const Component = () => {
       const logger = use(Logger);
       return <p>{logger.debug('my layout')}</p>;
@@ -87,7 +85,7 @@ describe('base cases', async () => {
     expect(queryByText('my message: my layout')).toBeInTheDocument();
   });
 
-  test('register instance', async () => {
+  test('register instance', () => {
     class Database {
       readonly entities: string[];
 
@@ -120,7 +118,7 @@ describe('base cases', async () => {
     expect(queryByText(entities[1])).toBeInTheDocument();
   });
 
-  test('nested providers', async () => {
+  test('nested providers', () => {
     const Component = () => {
       const logger = use(Logger);
       return <p>{logger.debug('my layout')}</p>;

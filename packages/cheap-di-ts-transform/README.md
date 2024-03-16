@@ -42,11 +42,11 @@ class Service {
     this.logger.debug('Hello world!');
   }
 }
-/** cheap-di-ts-transform will add folowwing code:
+/** cheap-di-ts-transform will add folowing code:
  * @example
+ * import cheap_di_1 from 'cheap-di';
  * try {
- *   const cheapDi = require('cheap-di');
- *   cheapDi.saveConstructorMetadata(Service, Logger);
+ *   cheap_di_1.saveConstructorMetadata(Service, Logger);
  * } catch (error: unknown) {
  *   console.warn(error);
  * }
@@ -74,8 +74,8 @@ class Example1 {
 }
 /** cheap-di-ts-transform will add folowwing code:
  * @example
+ * import cheap_di_1 from 'cheap-di';
  * try {
- *   const cheapDi = require('cheap-di');
  *   cheapDi.saveConstructorMetadata(Example1, 'unknown');
  * } catch (error: unknown) {
  *   console.warn(error);
@@ -101,8 +101,8 @@ class Example2 {
 }
 /** cheap-di-ts-transform will add folowwing code:
  * @example
+ * import cheap_di_1 from 'cheap-di';
  * try {
- *   const cheapDi = require('cheap-di');
  *   cheapDi.saveConstructorMetadata(Example2, Service, "unknown", Example1, "unknown", Logger, "unknown", unknown, "unknown");
  * } catch (error: unknown) {
  *   console.warn(error);
@@ -110,9 +110,15 @@ class Example2 {
  * */
 ```
 
-in case when you use class from some package:
+in case when you import class from somewhere:
 ```ts
 import { SomeClass } from 'some-package';
+/** cheap-di-ts-transform will add folowwing code:
+ * @example
+ * import cheap_di_1 from 'cheap-di';
+ * import * as some_package_for_cheap_di_1 from 'some-package';
+ * const { SomeClass: SomeClass_1 } = some_package_for_cheap_di_1;
+ * */
 
 class Example3 {
   constructor(service: SomeClass) {}
@@ -120,71 +126,11 @@ class Example3 {
 /** cheap-di-ts-transform will add folowwing code:
  * @example
  * try {
- *   const cheapDi = require('cheap-di');
- *   const { SomeClass } = require('some-package');
- *   cheapDi.saveConstructorMetadata(Example3, SomeClass);
+ *   cheap_di_1.saveConstructorMetadata(Example3, SomeClass_1);
  * } catch (error: unknown) {
  *   console.warn(error);
  * }
  * */
-```
-
-If the imported class also used a class in its constructor:
-> Note: works with `deepRegistration: true`
-```ts
-// "some-package"
-// there are 3 files:
-// SomeClass.ts, AnotherClass.ts, index.ts
-
-// AnotherClass.ts
-export class AnotherClass {}
-
-// SomeClass.ts
-import { AnotherClass } from './AnotherClass';
-
-export class SomeClass {
-  constructor(anotherClass: AnotherClass) {}
-}
-
-// index.ts
-export * from './AnotherClass';
-export * from './SomeClass';
-
-// end of "some-package"
-
-// your application
-import { SomeClass } from 'some-package';
-
-class Example3 {
-  constructor(service: SomeClass) {}
-}
-
-/** cheap-di-ts-transform will add folowwing code:
- * @example
- * try {
- *  const cheapDi = require('cheap-di');
- *  const { SomeClass } = require('some-package');
- *  cheapDi.saveConstructorMetadata(Example3, SomeClass);
- *
- *  try {
- *    const { AnotherClass } = require('some-package');
- *    cheapDi.saveConstructorMetadata(SomeClass, AnotherClass);
- *  } catch (error: unknown) {
- *    console.warn(error);
- *  }
- * } catch (error: unknown) {
- *  console.warn(error);
- * }
- */
-```
-> Be careful. If you use dependencies from package, that use another depenedncies in this package, that are not exported from there. You will get an error during bundling with webpack.
-
-```ts
-// if "index.ts" in "some-package" from example above will look like:
-export * from './SomeClass';
-// and no export of AnotherClass
-
-// you will get error during in bunlding time
 ```
 
 ## <a name="how-to-use"></a> How to use
@@ -196,47 +142,6 @@ export * from './SomeClass';
 | addDetailsToUnknownParameters  | `false`          | adds primitive types information of class parameters, to debug if something went wrong, instead of just `unknown` you will get something like `primitive /<parameter-name>/ :string` |
 | logRegisteredMetadata          | `false`          | adds console.debug call before saveConstructorMetadata function call. Useful to get debug information traced. You will see this information at runtime in console                    |
 | errorsLogLevel                 | `"warn"`         | used in try-catch statements to log registration errors                                                                                                                              |
-| esmImports                     | `false`          | use `await import('package')` instead of `require('package')`. It works with top level await in esm                                                                                  |
-| deepRegistration               | `false`          | add dependencies of dependencies right in place or not                                                                                                                               |
-
-`deepRegistration` example:
-```ts
-import { Repository } from './Repository';
-
-export class Service1 {
-  constructor(private repository: Repository) {}
-
-  data() {
-    return this.repository.users();
-  }
-}
-
-// region: deepRegistration: false
-try {
-  const cheapDi = await import('cheap-di');
-  const { Repository } = await import('./Repository.ts');
-  cheapDi.saveConstructorMetadata(Service1, Repository);
-} catch (error) {
-  console.warn(error);
-}
-// endregion
-
-// region: deepRegistration: true
-try {
-  const cheapDi = await import('cheap-di');
-  const { Repository } = await import('./Repository.ts');
-  cheapDi.saveConstructorMetadata(Service1, Repository);
-  try {
-    const { Logger } = await import('./Repository.ts');
-    cheapDi.saveConstructorMetadata(Repository, Logger);
-  } catch (error) {
-    console.warn(error);
-  }
-} catch (error) {
-  console.warn(error);
-}
-// endregion
-```
 
 ### <a name="ts-loader"></a> Webpack + ts-loader
 
@@ -270,7 +175,6 @@ const config = {
                   addDetailsToUnknownParameters: false,
                   logRegisteredMetadata: false,
                   errorsLogLevel: "warn",
-                  esmImports: false
                 }
               ),
             ],
@@ -301,7 +205,6 @@ tsconfig.json
         "addDetailsToUnknownParameters": false,
         "logRegisteredMetadata": false,
         "errorsLogLevel": "warn",
-        "esmImports": false
       }
     ]
   },
@@ -329,7 +232,6 @@ tsconfig.json
                 "addDetailsToUnknownParameters": false,
                 "logRegisteredMetadata": false,
                 "errorsLogLevel": "warn",
-                "esmImports": false
               }
             }
           ]
@@ -359,9 +261,6 @@ export default defineConfig({
               transformer(
                 { program },
                 {
-                  // (required) use esm imports to dependency registration
-                  esmImports: true,
-                  
                   // (optional) debugging options
                   debug: true,
                   addDetailsToUnknownParameters: true,

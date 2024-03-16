@@ -47,9 +47,4 @@ export function tryCatchStatement(tryStatements: ts.Statement[], transformOption
     ),
     undefined
   );
-  // return ts.factory.createTryStatement(
-  //   ts.factory.createBlock(tryStatements, true),
-  //   ts.factory.createCatchClause(undefined, ts.factory.createBlock([], true)),
-  //   undefined
-  // );
 }

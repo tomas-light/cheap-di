@@ -1,4 +1,4 @@
-import { cheapDiSymbol } from './cheapDiSymbol.js';
+import { cheapDiSymbol } from './cheapDiSymbol';
 
 type AbstractConstructor<T = any> = abstract new (...args: any[]) => T;
 type Constructor<T = any> = new (...args: any[]) => T;

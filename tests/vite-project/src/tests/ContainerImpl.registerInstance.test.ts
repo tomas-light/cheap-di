@@ -5,7 +5,7 @@ beforeEach(() => {
   container.clear();
 });
 
-test('register instance', async () => {
+test('register instance', () => {
   class Database {
     readonly entities: string[];
 

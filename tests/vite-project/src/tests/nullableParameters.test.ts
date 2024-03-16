@@ -5,7 +5,7 @@ beforeEach(() => {
   container.clear();
 });
 
-test('if parameter is optional', async () => {
+test('if parameter is optional', () => {
   class Some1 {
     get() {
       return '123';
@@ -20,7 +20,7 @@ test('if parameter is optional', async () => {
   expect(service?.some?.get()).toBe('123');
 });
 
-test('if parameter can be null', async () => {
+test('if parameter can be null', () => {
   class Some2 {
     get() {
       return '123';
@@ -35,7 +35,7 @@ test('if parameter can be null', async () => {
   expect(service?.some?.get()).toBe('123');
 });
 
-test('if parameter can be undefined', async () => {
+test('if parameter can be undefined', () => {
   class Some3 {
     get() {
       return '123';
@@ -50,7 +50,7 @@ test('if parameter can be undefined', async () => {
   expect(service?.some?.get()).toBe('123');
 });
 
-test('if parameter is optional and can be null or undefined', async () => {
+test('if parameter is optional and can be null or undefined', () => {
   class Some4 {
     get() {
       return '123';

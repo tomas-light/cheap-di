@@ -6,7 +6,7 @@ beforeEach(() => {
 });
 
 describe('register implementation', () => {
-  test('simple', async () => {
+  test('simple', () => {
     class Service {
       get(): string {
         return 'some';
@@ -20,7 +20,7 @@ describe('register implementation', () => {
     expect(service.get()).toBe('some');
   });
 
-  test('simple with passed arguments', async () => {
+  test('simple with passed arguments', () => {
     class Service {
       private readonly message: string;
 

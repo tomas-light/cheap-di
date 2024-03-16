@@ -2,6 +2,8 @@ import ts from 'typescript';
 import { makeClassFinder } from './makeClassFinder.js';
 import { TransformOptions } from './TransformOptions.js';
 import { InternalTransformOptions } from './InternalTransformOptions.js';
+import { defined } from './defined.js';
+import { mergeImportStatements } from './generation/mergeImportStatements.js';
 
 type FactoryParameters = {
   program: ts.Program;
@@ -12,15 +14,12 @@ type TransformerFactory = (
   partialOptions?: Partial<TransformOptions>
 ) => ts.TransformerFactory<ts.SourceFile>;
 
-export const transformer: TransformerFactory = (parameters, partialOptions: Partial<TransformOptions> = {}) => {
+export const transformer: TransformerFactory = (parameters, partialOptions = {}) => {
   const transformOptions: InternalTransformOptions = {
     debug: false,
     addDetailsToUnknownParameters: false,
     logRegisteredMetadata: false,
     errorsLogLevel: 'warn',
-    esmImports: false,
-    deepRegistration: false,
-    // registeredClasses: new Set(),
     ...partialOptions,
   };
 
@@ -35,27 +34,84 @@ export const transformer: TransformerFactory = (parameters, partialOptions: Part
   const typeChecker = program.getTypeChecker();
 
   return (context) => {
+    let counter = 0;
+
     return (sourceFile) => {
-      const { classFinder, ref } = makeClassFinder(context, typeChecker, transformOptions);
+      let localHash = (++counter).toString();
+
+      let cheapDiMetadata: {
+        /**
+         * ID to use in saveMetadata (generated ID for new node or existing one in case of reusing)
+         * @example
+         * cheap-di ID
+         *
+         * @example
+         * a class to save as dependency
+         * */
+        identifier?: ts.Identifier;
+
+        /**
+         * @example
+         * import cheap_di_1 from 'cheap-di';
+         * */
+        generatedImportDeclaration?: ts.Statement;
+      } = {};
+
+      const generatedImportsMap = new Map<
+        // where is import from
+        string,
+        /**
+         * there multiple statements for each import
+         * @example
+         * import * as package_for_cheap_di_1 from 'package'; // ts.ImportDeclaration
+         * const { A: A_1 } = package_for_cheap_di_1; // ts.VariableStatement
+         * */
+        ts.Statement[]
+      >();
+
+      const classFinder = makeClassFinder({
+        context,
+        typeChecker,
+        options: transformOptions,
+        localHash,
+        generations: {
+          getCheapDiIdentifier: () => cheapDiMetadata?.identifier,
+          addCheapDi: (metadata) => {
+            cheapDiMetadata = metadata;
+          },
+          addImport: (generatedImport) => {
+            const existedStatements = generatedImportsMap.get(generatedImport.from);
+            if (!existedStatements) {
+              generatedImportsMap.set(generatedImport.from, generatedImport.nodes);
+              return;
+            }
+
+            const merged = mergeImportStatements(existedStatements, generatedImport.nodes);
+            generatedImportsMap.set(generatedImport.from, merged);
+          },
+        },
+      });
 
       const transformedSourceFile = ts.visitNode(sourceFile, (tsNode) => {
         const nodeText = transformOptions?.debug ? tsNode.getFullText() : '';
         return ts.visitEachChild(tsNode, classFinder, context);
       }) as ts.SourceFile;
 
-      if (!ref.hasDependencies) {
-        return transformedSourceFile;
-      }
+      const importStatements = [cheapDiMetadata?.generatedImportDeclaration]
+        .concat(...generatedImportsMap.values())
+        .filter(defined);
 
-      return ts.factory.updateSourceFile(
-        transformedSourceFile,
-        transformedSourceFile.statements,
+      const updated = ts.factory.updateSourceFile(
+        sourceFile,
+        importStatements.concat(transformedSourceFile.statements),
         transformedSourceFile.isDeclarationFile,
         transformedSourceFile.referencedFiles,
         transformedSourceFile.typeReferenceDirectives,
         transformedSourceFile.hasNoDefaultLib,
         transformedSourceFile.libReferenceDirectives
       );
+
+      return updated;
     };
   };
 };

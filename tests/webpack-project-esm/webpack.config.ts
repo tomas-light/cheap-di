@@ -42,7 +42,6 @@ const config: Configuration & { devServer?: DevServerConfiguration } = {
                   addDetailsToUnknownParameters: true,
                   logRegisteredMetadata: true,
                   errorsLogLevel: 'debug',
-                  esmImports: true,
                 }
               ),
             ],

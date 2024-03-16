@@ -9,10 +9,10 @@ import { inject } from 'cheap-di';
 export class Bar {
   constructor(readonly service: Zoo) {}
 
-  logInfo() {
-    this.service.log('succeed');
+  log(message: string) {
+    console.log(message);
   }
-  get() {
-    return this.service.get('succeed');
+  get(message: string) {
+    return message;
   }
 }

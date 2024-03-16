@@ -1,5 +1,5 @@
-import { saveConstructorMetadata } from '../metadata.js';
-import { ImplementationType, SomeDependency } from '../types.js';
+import { saveConstructorMetadata } from '../metadata';
+import { ImplementationType, SomeDependency } from '../types';
 
 export interface InjectDecorator {
   <T>(...dependencies: SomeDependency[]): (constructor: T, context?: ClassDecoratorContext) => T;
