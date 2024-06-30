@@ -27,11 +27,17 @@ interface DiMetadata {
   injected?: unknown[];
 }
 
-type RegistrationType<TInstance> = Constructor<TInstance> | AbstractConstructor<TInstance>;
+type RegistrationType<TInstance> =
+  | Constructor<TInstance>
+  | AbstractConstructor<TInstance>;
 
-type AsBase<TClass, ReturnType> = <TBase extends Partial<TClass>>(type: RegistrationType<TBase>) => ReturnType;
+type AsBase<TClass, ReturnType> = <TBase extends Partial<TClass>>(
+  type: RegistrationType<TBase>
+) => ReturnType;
 
-type AsSingleton<TClass, ReturnType> = <TBase extends Partial<TClass>>(type?: RegistrationType<TBase>) => ReturnType;
+type AsSingleton<TClass, ReturnType> = <TBase extends Partial<TClass>>(
+  type?: RegistrationType<TBase>
+) => ReturnType;
 
 type Enrich<TInstance, ReturnType> = <EnrichedInstance extends TInstance>(
   enrichCallback: (instance: TInstance) => EnrichedInstance
@@ -57,7 +63,10 @@ interface RegisteredInstance<TInstance> {
   enrich: Enrich<TInstance, this>;
 }
 
-interface DependencyRegistrator<RegisterTypeExtension = object, RegisterInstanceExtension = object> {
+interface DependencyRegistrator<
+  RegisterTypeExtension = object,
+  RegisterInstanceExtension = object,
+> {
   /** register implementation class */
   registerImplementation: <TClass>(
     implementationType: Constructor<TClass>
@@ -82,16 +91,23 @@ interface DependencyResolver {
   clear(): void;
 }
 
-interface Container<RegisterTypeExtension = object, RegisterInstanceExtension = object>
-  extends DependencyRegistrator<RegisterTypeExtension, RegisterInstanceExtension>,
+interface Container<
+  RegisterTypeExtension = object,
+  RegisterInstanceExtension = object,
+> extends DependencyRegistrator<
+      RegisterTypeExtension,
+      RegisterInstanceExtension
+    >,
     DependencyResolver {}
 
 interface IHaveSingletons {
   singletons: Map<ImplementationType<any>, object>;
 }
+
 interface IHaveInstances {
   instances: Map<RegistrationType<any>, any>;
 }
+
 interface IHaveDependencies {
   dependencies: Map<RegistrationType<any>, ImplementationType<any> | object>;
 }

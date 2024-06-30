@@ -1,8 +1,14 @@
 # Changelog
 
+## 4.1.2
+
+🐛 fixed issue, when `enrich` method is not called in case of using nested containers (like `useDi` hook
+in `cheap-di-react`);
+
 ## 4.1.1
 
 🐛 fix `enrich` method call order dependency. Now you should be able to call in any order of dependency setup:
+
 ```ts
 container
   .registerImplementation(ApiImpl)
@@ -25,7 +31,6 @@ container
   .asSingleton(Api);
 ```
 
-
 ## 4.1.0
 
 🚀 added `enrich` method to container to be able to wrap resolved instance with Proxy or something else that you need;
@@ -36,13 +41,16 @@ container
 
 ## 4.0.0
 
-The release main goal is stop using reflect-metadata as obsoleted (and unstable) approach and become compatible with TypeScript 5.2.0 decorators (stage 3 proposal).
+The release main goal is stop using reflect-metadata as obsoleted (and unstable) approach and become compatible with
+TypeScript 5.2.0 decorators (stage 3 proposal).
 
-As a bonus we introduce new approach to dependency registration to achieve True dependency injection - <a href="https://github.com/tomas-light/cheap-di/blob/master/packages/cheap-di-ts-transform/README.md">cheap-di-ts-transform</a> package
+As a bonus we introduce new approach to dependency registration to achieve True dependency
+injection - <a href="https://github.com/tomas-light/cheap-di/blob/master/packages/cheap-di-ts-transform/README.md">
+cheap-di-ts-transform</a> package
 
 ### 🚧 Breaking changes
 
-* `registerType` method was renamed to `registerImplementation`;
+- `registerType` method was renamed to `registerImplementation`;
 
 ```ts
 import { container } from 'cheap-di';
@@ -56,7 +64,7 @@ container.registerType(Foo);
 container.registerImplementation(Foo);
 ```
 
-* parameters injection method was renamed;
+- parameters injection method was renamed;
 
 ```ts
 import { container } from 'cheap-di';
@@ -66,17 +74,13 @@ class Foo {
 }
 
 // before
-container
-  .registerType(Foo)
-  .with('some message');
+container.registerType(Foo).with('some message');
 
 // after
-container
-  .registerImplementation(Foo)
-  .inject('some message');
+container.registerImplementation(Foo).inject('some message');
 ```
 
-* `@inject` decorator was rewritten and its target changed from constructor parameter to constructor itself:
+- `@inject` decorator was rewritten and its target changed from constructor parameter to constructor itself:
 
 ```ts
 import { inject } from 'cheap-di';
@@ -95,9 +99,9 @@ class Foo {
 }
 ```
 
-* removed `@dependencies` decorator. You may use `@inject` decorator instead of;
-* removed `@di` decorator;
-* removed `@singleton` decorator. Instead of it you may use:
+- removed `@dependencies` decorator. You may use `@inject` decorator instead of;
+- removed `@di` decorator;
+- removed `@singleton` decorator. Instead of it you may use:
 
 ```ts
 import { container } from 'cheap-di';
@@ -110,12 +114,11 @@ container.registerInstance(new Foo());
 // or
 
 // Foo will be instantiated only once, all consumers will get the same instance
-container
-  .registerImplementation(Foo)
-  .asSingleton(); 
+container.registerImplementation(Foo).asSingleton();
 ```
 
-* All symbols `dependenciesSymbol`, `singletonSymbol`, `injectionSymbol`, `inheritancePreserveSymbol` were removed, all information now are stored in single `cheapDiSymbol` symbol:
+- All symbols `dependenciesSymbol`, `singletonSymbol`, `injectionSymbol`, `inheritancePreserveSymbol` were removed, all
+  information now are stored in single `cheapDiSymbol` symbol:
 
 ```ts
 type ImplementationType<TClass> = Dependency<TClass> & {
@@ -137,14 +140,14 @@ interface DiMetadata {
 
   /** parameters are passed to container.registerImplementation(...).inject(parameter1, parameter2) */
   injected?: unknown[];
-} 
+}
 ```
 
 ### 🚀 Features:
 
-* `@inject` decorator supports stage 2 and stage 3TypeScript decorator syntax;
-* get rid of reflect-metadata issues, when your class loses its dependencies in runtime in unpredictable cases;
-* provided separated bundles for CommonJs and EcmaScript modules;
+- `@inject` decorator supports stage 2 and stage 3TypeScript decorator syntax;
+- get rid of reflect-metadata issues, when your class loses its dependencies in runtime in unpredictable cases;
+- provided separated bundles for CommonJs and EcmaScript modules;
 
 ## 3.5.0
 
@@ -154,14 +157,13 @@ interface DiMetadata {
 
 🔨 bump dependencies;
 
-
 ## 3.4.3
 
 🔨 Bump dependencies versions (and typescript from v4.7.3 to v4.9.4)
 
 ## 3.4.2
 
-Types: 
+Types:
 
 🔨 changed access level of `getInstance`, `getImplementation`, `getSingletons` methods in `ContainerImpl` to public;
 
@@ -220,6 +222,7 @@ Bugfixes:
 🚀 add `asSingleton` registration method;
 
 ## 3.1.0
+
 Features:
 
 🚀 add `@di` class-decorator;
@@ -230,123 +233,125 @@ Features:
 
 ## 3.0.0
 
-* move `parentContainer` field to `cheap-di-react`;
-* move `sameParent` method to `cheap-di-react`;
-* change access to `singletons` field by `protected`;
-* change access to `instances` field by `protected`;
-* change access to `dependencies` field by `protected`;
-* change access to `getInstance` method by `protected`;
-* change access to `getImplementation` method by `protected`;
-* change access to `getSingletons` method by `protected`;
+- move `parentContainer` field to `cheap-di-react`;
+- move `sameParent` method to `cheap-di-react`;
+- change access to `singletons` field by `protected`;
+- change access to `instances` field by `protected`;
+- change access to `dependencies` field by `protected`;
+- change access to `getInstance` method by `protected`;
+- change access to `getImplementation` method by `protected`;
+- change access to `getSingletons` method by `protected`;
 
 ## 2.3.0
 
-* prevent decorated setting inheritance (because it's a static field)
-* add `getDependencies` method to get settled types
+- prevent decorated setting inheritance (because it's a static field)
+- add `getDependencies` method to get settled types
 
+- add `getSingletons` public method to ContainerImpl
+- add `isSingleton` method to check if your type. It prevents falsy-singletons, that inherits this field from another
+  class
 
-* add `getSingletons` public method to ContainerImpl
-* add `isSingleton` method to check if your type. It prevents falsy-singletons, that inherits this field from another class
-
- 
-* add `setInjectedParams` method to set params (it's not `@inject` analog), that will be passed after all dependencies in your class
-* add `getInjectedParams` method to get injected params
+- add `setInjectedParams` method to set params (it's not `@inject` analog), that will be passed after all dependencies
+  in your class
+- add `getInjectedParams` method to get injected params
 
 ## 2.2.3
 
-* bugfix using of `@inject` in inherited classes
+- bugfix using of `@inject` in inherited classes
 
 ## 2.2.2
 
-* bugfix singletons -> move all singleton registration to root container
-* improve instance resolving
-* improve `@dependencies` and `@singleton` decorators. it doesn't wrap your class with synthetic class anymore
-* change using of `@singleton`
+- bugfix singletons -> move all singleton registration to root container
+- improve instance resolving
+- improve `@dependencies` and `@singleton` decorators. it doesn't wrap your class with synthetic class anymore
+- change using of `@singleton`
+
 ```ts
 import { singleton } from 'cheap-di';
 
 @singleton()
-class Old {
-}
+class Old {}
 
 @singleton
-class New {
-}
+class New {}
 ```
-* add error for circular dependencies with dependency trace
+
+- add error for circular dependencies with dependency trace
 
 ## 2.2.1
 
-* add `@inject` to index import
+- add `@inject` to index import
 
 ## 2.2.0
 
-* replace static property names by Symbols:
+- replace static property names by Symbols:
+
 ```ts
 import { dependenciesSymbol, singletonSymbol, injectionSymbol } from 'cheap-di';
 
 class Old {
-  static __singleton
-  static __dependencies
-  static __injectionParams
+  static __singleton;
+  static __dependencies;
+  static __injectionParams;
 }
+
 class New {
-  static [dependenciesSymbol]
-  static [singletonSymbol]
-  static [injectionSymbol]
+  static [dependenciesSymbol];
+  static [singletonSymbol];
+  static [injectionSymbol];
 }
 ```
 
-* add `@inject()` parameter-decorator, you can use it instead of `@dependencies()`
+- add `@inject()` parameter-decorator, you can use it instead of `@dependencies()`
 
 before:
+
 ```ts
 import { dependencies } from 'cheap-di';
 
 @dependencies(Service1, Service2)
 class MyClass {
-    constructor(
-      service1: Service1,
-      service2: Service2,
-    ) {}
+  constructor(service1: Service1, service2: Service2) {}
 }
 ```
+
 now:
+
 ```ts
 import { inject } from 'cheap-di';
 
 class MyClass {
-    constructor(
-      @inject(Service1) service1: Service1,
-      @inject(Service2) service2: Service2,
-    ) {}
+  constructor(
+    @inject(Service1) service1: Service1,
+    @inject(Service2) service2: Service2
+  ) {}
 }
 ```
 
 ## 2.1.0
 
-* add `@singleton` class-decorator
+- add `@singleton` class-decorator
 
 ## 2.0.5
 
-* fix type error: for class that contains static members
-* fix type error: for type registration with injection params
-* fix type error: add abstract constructor for instance registration
-* add className property for decorated classes
+- fix type error: for class that contains static members
+- fix type error: for type registration with injection params
+- fix type error: add abstract constructor for instance registration
+- add className property for decorated classes
 
 ## 2.0.1
 
-* add Container instantiation (with container nesting)
-* add 'dependencies' decorator for TypeScript classes
-* bugfixes
+- add Container instantiation (with container nesting)
+- add 'dependencies' decorator for TypeScript classes
+- bugfixes
 
 ## 2.0.0
 
-* rename RegisteredType to RegistrationType
-* rename __constructorParams to __dependencies
+- rename RegisteredType to RegistrationType
+- rename **constructorParams to **dependencies
 
 ## 1.1.0
 
-* rename IContainer to Container
-* rename IDependencyRegistrator to DependencyRegistrator
-* rename IDependencyResolver to DependencyResolver
+- rename IContainer to Container
+- rename IDependencyRegistrator to DependencyRegistrator
+- rename IDependencyResolver to DependencyResolver

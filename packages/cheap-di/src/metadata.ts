@@ -1,5 +1,11 @@
 import { cheapDiSymbol } from './cheapDiSymbol';
-import { AbstractConstructor, Constructor, DiMetadata, ImplementationType, SomeDependency } from './types';
+import {
+  AbstractConstructor,
+  Constructor,
+  DiMetadata,
+  ImplementationType,
+  SomeDependency,
+} from './types';
 
 export function saveConstructorMetadata<T>(
   constructor: Constructor<T> | AbstractConstructor<T>,
@@ -9,13 +15,17 @@ export function saveConstructorMetadata<T>(
     return {};
   }
 
-  const metadata = createConstructorMetadata(constructor as ImplementationType<T>);
+  const metadata = createConstructorMetadata(
+    constructor as ImplementationType<T>
+  );
   metadata.dependencies = dependencies;
 
   return metadata;
 }
 
-export function findOrCreateMetadata<TClass>(constructor: ImplementationType<TClass>) {
+export function findOrCreateMetadata<TClass>(
+  constructor: ImplementationType<TClass>
+) {
   const metadata = findMetadata(constructor);
   if (metadata) {
     return metadata;
@@ -28,7 +38,9 @@ export function findMetadata<TClass>(constructor: ImplementationType<TClass>) {
   return constructor[cheapDiSymbol];
 }
 
-export function createConstructorMetadata<TClass>(constructor: ImplementationType<TClass>): DiMetadata {
+export function createConstructorMetadata<TClass>(
+  constructor: ImplementationType<TClass>
+): DiMetadata {
   return (constructor[cheapDiSymbol] = {
     modifiedClass: constructor,
   });

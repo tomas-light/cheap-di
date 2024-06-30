@@ -1,2 +1,1 @@
-export class CircularDependencyError extends Error {
-}
+export class CircularDependencyError extends Error {}
