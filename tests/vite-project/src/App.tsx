@@ -1,4 +1,4 @@
-import { container, Container } from 'cheap-di';
+import { container, ContainerImpl } from 'cheap-di';
 import { DIProviderMemo } from 'cheap-di-react';
 import { useEffect, useState } from 'react';
 import { Provider } from 'react-redux';
@@ -10,7 +10,7 @@ import { CheapDiAndReduxMiddlewareComponent1 } from './CheapDiAndReduxMiddleware
 import { CheapDiAndReduxMiddlewareComponent2 } from './CheapDiAndReduxMiddlewareComponent2.tsx';
 
 function App() {
-  const [configuredContainer, setConfiguredContainer] = useState<Container | null>(null);
+  const [configuredContainer, setConfiguredContainer] = useState<ContainerImpl | null>(null);
 
   useEffect(() => {
     container.registerImplementation(SingletonService).asSingleton();
@@ -24,7 +24,7 @@ function App() {
   return (
     <>
       <Provider store={store}>
-        <DIProviderMemo parentContainer={configuredContainer}>
+        <DIProviderMemo rootContainer={configuredContainer}>
           <CheapDiAndReduxMiddlewareComponent1 />
           <CheapDiAndReduxMiddlewareComponent2 />
         </DIProviderMemo>

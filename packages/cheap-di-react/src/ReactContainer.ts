@@ -1,4 +1,9 @@
-import { AbstractConstructor, Constructor, ContainerImpl, ImplementationType } from 'cheap-di';
+import {
+  AbstractConstructor,
+  Constructor,
+  ContainerImpl,
+  ImplementationType,
+} from 'cheap-di';
 
 export class ReactContainer extends ContainerImpl {
   rerender: () => void;
@@ -29,7 +34,9 @@ export class ReactContainer extends ContainerImpl {
 
   localScope<Callback extends (container: ReactContainer) => any>(
     callback: Callback
-  ): Callback extends (container: ReactContainer) => infer Result ? Result : void {
+  ): Callback extends (container: ReactContainer) => infer Result
+    ? Result
+    : void {
     this.scope = 'local';
     const result = callback(this);
     this.scope = 'global';
@@ -69,6 +76,20 @@ export class ReactContainer extends ContainerImpl {
 
     if (this.parentContainer && this.scope === 'global') {
       return this.parentContainer.getImplementation(type);
+    }
+
+    return undefined;
+  }
+
+  getEnrichCallback<TInstance>(
+    type: Constructor<TInstance> | AbstractConstructor<TInstance>
+  ): ((instance: any) => any) | undefined {
+    if (this.enrichCallbacks.has(type)) {
+      return this.enrichCallbacks.get(type)!;
+    }
+
+    if (this.parentContainer && this.scope === 'global') {
+      return this.parentContainer.getEnrichCallback(type);
     }
 
     return undefined;
