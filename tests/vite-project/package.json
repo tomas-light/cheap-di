@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "test": "npx vitest",
+    "test": "vitest run",
     "build": "vite build",
     "preview": "vite preview"
   },

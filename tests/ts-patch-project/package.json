@@ -1,6 +1,7 @@
 {
   "name": "@tests/ts-patch-project",
   "version": "0.0.0",
+  "type": "module",
   "scripts": {
     "// live": "",
     "ts-test:1": "ts-node src/case-01-single-file.ts",

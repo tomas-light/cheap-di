@@ -1,6 +1,6 @@
 {
   "name": "cheap-di",
-  "version": "4.1.1",
+  "version": "4.1.2",
   "description": "TypeScript dependency injection like Autofac in .Net",
   "type": "module",
   "scripts": {
@@ -42,6 +42,7 @@
       "esm/**/*",
       "types/**/*",
       "package.json",
+      "CHANGELOG.md",
       "README.md",
       "LICENSE"
     ],

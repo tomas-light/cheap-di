@@ -25,5 +25,4 @@ const DIProviderMemo: FC<DIProviderProps> = (props) => {
 };
 
 const memoizedComponent = memo(DIProviderMemo) as FC<DIProviderProps>;
-export { memoizedComponent as DIProviderMemo };
-export type { DIProviderProps as DIProviderMemoProps };
+export { memoizedComponent as DIProviderMemo, type DIProviderProps as DIProviderMemoProps };

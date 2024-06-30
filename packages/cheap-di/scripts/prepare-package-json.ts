@@ -38,11 +38,17 @@ async function copyAndFixPackageJson(sourcePackageJson: Record<string, any>) {
   delete modifiedPackageJson['devDependencies'];
   delete modifiedPackageJson['scripts'];
 
-  const modifiedPackageJsonString = JSON.stringify(modifiedPackageJson, null, 2);
+  const modifiedPackageJsonString = JSON.stringify(
+    modifiedPackageJson,
+    null,
+    2
+  );
   await writeFile(paths.distPackageJson, modifiedPackageJsonString);
 }
 
-async function createEsmModulePackageJson(sourcePackageJson: Record<string, any>) {
+async function createEsmModulePackageJson(
+  sourcePackageJson: Record<string, any>
+) {
   const directories = await readdir(paths.dist);
 
   const directoryTypeMap = {
@@ -53,7 +59,11 @@ async function createEsmModulePackageJson(sourcePackageJson: Record<string, any>
 
   for await (const directory of directories) {
     if (keys.includes(directory)) {
-      const packageJsonFilePath = path.join(paths.dist, directory, 'package.json');
+      const packageJsonFilePath = path.join(
+        paths.dist,
+        directory,
+        'package.json'
+      );
 
       const content = JSON.stringify(
         {

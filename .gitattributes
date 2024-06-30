@@ -1,0 +1,5 @@
+/.yarn/**                       linguist-vendored
+/.yarn/releases/*               binary
+
+*                               text=auto eol=lf
+*.png                           binary

@@ -16,7 +16,14 @@ import {
   RegistrationType,
 } from './types';
 
-class ContainerImpl implements Container, IHaveSingletons, IHaveInstances, IHaveDependencies, Disposable {
+class ContainerImpl
+  implements
+    Container,
+    IHaveSingletons,
+    IHaveInstances,
+    IHaveDependencies,
+    Disposable
+{
   singletons: Map<ImplementationType<any>, object>;
   instances: Map<RegistrationType<any>, object>;
   dependencies: Map<RegistrationType<any>, ImplementationType<any> | object>;
@@ -30,7 +37,9 @@ class ContainerImpl implements Container, IHaveSingletons, IHaveInstances, IHave
   }
 
   /** register implementation class */
-  registerImplementation: Container['registerImplementation'] = <TClass>(implementationType: Constructor<TClass>) => {
+  registerImplementation: Container['registerImplementation'] = <TClass>(
+    implementationType: Constructor<TClass>
+  ) => {
     this.dependencies.set(implementationType, implementationType);
 
     let asType: RegistrationType<any> | undefined = undefined;
@@ -58,7 +67,9 @@ class ContainerImpl implements Container, IHaveSingletons, IHaveInstances, IHave
         }
 
         if (!isSingleton(implementationType)) {
-          const metadata = findOrCreateMetadata(implementationType as ImplementationType<unknown>);
+          const metadata = findOrCreateMetadata(
+            implementationType as ImplementationType<unknown>
+          );
           metadata.modifiedClass = implementationType;
           metadata.singleton = true;
         }
@@ -66,7 +77,9 @@ class ContainerImpl implements Container, IHaveSingletons, IHaveInstances, IHave
         return registeredImplementation;
       },
       inject: (...injectionParams) => {
-        const metadata = findOrCreateMetadata(implementationType as ImplementationType<unknown>);
+        const metadata = findOrCreateMetadata(
+          implementationType as ImplementationType<unknown>
+        );
         metadata.injected = injectionParams;
 
         return registeredImplementation;
@@ -87,7 +100,9 @@ class ContainerImpl implements Container, IHaveSingletons, IHaveInstances, IHave
   };
 
   /** register any object as its constructor */
-  registerInstance: Container['registerInstance'] = <TInstance extends object>(instance: TInstance) => {
+  registerInstance: Container['registerInstance'] = <TInstance extends object>(
+    instance: TInstance
+  ) => {
     const constructor = instance.constructor as Constructor<TInstance>;
     if (constructor) {
       this.instances.set(constructor, instance);
@@ -128,10 +143,9 @@ class ContainerImpl implements Container, IHaveSingletons, IHaveInstances, IHave
   ): TInstance | undefined {
     const trace = new Trace(type.name);
     try {
-      // return this.internalResolve(type, trace, ...args);
       const resolvedInstance = this.internalResolve(type, trace, ...args);
 
-      const enrichCallback = this.enrichCallbacks.get(type);
+      const enrichCallback = this.getEnrichCallback(type);
       if (typeof enrichCallback === 'function') {
         return enrichCallback(resolvedInstance);
       }
@@ -141,7 +155,9 @@ class ContainerImpl implements Container, IHaveSingletons, IHaveInstances, IHave
       if (error instanceof RangeError) {
         const tree = trace.build();
         console.warn('cheap-di, circular dependencies tree', tree);
-        throw new CircularDependencyError(`Circular dependencies during resolve ${type.name}. ${error.message}`);
+        throw new CircularDependencyError(
+          `Circular dependencies during resolve ${type.name}. ${error.message}`
+        );
       }
       throw error;
     }
@@ -217,7 +233,8 @@ class ContainerImpl implements Container, IHaveSingletons, IHaveInstances, IHave
           const instance = this.internalResolve(dependencyType, trace.trace!);
 
           const isNewInstance =
-            !this.isRegisteredInstance(dependencyType, instance) && !this.isRegisteredType(dependencyType, instance);
+            !this.isRegisteredInstance(dependencyType, instance) &&
+            !this.isRegisteredType(dependencyType, instance);
           if (
             // todo: can't remember why is it, have to add comment ...
             isNewInstance &&
@@ -296,7 +313,9 @@ class ContainerImpl implements Container, IHaveSingletons, IHaveInstances, IHave
 
           const replaceableIndex = injectableArguments.findIndex(
             (argument) =>
-              argument != null && typeof argument === 'object' && argument instanceof restParameter.constructor
+              argument != null &&
+              typeof argument === 'object' &&
+              argument instanceof restParameter.constructor
           );
           if (replaceableIndex === -1) {
             notReplacedParams.push(restParameter);
@@ -337,6 +356,16 @@ class ContainerImpl implements Container, IHaveSingletons, IHaveInstances, IHave
   ): ImplementationType<TInstance> | object | undefined {
     if (this.dependencies.has(type)) {
       return this.dependencies.get(type)!;
+    }
+
+    return undefined;
+  }
+
+  getEnrichCallback<TInstance>(
+    type: Constructor<TInstance> | AbstractConstructor<TInstance>
+  ): ((instance: any) => any) | undefined {
+    if (this.enrichCallbacks.has(type)) {
+      return this.enrichCallbacks.get(type)!;
     }
 
     return undefined;

@@ -41,7 +41,9 @@ class Trace {
     const secondLoopIndex = copy.indexOf(loopImplementation) + 1;
 
     const loop = traces.slice(firstLoopIndex, secondLoopIndex + 1);
-    const trace = loop.map((types) => `(${types.type}, ${types.implemented})`).join(' -> ');
+    const trace = loop
+      .map((types) => `(${types.type}, ${types.implemented})`)
+      .join(' -> ');
     return trace;
   }
 

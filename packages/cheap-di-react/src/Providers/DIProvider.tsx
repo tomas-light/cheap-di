@@ -1,4 +1,10 @@
-import { Constructor, Container, DependencyRegistrator, isSingleton } from 'cheap-di';
+import {
+  Constructor,
+  Container,
+  ContainerImpl,
+  DependencyRegistrator,
+  isSingleton,
+} from 'cheap-di';
 import { FC, ReactNode, useEffect, useRef, useState } from 'react';
 import { DiContext } from '../DiContext.js';
 import { useDiContext } from '../hooks/index.js';
@@ -39,6 +45,9 @@ interface Props {
    * */
   selfSingletons?: SelfDependency[];
 
+  /** @deprecated use `rootContainer` instead */
+  parentContainer?: ContainerImpl;
+
   /**
    * adds your configured container as root container to your React tree
    * @example
@@ -53,13 +62,13 @@ interface Props {
    *   });
    *
    *   return (
-   *     <DIProvider parentContainer={configuredContainer}>
+   *     <DIProvider rootContainer={configuredContainer}>
    *       <MyComponent />
    *     </DIProvider>
    *   );
    * }
    * */
-  parentContainer?: Container;
+  rootContainer?: ContainerImpl;
 
   /** enables logging of dependencies registrations */
   debugName?: string;
@@ -68,16 +77,33 @@ interface Props {
 }
 
 const DIProvider: FC<Props> = (props) => {
-  const { dependencies, self, selfSingletons, parentContainer, debugName, children } = props;
+  const {
+    //
+    dependencies,
+    self,
+    selfSingletons,
+    parentContainer,
+    rootContainer,
+    debugName,
+    children,
+  } = props;
 
   const [logger] = useState(() => new InternalLogger(debugName));
   const [initialized, setInitialized] = useState(false);
   const timerRef = useRef<any>(null);
-  const diContext = useDiContext({ logger, parentContainer });
+  const diContext = useDiContext({
+    logger,
+    parentContainer: rootContainer ?? parentContainer,
+  });
   const { container: reactContainer } = diContext;
 
   useEffect(() => {
-    const isAnyConfigurationPassed = dependencies || self || selfSingletons || parentContainer;
+    const isAnyConfigurationPassed =
+      dependencies ||
+      self ||
+      selfSingletons ||
+      rootContainer ||
+      parentContainer;
     if (!reactContainer || !isAnyConfigurationPassed) {
       return;
     }
@@ -85,15 +111,23 @@ const DIProvider: FC<Props> = (props) => {
     reactContainer.clear();
     logger.log('dependency registrations');
 
-    const singletonsSizeBeforeDependenciesUpdate = reactContainer?.getSingletons().size ?? 0;
+    const singletonsSizeBeforeDependenciesUpdate =
+      reactContainer?.getSingletons().size ?? 0;
+
     dependencies?.forEach((dependency) => dependency(reactContainer));
-    self?.forEach((selfDependency) => reactContainer.registerImplementation(selfDependency));
-    selfSingletons?.forEach((selfDependency) => reactContainer.registerImplementation(selfDependency).asSingleton());
+    self?.forEach((selfDependency) =>
+      reactContainer.registerImplementation(selfDependency)
+    );
+    selfSingletons?.forEach((selfDependency) =>
+      reactContainer.registerImplementation(selfDependency).asSingleton()
+    );
 
     logger.log('singleton and stateful configurations');
 
     for (const [type] of reactContainer.getDependencies()) {
-      const implementation = reactContainer.localScope((container) => container.getImplementation(type));
+      const implementation = reactContainer.localScope((container) =>
+        container.getImplementation(type)
+      );
       if (!implementation) {
         continue;
       }
@@ -107,7 +141,8 @@ const DIProvider: FC<Props> = (props) => {
 
     if (
       reactContainer.parentContainer &&
-      singletonsSizeBeforeDependenciesUpdate !== reactContainer.getSingletons().size
+      singletonsSizeBeforeDependenciesUpdate !==
+        reactContainer.getSingletons().size
     ) {
       logger.log('singletons size changed, trigger root rerender');
       timerRef.current = setTimeout(() => {
@@ -135,5 +170,4 @@ const DIProvider: FC<Props> = (props) => {
   return <DiContext.Provider value={diContext}>{children}</DiContext.Provider>;
 };
 
-export { DIProvider };
-export type { Props as DIProviderProps };
+export { DIProvider, type Props as DIProviderProps };

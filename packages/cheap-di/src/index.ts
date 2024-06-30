@@ -11,7 +11,12 @@ import { cheapDiSymbol } from './cheapDiSymbol';
 import { CircularDependencyError } from './CircularDependencyError';
 import { container, ContainerImpl } from './ContainerImpl';
 import { inject } from './decorators/inject';
-import { findMetadata, findOrCreateMetadata, saveConstructorMetadata, createConstructorMetadata } from './metadata';
+import {
+  findMetadata,
+  findOrCreateMetadata,
+  saveConstructorMetadata,
+  createConstructorMetadata,
+} from './metadata';
 import { isSingleton } from './isSingleton';
 import { Trace } from './Trace';
 

@@ -2,12 +2,12 @@
 
 JavaScript's dependency injection is like Autofac in .Net
 
-* [Installation](#installation)
-* [How to use](#how-to-use)
-* [Using with abstractions](#using-abstractions)
-* [Registration variants](#registration-variants)
-  * [registerImplementation](#register-implementation)
-  * [registerInstance](#register-instance)
+- [Installation](#installation)
+- [How to use](#how-to-use)
+- [Using with abstractions](#using-abstractions)
+- [Registration variants](#registration-variants)
+  - [registerImplementation](#register-implementation)
+  - [registerInstance](#register-instance)
 
 ## <a name="installation"></a> Installation
 
@@ -17,7 +17,10 @@ npm i cheap-di
 
 ## <a name="how-to-use"></a> How to use
 
-The recommended way of using this package is to use it with code transformers like <a href="https://github.com/tomas-light/cheap-di/tree/master/packages/cheap-di-ts-transform">cheap-di-ts-transform</a>. Because in this way, you will get true dependency injection:
+The recommended way of using this package is to use it with code transformers
+like <a href="https://github.com/tomas-light/cheap-di/tree/master/packages/cheap-di-ts-transform">
+cheap-di-ts-transform</a>. Because in this way, you will get true dependency injection:
+
 ```ts
 import { container } from 'cheap-di';
 
@@ -34,6 +37,7 @@ class MyService {
     this.logger.log('I do something');
   }
 }
+
 /**
  * With cheap-di-ts-transform here will be added metadata about Service dependencies.
  * */
@@ -46,7 +50,10 @@ if (myService) {
 }
 ```
 
-If you can't use <a href="https://github.com/tomas-light/cheap-di/tree/master/packages/cheap-di-ts-transform">cheap-di-ts-transform</a>, you have to use `@inject` decorator to define your dependencies (<i>it supports stage 2 and stage 3 TypeScript syntax</i>):
+If you can't use <a href="https://github.com/tomas-light/cheap-di/tree/master/packages/cheap-di-ts-transform">
+cheap-di-ts-transform</a>, you have to use `@inject` decorator to define your dependencies (<i>it supports stage 2 and
+stage 3 TypeScript syntax</i>):
+
 ```ts
 import { container, inject } from 'cheap-di';
 
@@ -78,11 +85,13 @@ if (myService) {
 > Note:
 > You may wonder why we use abstract classes?
 > - It is syntax analog of interface.
-> 
+>
 > But why don't we use interfaces?
-> - Because we need some unique "token" compatible with JavaScript, to be able to register and resolve implementations. You can't use TypeScript interface in runtime (because it doesn't exists in JavaScript), and you can use classes!
-> 
-> Some another DI libraries use symbols to achieve that, but we don't see necessity to map somewhere symbols with implementations if we may use only classes everywhere. Less code -> less issues.
+> - Because we need some unique "token" compatible with JavaScript, to be able to register and resolve implementations.
+>    You can't use TypeScript interface in runtime (because it doesn't exists in JavaScript), and you can use classes!
+>
+> Some another DI libraries use symbols to achieve that, but we don't see necessity to map somewhere symbols with
+> implementations if we may use only classes everywhere. Less code -> less issues.
 
 ```ts
 // logger.ts
@@ -98,6 +107,7 @@ class ConsoleLogger implements Logger {
   }
 }
 ```
+
 ```ts
 // service.ts
 import { Logger } from './logger';
@@ -110,6 +120,7 @@ class Service {
   }
 }
 ```
+
 ```ts
 // somewhere in your application initialization
 import { container } from 'cheap-di';
@@ -118,6 +129,7 @@ import { Logger, ConsoleLogger } from './logger';
 const myLogPrefix = 'INFO: ';
 container.registerImplementation(ConsoleLogger).as(Logger).inject(myLogPrefix);
 ```
+
 ```ts
 // somewhere inside your code
 // or you may use some middleware to do this, to get rid of Service Locator antipattern
@@ -128,7 +140,9 @@ const service = container.resolve(Service);
 service.doSome();
 ```
 
-Without <a href="https://github.com/tomas-light/cheap-di/tree/master/packages/cheap-di-ts-transform">cheap-di-ts-transform</a>, you still may use cheap-di with `@inject` decorator (it supports stage 2 and stage 3 TypeScript syntax):
+Without <a href="https://github.com/tomas-light/cheap-di/tree/master/packages/cheap-di-ts-transform">
+cheap-di-ts-transform</a>, you still may use cheap-di with `@inject` decorator (it supports stage 2 and stage 3
+TypeScript syntax):
 
 ```ts
 import { inject } from 'cheap-di';
@@ -140,17 +154,24 @@ abstract class SessionAccessor {
 abstract class Logger {
   abstract debug(message: string): void;
 }
+
 abstract class InfoLogger extends Logger {}
+
 abstract class ErrorLogger extends Logger {}
 
 // non-classes-arguments specified as "unknown" (or any other string)
 // we use `dependencies.filter((dependency) => typeof dependency !== 'string'))` code to filter non-clases dependencies
 @inject('unknown', SessionAccessor)
 class ConsoleLogger implements Logger {
-  constructor(public prefix: string, private sessionAccessor: SessionAccessor) {}
+  constructor(
+    public prefix: string,
+    private sessionAccessor: SessionAccessor
+  ) {}
 
   debug(message: string) {
-    console.log(`[${this.sessionAccessor.getSession()}] ${this.prefix}: ${message}`);
+    console.log(
+      `[${this.sessionAccessor.getSession()}] ${this.prefix}: ${message}`
+    );
   }
 }
 
@@ -163,17 +184,25 @@ class Service {
   }
 }
 ```
+
 ```ts
 // somewhere
 import { container } from 'cheap-di';
 import { InfoLogger, ErrorLogger, ConsoleLogger } from './logger';
 
 const infoPrefix = 'INFO: ';
-container.registerImplementation(ConsoleLogger).as(InfoLogger).inject(infoPrefix);
+container
+  .registerImplementation(ConsoleLogger)
+  .as(InfoLogger)
+  .inject(infoPrefix);
 
 const errorPrefix = 'ERROR: ';
-container.registerImplementation(ConsoleLogger).as(ErrorLogger).inject(errorPrefix);
+container
+  .registerImplementation(ConsoleLogger)
+  .as(ErrorLogger)
+  .inject(errorPrefix);
 ```
+
 ```ts
 // somewhere in inside your code
 // or you may use some middleware to do this, to get rid of Service Locator antipattern
@@ -185,6 +214,7 @@ service.doSome();
 ```
 
 To use stage 2 decorators, you need to adjust your tsconfig.json like this:
+
 ```json
 {
   "compilerOptions": {
@@ -201,6 +231,7 @@ To use stage 3 decorators, you don't need extra setup.
 #### <a name="register-implementation"></a> registerImplementation
 
 If you would like to specify implementation of your interface:
+
 ```ts
 import { container } from 'cheap-di';
 
@@ -213,6 +244,7 @@ container
 ```
 
 Or if you want to inject some parameters to its constructor:
+
 ```ts
 import { container } from 'cheap-di';
 
@@ -226,6 +258,7 @@ container
 ```
 
 Or if you want to have only one instance of the implementation class:
+
 ```ts
 import { container } from 'cheap-di';
 
@@ -237,6 +270,7 @@ container
 ```
 
 And singletons may also be used with interface specifications:
+
 ```ts
 import { container } from 'cheap-di';
 
@@ -249,6 +283,7 @@ container
 ```
 
 And even with argument injection:
+
 ```ts
 import { container } from 'cheap-di';
 
@@ -266,8 +301,9 @@ container
   .inject('some name');
 ```
 
-You may wrap resolved instance with Proxy or do something else. 
+You may wrap resolved instance with Proxy or do something else.
 For example if you want to log called methods of Api.
+
 ```ts
 import { container } from 'cheap-di';
 
@@ -291,7 +327,8 @@ container
 
 #### <a name="register-instance"></a> registerInstance
 
-If you want to register some instance as an interface, the result is similar to singleton registration, except that you have to instantiate the class yourself.
+If you want to register some instance as an interface, the result is similar to singleton registration, except that you
+have to instantiate the class yourself.
 
 ```ts
 import { container } from 'cheap-di';
@@ -327,6 +364,8 @@ container
   .as(Database);
 ```
 
-You can see more examples of container methods in <a href="https://github.com/tomas-light/cheap-di/blob/master/tests/jest-test/src/ContainerImpl.test.ts">ContainerImpl.test.ts</a>
+You can see more examples of container methods
+in <a href="https://github.com/tomas-light/cheap-di/blob/master/tests/jest-test/src/ContainerImpl.test.ts">
+ContainerImpl.test.ts</a>
 
 [Changelog](./CHANGELOG.md)

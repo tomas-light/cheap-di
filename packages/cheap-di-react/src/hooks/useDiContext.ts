@@ -1,4 +1,4 @@
-import { Container } from 'cheap-di';
+import { ContainerImpl } from 'cheap-di';
 import { useContext, useEffect, useState } from 'react';
 import { DiContext, DiContextType } from '../DiContext.js';
 import { ReactContainer } from '../ReactContainer.js';
@@ -6,19 +6,23 @@ import { InternalLogger } from '../InternalLogger.js';
 
 type HookParams = {
   logger?: InternalLogger;
-  /** will be used, if there is no parent Container in React Context */
-  parentContainer?: Container;
+  /**
+   * will be used, if there is no parent Container in React Context
+   * */
+  parentContainer?: ContainerImpl;
 };
 
 export function useDiContext(params: HookParams = {}) {
   const { logger = console } = params;
 
-  const parentContainer = useContext(DiContext)?.container as ReactContainer;
+  const parentReactContainer = useContext(DiContext)?.container;
 
-  const [contextValue, setContextValue] = useState<DiContextType>({ container: undefined });
+  const [contextValue, setContextValue] = useState<DiContextType>({
+    container: undefined,
+  });
 
   useEffect(() => {
-    const parent = parentContainer ?? params.parentContainer;
+    const parent = parentReactContainer ?? params.parentContainer;
 
     if (!contextValue.container) {
       if (parent) {
@@ -27,7 +31,8 @@ export function useDiContext(params: HookParams = {}) {
       } else {
         logger.log('create root container');
         contextValue.container = new ReactContainer();
-        contextValue.container.rerender = () => setContextValue({ ...contextValue });
+        contextValue.container.rerender = () =>
+          setContextValue({ ...contextValue });
       }
 
       setContextValue({ container: contextValue.container });
@@ -42,7 +47,7 @@ export function useDiContext(params: HookParams = {}) {
 
     logger.log('RECREATE container');
     setContextValue({ container: new ReactContainer(parent) });
-  }, [parentContainer, params.parentContainer]);
+  }, [parentReactContainer, params.parentContainer]);
 
   return contextValue;
 }
