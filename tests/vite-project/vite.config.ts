@@ -12,16 +12,7 @@ const viteConfig = defineConfig({
         before: [
           {
             type: 'program',
-            factory: (program) =>
-              transformer(
-                { program },
-                {
-                  debug: true,
-                  addDetailsToUnknownParameters: true,
-                  logRegisteredMetadata: true,
-                  errorsLogLevel: 'debug',
-                }
-              ),
+            factory: (program) => transformer({ program }),
           },
         ],
       },
