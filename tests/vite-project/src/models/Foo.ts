@@ -4,6 +4,6 @@ export class Foo {
   constructor(readonly bar: Bar) {}
 
   do() {
-    return 'foo resolved in esm mode: ' + this.bar.get();
+    return 'foo resolved in esm mode: ' + this.bar.get('bar message');
   }
 }

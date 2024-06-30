@@ -5,10 +5,8 @@ beforeEach(() => {
   container.clear();
 });
 
-// because cheap-di-ts-transformer adds `await import(...)` after class declaration with injected dependencies,
-// and `await` keyword may be used only inside `async` function
-describe('register implementation as', async () => {
-  test('simple', async () => {
+describe('register implementation as', () => {
+  test('simple', () => {
     class Service {
       constructor() {
         if (new.target === Service) {
@@ -35,7 +33,7 @@ describe('register implementation as', async () => {
     expect(service.get()).toBe('some');
   });
 
-  test('simple with passed arguments', async () => {
+  test('simple with passed arguments', () => {
     class Service {
       constructor() {
         if (new.target === Service) {
@@ -70,10 +68,8 @@ describe('register implementation as', async () => {
   });
 });
 
-// because cheap-di-ts-transformer adds `await import(...)` after class declaration with injected dependencies,
-// and `await` keyword may be used only inside `async` function
-describe('register instance', async () => {
-  test('simple', async () => {
+describe('register instance', () => {
+  test('simple', () => {
     class Database {
       readonly entities: string[];
 
@@ -94,7 +90,7 @@ describe('register instance', async () => {
     expect(database.list()).toBe(entities);
   });
 
-  test('as other', async () => {
+  test('as other', () => {
     class Service {
       readonly entities: string[];
 
@@ -128,9 +124,7 @@ describe('register instance', async () => {
   });
 });
 
-// because cheap-di-ts-transformer adds `await import(...)` after class declaration with injected dependencies,
-// and `await` keyword may be used only inside `async` function
-describe('resolving several dependencies', async () => {
+describe('resolving several dependencies', () => {
   class ApiInterceptor {
     static singleton: ApiInterceptor;
 
@@ -176,20 +170,20 @@ describe('resolving several dependencies', async () => {
   container.registerImplementation(MyApi);
 
   const myApi = container.resolve(MyApi);
-  test('api resolved', async () => {
+  test('api resolved', () => {
     expect(myApi).not.toBe(null);
   });
-  test('api has passed parameter', async () => {
+  test('api has passed parameter', () => {
     expect(myApi!.interceptor).not.toBe(null);
     expect(myApi!.interceptor!.dispatch).not.toBe(null);
   });
-  test('api method works', async () => {
+  test('api method works', () => {
     expect(myApi!.getData()).toBe('123-456');
     expect(dispatch).toBeCalledTimes(1);
   });
 });
 
-test('asSingleton', async () => {
+test('asSingleton', () => {
   class Service {}
 
   container.registerImplementation(Service).asSingleton();
@@ -199,7 +193,7 @@ test('asSingleton', async () => {
 });
 
 describe('nested resolve', () => {
-  test('resolve service', async () => {
+  test('resolve service', () => {
     class Database {
       readonly entities: string[];
 
@@ -243,7 +237,7 @@ describe('nested resolve', () => {
     expect(list).toEqual(['entity 1', 'entity 2', 'service entity']);
   });
 
-  test('auto resolve service', async () => {
+  test('auto resolve service', () => {
     class Database {
       readonly entities: string[];
 
@@ -283,7 +277,7 @@ describe('nested resolve', () => {
   });
 });
 
-test('add abstract constructor for instance registration', async () => {
+test('add abstract constructor for instance registration', () => {
   abstract class Config {
     abstract message: string;
   }
@@ -297,9 +291,7 @@ test('add abstract constructor for instance registration', async () => {
   expect(result).toBe(config);
 });
 
-// because cheap-di-ts-transformer adds `await import(...)` after class declaration with injected dependencies,
-// and `await` keyword may be used only inside `async` function
-describe('with decorators', async () => {
+describe('with decorators', () => {
   class Database {
     readonly entities: string[];
 
@@ -346,7 +338,7 @@ describe('with decorators', async () => {
     container.clear();
   });
 
-  test('with inject decorator', async () => {
+  test('with inject decorator', () => {
     class _Repository extends Repository {
       constructor(db: Database) {
         super(db);
@@ -362,7 +354,7 @@ describe('with decorators', async () => {
     check(_Service);
   });
 
-  test('with di decorator', async () => {
+  test('with di decorator', () => {
     class _Repository extends Repository {
       constructor(db: Database) {
         super(db);
@@ -378,7 +370,7 @@ describe('with decorators', async () => {
     check(_Service);
   });
 
-  test('resolve service', async () => {
+  test('resolve service', () => {
     class Database {
       readonly entities: string[];
 
@@ -421,9 +413,7 @@ describe('with decorators', async () => {
   });
 });
 
-// because cheap-di-ts-transformer adds `await import(...)` after class declaration with injected dependencies,
-// and `await` keyword may be used only inside `async` function
-describe('arguments order', async () => {
+describe('arguments order', () => {
   class Database {
     constructor(private readonly entities: string[]) {}
 
@@ -495,7 +485,7 @@ describe('arguments order', async () => {
     container.clear();
   });
 
-  test('case 1', async () => {
+  test('case 1', () => {
     class Service1 extends Service {
       constructor(
         public repository: Repository,
@@ -517,7 +507,7 @@ describe('arguments order', async () => {
     check(Service1);
   });
 
-  test('case 2', async () => {
+  test('case 2', () => {
     class Service2 extends Service {
       constructor(
         public repository: Repository,
@@ -539,7 +529,7 @@ describe('arguments order', async () => {
     check(Service2 as any);
   });
 
-  test('case 3', async () => {
+  test('case 3', () => {
     class Service3 extends Service {
       constructor(
         message: string,
@@ -561,7 +551,7 @@ describe('arguments order', async () => {
     check(Service3 as any);
   });
 
-  test('case 4', async () => {
+  test('case 4', () => {
     class Service4 extends Service {
       constructor(
         message: string,
@@ -583,7 +573,7 @@ describe('arguments order', async () => {
     check(Service4 as any);
   });
 
-  test('case 5', async () => {
+  test('case 5', () => {
     class Service5 extends Service {
       constructor(
         message: string,
@@ -605,7 +595,7 @@ describe('arguments order', async () => {
     check(Service5 as any);
   });
 
-  test('case 6', async () => {
+  test('case 6', () => {
     class AnotherService {
       constructor(private num: number) {}
 

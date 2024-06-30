@@ -173,7 +173,7 @@ describe('enrich callbacks', () => {
     expect(usedMethods).toEqual(['getUsers', 'getRoles']);
   });
 
-  test('if instance is wrapped with Proxy when it is one of dependencies of target type', async () => {
+  test('if instance is wrapped with Proxy when it is one of dependencies of target type', () => {
     class Api {
       getUsers() {
         return ['user-1', 'user-2'];
@@ -204,7 +204,7 @@ describe('enrich callbacks', () => {
     expect(usedMethods).toEqual(['getUsers', 'getRoles']);
   });
 
-  test('if instance is wrapped with Proxy when it is one of deep dependencies of target type', async () => {
+  test('if instance is wrapped with Proxy when it is one of deep dependencies of target type', () => {
     class Api {
       getUsers() {
         return ['user-1', 'user-2'];
