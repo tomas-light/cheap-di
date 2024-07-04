@@ -1,5 +1,5 @@
-import { findMetadata } from './metadata';
-import { Dependency, ImplementationType } from './types';
+import { findMetadata } from './metadata.js';
+import { Dependency, ImplementationType } from './types.js';
 
 export function isSingleton<T, TClass extends Dependency<T>>(
   constructor: TClass

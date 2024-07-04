@@ -1,5 +1,14 @@
 # Changelog
 
+## 4.1.3
+
+🔨🐛 fixed issue with esm imports that comes in v4.1.2:
+```txt
+ERROR in ../../node_modules/cheap-di/esm/index.js 1:0-32
+Module not found: Error: Can't resolve './cheapDiSymbol' in '.../node_modules/cheap-di/esm'
+Did you mean 'cheapDiSymbol.js'?
+```
+
 ## 4.1.2
 
 🐛 fixed issue, when `enrich` method is not called in case of using nested containers (like `useDi` hook

@@ -1,5 +1,5 @@
-import { saveConstructorMetadata } from '../metadata';
-import { ImplementationType, SomeDependency } from '../types';
+import { saveConstructorMetadata } from '../metadata.js';
+import { ImplementationType, SomeDependency } from '../types.js';
 
 export interface InjectDecorator {
   <T>(

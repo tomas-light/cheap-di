@@ -1,6 +1,5 @@
 import {
   Constructor,
-  Container,
   ContainerImpl,
   DependencyRegistrator,
   isSingleton,
